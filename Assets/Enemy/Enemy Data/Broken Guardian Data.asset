@@ -10,13 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 21ff5c059d1982e4d842f211a5493c88, type: 3}
-  m_Name: GuardianData
+  m_Name: Broken Guardian Data
   m_EditorClassIdentifier: Assembly-CSharp::GuardianDataManager
-  poise: 0
+  poise: 2
   enemyName: Broken Guardian
   enemyHealth: 180
   enemyStamina: 100
   enemyDefense: 25
+  enemySpeed: 10
   enemyMinAttackPower: 12
   enemyMaxAttackPower: 14
   enemyID: 22601

@@ -21,8 +21,9 @@ public class GuardianDataManager : ScriptableObject
     public float enemyHealth;
     public float enemyStamina;
     public float enemyDefense;
+    public float enemySpeed;
 
-    [Header("Enemy Combat")]
+    [Header("Enemy Base Attack")]
     public float enemyMinAttackPower;
     public float enemyMaxAttackPower;
     
