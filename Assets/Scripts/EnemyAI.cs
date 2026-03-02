@@ -12,6 +12,7 @@ public class EnemyAI : MonoBehaviour
     }
     public Transform player;
     public GuardianDataManager guardianData;
+    public AttackRandomizer attackRandomizer;
   
     [SerializeField] private float enemyHealth;
     [SerializeField] private float enemyMinAttackPower;
