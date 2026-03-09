@@ -1,9 +1,13 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
-public class EnemyAI : MonoBehaviour
+public class EnemyAI : MonoBehaviour, IDamageable
 {
-
+    private HashSet<IDamageable> alreadyhit = new HashSet<IDamageable>();
     public enum PhaseLevel
     {
         One,
@@ -13,26 +17,40 @@ public class EnemyAI : MonoBehaviour
     public Transform player;
     public GuardianDataManager guardianData;
     public AttackRandomizer attackRandomizer;
-  
-    [SerializeField] private float enemyHealth;
+    PlayerMovementScript playerMovementScript;
+    [SerializeField] private float enemyCurrentHealth;
+    [SerializeField] private float enemyMaxHealth;
     [SerializeField] private float enemyMinAttackPower;
     [SerializeField] private float enemyMaxAttackPower;
     [SerializeField] private float enemyDefense;
+    [SerializeField] private float enemyMinAP;
+    [SerializeField] private float enemyMaxAP;
     [SerializeField] private float enemySpeed;
+    private float enemyDamage;
 
-     private float enemyDamage;
+    public static event Action onEnemyDeath;
+    public static event Action<float> onEnemyAttack;
+   
 
     private UnityEngine.AI.NavMeshAgent navMeshAgent;
 
     int strafeDirection = 1;
+    private bool isAttacking;
+    private bool isInCombat;
 
     private void Awake()
     {
         navMeshAgent = GetComponent<UnityEngine.AI.NavMeshAgent>();
 
-        enemyHealth = guardianData.enemyHealth;
+        enemyMaxHealth = guardianData.enemyHealth;
+        enemyCurrentHealth = enemyMaxHealth;
         enemyDefense = guardianData.enemyDefense;
         enemySpeed = guardianData.enemySpeed;
+        enemyMinAP = guardianData.enemyMinAttackPower;
+        enemyMaxAP = guardianData.enemyMaxAttackPower;
+
+
+
     }
     private void Start()
     {
@@ -49,7 +67,7 @@ public class EnemyAI : MonoBehaviour
     }
     void Update()
     {
-        enemyDamage = Random.Range(guardianData.enemyMinAttackPower, guardianData.enemyMaxAttackPower);
+        enemyDamage = Random.Range(enemyMinAP, enemyMaxAP);
         EnemyStrafing();
         
     }
@@ -76,9 +94,35 @@ public class EnemyAI : MonoBehaviour
 
 
     }
+    void EnemyDeath()
+    {
+        if(enemyCurrentHealth <= 0)
+        {
+            StartCoroutine(EnemyDeathAnimation());
+        }
+    }
     void SwitchStrafeDirection()
     {
         strafeDirection *= -1;
+
     }
 
+    public void TakeDamage()
+    {
+        float attAndDefSum = playerMovementScript.playerDamage + enemyDefense;
+        float damagetakenValue = playerMovementScript.playerDamage * playerMovementScript.playerDamage / attAndDefSum;
+        enemyCurrentHealth -= damagetakenValue;
+    }
+    public void EnemyAttacK()
+    {
+        alreadyhit.Clear();
+        isAttacking = true;
+    }
+  
+    IEnumerator EnemyDeathAnimation()
+    {
+        yield return new WaitForSeconds(2f);
+        gameObject.SetActive(false);
+    }
+   
 }

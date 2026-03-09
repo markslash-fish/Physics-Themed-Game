@@ -21,8 +21,8 @@ public class PlayerMovementScript : MonoBehaviour
 
     [SerializeField] private LayerMask groundMask;
     [SerializeField] private float groundDistance = 0.1f;
-    [SerializeField] private Transform groundCheck; 
-
+    [SerializeField] private Transform groundCheck;
+    [SerializeField] public float playerDamage;
     Rigidbody rb;
 
 
@@ -34,6 +34,7 @@ public class PlayerMovementScript : MonoBehaviour
     }
     private void OnEnable()
     {
+        playerDamage = 10f;
         playerInputReader.onMove += PlayerMove;
         playerInputReader.jumpStarted += PlayerJump;
     }

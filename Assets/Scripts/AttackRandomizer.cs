@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class AttackRandomizer : MonoBehaviour
 {
@@ -27,7 +28,7 @@ public class AttackRandomizer : MonoBehaviour
             UpdateWeightValue();
 
             // Wait 4 seconds before the next roll
-            yield return new WaitForSeconds(4f);
+            yield return new WaitForSeconds(Random.Range(4f, 5f));
         }
     }
 
