@@ -7,40 +7,41 @@ using Random = UnityEngine.Random;
 
 public class EnemyAI : MonoBehaviour, IDamageable
 {
-    private HashSet<IDamageable> alreadyhit = new HashSet<IDamageable>();
-    public enum PhaseLevel
-    {
-        One,
-        Two,
-        Three
-    }
+
     public Transform player;
     public GuardianDataManager guardianData;
-    public AttackRandomizer attackRandomizer;
+    EnemyAttackController attackController;
+    EnemyStateHandler stateHandler;
     PlayerMovementScript playerMovementScript;
+
+
     [SerializeField] private float enemyCurrentHealth;
-    [SerializeField] private float enemyMaxHealth;
-    [SerializeField] private float enemyMinAttackPower;
-    [SerializeField] private float enemyMaxAttackPower;
-    [SerializeField] private float enemyDefense;
-    [SerializeField] private float enemyMinAP;
-    [SerializeField] private float enemyMaxAP;
+    [SerializeField] private int enemyMaxHealth;
+    [SerializeField] private int enemyDefense;
+    [SerializeField] private int enemyMinAP;
+    [SerializeField] private int enemyMaxAP;
     [SerializeField] private float enemySpeed;
     private float enemyDamage;
 
-    public static event Action onEnemyDeath;
-    public static event Action<float> onEnemyAttack;
    
+  
 
+    private Animator anim;
     private UnityEngine.AI.NavMeshAgent navMeshAgent;
 
     int strafeDirection = 1;
-    private bool isAttacking;
-    private bool isInCombat;
+    [SerializeField] private float strafeDistance = 6f;
+
+
+
+    public Vector3 dirToPlayer;
+
 
     private void Awake()
     {
         navMeshAgent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        attackController = GetComponent<EnemyAttackController>();
+        stateHandler = GetComponent<EnemyStateHandler>();
 
         enemyMaxHealth = guardianData.enemyHealth;
         enemyCurrentHealth = enemyMaxHealth;
@@ -50,79 +51,107 @@ public class EnemyAI : MonoBehaviour, IDamageable
         enemyMaxAP = guardianData.enemyMaxAttackPower;
 
 
+    }
+    private void OnEnable()
+    {
+     
 
     }
     private void Start()
     {
-        
-        
-       
+
+
+
         navMeshAgent.speed = enemySpeed;
         navMeshAgent.acceleration = enemySpeed * 2f;
-        
-       
-        
+
+
+
         InvokeRepeating("SwitchStrafeDirection", 2f, 5f);
-       
+
     }
     void Update()
     {
+
+
         enemyDamage = Random.Range(enemyMinAP, enemyMaxAP);
+
+       
+
+
+            CalculateDistancefromPlayer();
         EnemyStrafing();
-        
+
     }
+
+
     public void EnemyStrafing()
     {
         if (player == null) return;
 
-        // 1. Calculate direction vectors
-        Vector3 dirToPlayer = (player.position - transform.position).normalized;
+
+        dirToPlayer = (player.position - transform.position).normalized;
         Vector3 sideVector = Vector3.Cross(Vector3.up, dirToPlayer);
-        float strafeDistance = 10f;
        
-       
+
+
         Vector3 orbitPoint = player.position - (dirToPlayer * strafeDistance);
         Vector3 targetpos = orbitPoint + (sideVector * strafeDirection * 5f);
-         
-    
 
-    // 3. Update Destination
-    navMeshAgent.SetDestination(targetpos);
+
+
+
+        navMeshAgent.SetDestination(targetpos);
 
         Quaternion lookrotation = Quaternion.LookRotation(new Vector3(dirToPlayer.x, 0, dirToPlayer.z));
         transform.rotation = Quaternion.Slerp(transform.rotation, lookrotation, Time.deltaTime * 5f);
+      
 
 
     }
-    void EnemyDeath()
-    {
-        if(enemyCurrentHealth <= 0)
-        {
-            StartCoroutine(EnemyDeathAnimation());
-        }
-    }
+
     void SwitchStrafeDirection()
     {
         strafeDirection *= -1;
 
     }
+ 
 
-    public void TakeDamage()
+    public void TakeDamage(int damage)
     {
-        float attAndDefSum = playerMovementScript.playerDamage + enemyDefense;
-        float damagetakenValue = playerMovementScript.playerDamage * playerMovementScript.playerDamage / attAndDefSum;
-        enemyCurrentHealth -= damagetakenValue;
+        int damageTaken = damage ^ 2 / damage + enemyDefense;
+        enemyCurrentHealth -= damageTaken;
+        if (enemyCurrentHealth <= 0) stateHandler.enemyState = EnemyStateHandler.EnemyState.OnDeath;
     }
-    public void EnemyAttacK()
+    public void EnemyAttack()
     {
-        alreadyhit.Clear();
-        isAttacking = true;
+
+        if (attackController.isBusy) navMeshAgent.isStopped = true;
+
+
     }
-  
+
     IEnumerator EnemyDeathAnimation()
     {
         yield return new WaitForSeconds(2f);
         gameObject.SetActive(false);
+    }
+    void CalculateDistancefromPlayer()
+    {
+        dirToPlayer = (player.position - transform.position).normalized;
+    }
+
+    public void EnemyDeath()
+    {
+        gameObject.SetActive(false);
+    }
+    void ResetState()
+    {
+        if(dirToPlayer.magnitude < strafeDistance)
+        {
+            EnemyStrafing();
+        }
+      
     }
    
 }

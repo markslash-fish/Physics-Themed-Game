@@ -34,7 +34,9 @@ public class PlayerMovementScript : MonoBehaviour
     }
     private void OnEnable()
     {
+
         playerDamage = 10f;
+        playerInputReader.onLightAttackStarted += PlayerLightAttack;
         playerInputReader.onMove += PlayerMove;
         playerInputReader.jumpStarted += PlayerJump;
     }
@@ -44,7 +46,7 @@ public class PlayerMovementScript : MonoBehaviour
     }
     private void Update()
     {
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+       
         float x = movement.x;
         float z = movement.y;
 
@@ -67,6 +69,10 @@ public class PlayerMovementScript : MonoBehaviour
             rb.AddForce(Vector3.up * jumpHeight, ForceMode.Impulse);
         }
       
+    }
+  void PlayerLightAttack()
+    {
+        Debug.Log("Attack");
     }
 
 
