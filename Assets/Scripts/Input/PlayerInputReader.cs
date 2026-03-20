@@ -17,6 +17,7 @@ public class PlayerInputReader : MonoBehaviour, InputSystem_Actions.IPlayerActio
     public UnityAction onLightAttackFinished;
     public UnityAction onHeavyAttackStarted;
     public UnityAction onHeavyAttackFinished;
+    public UnityAction onSprint;
 
     private InputAction moveAction;
     private InputAction jumpAction;
@@ -26,8 +27,10 @@ public class PlayerInputReader : MonoBehaviour, InputSystem_Actions.IPlayerActio
     private InputAction healAction;
     private InputAction lAttackAction;
     private InputAction hAttackAction;
+    private InputAction sprintAction;
     void OnEnable()
     {
+        sprintAction = inputActionAsset.FindAction("Sprint");
         moveAction = inputActionAsset.FindAction("Move");
         jumpAction = inputActionAsset.FindAction("Jump");
         dodgeAction = inputActionAsset.FindAction("Dodge");
@@ -72,6 +75,12 @@ public class PlayerInputReader : MonoBehaviour, InputSystem_Actions.IPlayerActio
         hAttackAction.started += OnHeavyAttack;
         hAttackAction.performed += OnHeavyAttack;
         hAttackAction.canceled += OnHeavyAttack;
+
+
+        sprintAction.started += OnMove;
+        sprintAction.performed += OnMove;
+        sprintAction.canceled += OnMove;
+
 
         moveAction.Enable();
         jumpAction.Enable();
@@ -120,6 +129,11 @@ public class PlayerInputReader : MonoBehaviour, InputSystem_Actions.IPlayerActio
         hAttackAction.started -= OnHeavyAttack;
         hAttackAction.performed -= OnHeavyAttack;
         hAttackAction.canceled -= OnHeavyAttack;
+
+        sprintAction.started -= OnMove;
+        sprintAction.performed -= OnMove;
+        sprintAction.canceled -= OnMove;
+
     }
     public void OnBlock(InputAction.CallbackContext context)
     {
@@ -138,7 +152,7 @@ public class PlayerInputReader : MonoBehaviour, InputSystem_Actions.IPlayerActio
 
     public void OnHeavyAttack(InputAction.CallbackContext context)
     {
-        if (onHeavyAttackStarted != null && context.started) onHeavyAttackStarted.Invoke();
+        if (onHeavyAttackStarted != null && context.performed) onHeavyAttackStarted.Invoke();
     }
 
     public void OnJump(InputAction.CallbackContext context)
@@ -148,7 +162,7 @@ public class PlayerInputReader : MonoBehaviour, InputSystem_Actions.IPlayerActio
 
     public void OnLightAttack(InputAction.CallbackContext context)
     {
-        if (onLightAttackStarted != null && context.started) onLightAttackStarted.Invoke();
+        if (onLightAttackStarted != null && context.canceled) onLightAttackStarted.Invoke();
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -161,5 +175,10 @@ public class PlayerInputReader : MonoBehaviour, InputSystem_Actions.IPlayerActio
         if (onUniqueSkillStarted != null && context.started) onUniqueSkillStarted.Invoke();
     }
 
-   
+    public void OnSprint(InputAction.CallbackContext context)
+    {
+        if (onSprint != null && context.started) onSprint.Invoke();
+    }
+
+
 }
