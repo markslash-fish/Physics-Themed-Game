@@ -1,16 +1,20 @@
-using System.Numerics;
+
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    
     [SerializeField] PlayerInputReader playerInputReader;
     [SerializeField] private float movementSpeed = 10f;
     [SerializeField] private float jumpHeight = 5f;
+    [SerializeField] private float walkSpeed = 5f;
+    [SerializeField] private float runSpeed = 10f;
 
     public UnityEngine.Vector2 movement;
     private Rigidbody rb;
     public UnityEngine.Vector3 move;
     public bool isGrounded;
+    public bool isRunning;
 
     [SerializeField] private Transform groundCheck;
     public LayerMask groundMask;
@@ -18,12 +22,14 @@ public class Player : MonoBehaviour
 
     void OnEnable()
     {
+        playerInputReader.onSprint += SetSprint;
         playerInputReader.onLightAttackStarted += PlayerAttack;
         playerInputReader.onMove += PlayerMove;
         playerInputReader.jumpStarted += PlayerJump;
     }
     void OnDisable()
     {
+        playerInputReader.onSprint -= SetSprint;
         playerInputReader.onMove -= PlayerMove;
         playerInputReader.jumpStarted -= PlayerJump;
         playerInputReader.onLightAttackStarted -= PlayerAttack;
@@ -43,25 +49,45 @@ public class Player : MonoBehaviour
     }
     void FixedUpdate()
     {
-        UnityEngine.Vector3 moveposition = rb.position + move * movementSpeed * Time.deltaTime; ;
+        float currentSpeed = isRunning ? 10f : 5f;
 
+        Vector3 moveposition = rb.position + move * currentSpeed * Time.deltaTime;
         rb.MovePosition(moveposition);
     }
-    void PlayerMove(UnityEngine.Vector2 input)
-    {
-        movement = input;
-    }
-    void PlayerJump()
-    {
-        if (isGrounded)
+        void PlayerMove(UnityEngine.Vector2 input)
         {
-            rb.AddForce(UnityEngine.Vector3.up * jumpHeight, ForceMode.Impulse);
+            movement = input;
+        }
+        void PlayerJump()
+        {
+            if (isGrounded)
+            {
+                rb.AddForce(UnityEngine.Vector3.up * jumpHeight, ForceMode.Impulse);
+            }
+        }
+        void PlayerAttack()
+        {
+        
+        }   
+        void SetSprint(bool value)
+    {
+        isRunning = value;
+    }
+    public Transform target;
+
+void LateUpdate()
+{
+    if (target != null)
+    {
+        Vector3 direction = (target.position - transform.position).normalized;
+        direction.y = 0;
+
+        if (direction != Vector3.zero)
+        {
+            Quaternion rot = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * 10f);
         }
     }
-    void PlayerAttack()
-    {
-      
-    }   
-    
+}
 
 }

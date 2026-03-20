@@ -155,7 +155,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8033735790047714470}
   - component: {fileID: 4731200433071499338}
-  - component: {fileID: 1520481801237819341}
   - component: {fileID: 8636159683605696304}
   m_Layer: 0
   m_Name: Camera Lock-in
@@ -222,25 +221,6 @@ MonoBehaviour:
       BarrelClipping: 0.25
       Anamorphism: 0
   BlendHint: 0
---- !u!114 &1520481801237819341
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1293705005548607733}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b617507da6d07e749b7efdb34e1173e1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineFollow
-  TrackerSettings:
-    BindingMode: 4
-    PositionDamping: {x: 1, y: 1, z: 1}
-    AngularDampingMode: 0
-    RotationDamping: {x: 1, y: 1, z: 1}
-    QuaternionDamping: 1
-  FollowOffset: {x: 0, y: 0, z: -10}
 --- !u!114 &8636159683605696304
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -280,7 +260,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3273584309349883016}
   - component: {fileID: 4588378252448832487}
-  - component: {fileID: -4374590416316671453}
   - component: {fileID: 4190110583866383156}
   m_Layer: 0
   m_Name: Player
@@ -334,40 +313,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!114 &-4374590416316671453
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3272960668794980503}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8fac3b7f0ed6934c910a835aca648e5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovementScript
-  moveSpd: 10
-  jumpHeight: 5
-  accelerationSpd: 20
-  decelerationSpd: 20
-  isWalking: 0
-  isGrounded: 0
-  isIdle: 0
-  playerCamera: {fileID: 0}
-  mouseSensitivity: 150
-  verticalClamp: 90
-  cameraPitch: 0
-  lastClickedTime: 0
-  comboResetTime: 0.5
-  comboStep: 0
-  attackDelay: 0.2
-  canAttack: 0
-  isAttacking: 0
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 64
-  groundDistance: 0.1
-  groundCheck: {fileID: 5070138359262705013}
 --- !u!114 &4190110583866383156
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -382,6 +327,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.PlayerInput
   m_Actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
   m_DeviceLostEvent:
     m_PersistentCalls:
       m_Calls: []

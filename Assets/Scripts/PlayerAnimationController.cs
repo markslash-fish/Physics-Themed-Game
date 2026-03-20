@@ -38,6 +38,8 @@ public class PlayerAnimationController : MonoBehaviour
     {
         SetIdle();
         SetWalking();
+
+        
     }
 
     public void SetIdle()
@@ -48,12 +50,16 @@ public class PlayerAnimationController : MonoBehaviour
     }
 
     
-    public void SetWalking()
-    {
-        isWalking = player.move.magnitude > 0;
-        animator.SetBool("isWalking", isWalking);
-        
-    }
+public void SetWalking()
+{
+    float speed = player.move.magnitude;
+
+    bool isWalking = speed > 0 && !player.isRunning;
+    bool isRunning = speed > 0 && player.isRunning;
+
+    animator.SetBool("isWalking", isWalking);
+    animator.SetBool("isRunning", isRunning);
+}
 
     public void SetLightAttack()
     {
@@ -61,8 +67,8 @@ public class PlayerAnimationController : MonoBehaviour
     
          if (isAttacking == false)
           comboStep++;
-
-        {
+    
+     
             if (comboStep == 1)
         {
 
@@ -79,9 +85,7 @@ public class PlayerAnimationController : MonoBehaviour
             animator.SetInteger("LightAttack", 3);
             isAttacking = true;
         }
-        }
-
-            
+              
     }
 
     void ResetCombo()
@@ -95,6 +99,7 @@ public class PlayerAnimationController : MonoBehaviour
     {
         isAttacking = false;
     }
+
     
 }
     

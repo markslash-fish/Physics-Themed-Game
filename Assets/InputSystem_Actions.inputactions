@@ -16,6 +16,15 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "Sprint",
+                    "type": "Button",
+                    "id": "d481545d-ad2c-4632-bc4e-ad003917ba7e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Jump",
                     "type": "Button",
                     "id": "a8b3cd94-468e-48e5-8c51-f97b24fa0b21",
@@ -73,6 +82,15 @@
                     "name": "Unique Skill",
                     "type": "Button",
                     "id": "4ba5953f-36dc-4a10-b8fb-fdd28b680abc",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "LockOn",
+                    "type": "Button",
+                    "id": "aaa4c7dc-9150-40b7-82b6-55dbc92a7465",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -253,6 +271,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "Unique Skill",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5e1df253-0745-4c94-a4ee-40a5fca10148",
+                    "path": "<Keyboard>/leftShift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Sprint",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4b1839b3-16d4-4b55-953f-5e3fef6420aa",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LockOn",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
