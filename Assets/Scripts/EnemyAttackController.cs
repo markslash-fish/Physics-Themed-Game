@@ -11,7 +11,7 @@ public class EnemyAttackController : MonoBehaviour
     [SerializeField] private EnemyAI enemyAI;
     [SerializeField] private EnemyStateHandler stateHandler;
 
-    public Transform player;
+  
     public List<CombatMove> moveset;
     public List<CombatMove> movesInCooldown = new List<CombatMove>();
     private Animator animator;
@@ -22,7 +22,7 @@ public class EnemyAttackController : MonoBehaviour
 
     private void Awake()
     {
-       if(!isBusy) InvokeRepeating("ChooseAction", 1f, 1.2f);
+       if(!isBusy | enemyAI.player != null) InvokeRepeating("ChooseAction", 1f, 1.2f);
 
     }
     private void Start()
@@ -40,8 +40,8 @@ public class EnemyAttackController : MonoBehaviour
     }
    public  void ChooseAction()
     {
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-        distance1 = enemyAI.dirToPlayer.magnitude;
+        float distanceToPlayer = Vector3.Distance(transform.position, enemyAI.player.position);
+        distance1 = distanceToPlayer;
         if (!isBusy)
         {
             DecideAction(distanceToPlayer);
@@ -87,6 +87,7 @@ public class EnemyAttackController : MonoBehaviour
     }
    public void ExecuteMove(CombatMove move)
     {
+        isBusy = true;
         StartCoroutine(MoveCooldown(move));
         stateHandler.enemyState = EnemyStateHandler.EnemyState.IsAttacking;
         Debug.Log(move.moveName);

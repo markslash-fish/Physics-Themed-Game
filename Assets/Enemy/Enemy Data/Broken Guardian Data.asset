@@ -17,7 +17,7 @@ MonoBehaviour:
   enemyHealth: 180
   enemyStamina: 100
   enemyDefense: 25
-  enemySpeed: 5
+  enemySpeed: 3
   enemyMinAttackPower: 12
   enemyMaxAttackPower: 14
   enemyID: 22601

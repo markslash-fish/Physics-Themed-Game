@@ -23,18 +23,20 @@ public class EnemyAI : MonoBehaviour, IDamageable
     [SerializeField] private float enemySpeed;
     private float enemyDamage;
 
-   
-  
+
+
 
     private Animator anim;
     private UnityEngine.AI.NavMeshAgent navMeshAgent;
 
     int strafeDirection = 1;
     [SerializeField] private float strafeDistance = 6f;
+    public float rayDistance = 0f;
+    public Vector3 rayOffset;
 
 
 
-    public Vector3 dirToPlayer;
+    private Vector3 dirToPlayer;
 
 
     private void Awake()
@@ -54,7 +56,7 @@ public class EnemyAI : MonoBehaviour, IDamageable
     }
     private void OnEnable()
     {
-     
+
 
     }
     private void Start()
@@ -66,8 +68,8 @@ public class EnemyAI : MonoBehaviour, IDamageable
         navMeshAgent.acceleration = enemySpeed * 2f;
 
 
-
-        InvokeRepeating("SwitchStrafeDirection", 2f, 5f);
+        if(!attackController.isBusy | player == null) 
+        InvokeRepeating("SwitchStrafeDirection", 3f, 5f);
 
     }
     void Update()
@@ -76,10 +78,13 @@ public class EnemyAI : MonoBehaviour, IDamageable
 
         enemyDamage = Random.Range(enemyMinAP, enemyMaxAP);
 
+
+        if(!attackController.isBusy)
+        {
+            SetTarget();
+        }
        
-
-
-            CalculateDistancefromPlayer();
+        CalculateDistancefromPlayer();
         EnemyStrafing();
 
     }
@@ -90,12 +95,12 @@ public class EnemyAI : MonoBehaviour, IDamageable
         if (player == null) return;
 
 
-        dirToPlayer = (player.position - transform.position).normalized;
+        dirToPlayer = (player.transform.position - transform.position).normalized;
         Vector3 sideVector = Vector3.Cross(Vector3.up, dirToPlayer);
-       
 
 
-        Vector3 orbitPoint = player.position - (dirToPlayer * strafeDistance);
+
+        Vector3 orbitPoint = player.transform.position - (dirToPlayer * strafeDistance);
         Vector3 targetpos = orbitPoint + (sideVector * strafeDirection * 5f);
 
 
@@ -105,7 +110,7 @@ public class EnemyAI : MonoBehaviour, IDamageable
 
         Quaternion lookrotation = Quaternion.LookRotation(new Vector3(dirToPlayer.x, 0, dirToPlayer.z));
         transform.rotation = Quaternion.Slerp(transform.rotation, lookrotation, Time.deltaTime * 5f);
-      
+
 
 
     }
@@ -115,7 +120,7 @@ public class EnemyAI : MonoBehaviour, IDamageable
         strafeDirection *= -1;
 
     }
- 
+
 
     public void TakeDamage(int damage)
     {
@@ -138,7 +143,7 @@ public class EnemyAI : MonoBehaviour, IDamageable
     }
     void CalculateDistancefromPlayer()
     {
-        dirToPlayer = (player.position - transform.position).normalized;
+        dirToPlayer = (player.transform.position - transform.position).normalized;
     }
 
     public void EnemyDeath()
@@ -147,11 +152,32 @@ public class EnemyAI : MonoBehaviour, IDamageable
     }
     void ResetState()
     {
-        if(dirToPlayer.magnitude < strafeDistance)
+        if (dirToPlayer.magnitude < strafeDistance)
         {
             EnemyStrafing();
         }
-      
+
     }
-   
+    void SetTarget()
+    {
+
+        Ray ray = new Ray(transform.position + rayOffset, transform.forward * rayDistance);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit))
+        {
+            if (hit.collider.CompareTag("Player"))
+            {
+                player = hit.transform;
+                stateHandler.enemyState = EnemyStateHandler.EnemyState.IsStrafing;
+               
+            }
+        }
+    }
+    private void OnDrawGizmos()
+    {
+        // Ray1
+        Gizmos.color = Color.red;
+        Gizmos.DrawRay(transform.position + rayOffset, transform.forward * rayDistance);
+
+    }
 }

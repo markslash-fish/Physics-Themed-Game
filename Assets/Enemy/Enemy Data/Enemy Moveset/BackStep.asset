@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: BackStep
   m_EditorClassIdentifier: Assembly-CSharp::CombatMove
   moveName: Backstep
-  minRange: 3
-  maxRange: 7
-  baseWeight: 55
+  minRange: 0
+  maxRange: 4
+  baseWeight: 60
   animTrigger: isBackStepping
   cooldown: 3.5
