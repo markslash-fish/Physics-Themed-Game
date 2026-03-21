@@ -21,8 +21,8 @@ public class PlayerMovementScript : MonoBehaviour
 
     [SerializeField] private LayerMask groundMask;
     [SerializeField] private float groundDistance = 0.1f;
-    [SerializeField] private Transform groundCheck; 
-
+    [SerializeField] private Transform groundCheck;
+    [SerializeField] public float playerDamage;
     Rigidbody rb;
 
 
@@ -34,6 +34,9 @@ public class PlayerMovementScript : MonoBehaviour
     }
     private void OnEnable()
     {
+
+        playerDamage = 10f;
+        playerInputReader.onLightAttackStarted += PlayerLightAttack;
         playerInputReader.onMove += PlayerMove;
         playerInputReader.jumpStarted += PlayerJump;
     }
@@ -44,7 +47,7 @@ public class PlayerMovementScript : MonoBehaviour
     }
     private void Update()
     {
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+       
         float x = movement.x;
         float z = movement.y;
 
@@ -67,6 +70,10 @@ public class PlayerMovementScript : MonoBehaviour
             rb.AddForce(Vector3.up * jumpHeight, ForceMode.Impulse);
         }
       
+    }
+  void PlayerLightAttack()
+    {
+        Debug.Log("Attack");
     }
 
 

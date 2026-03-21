@@ -1,84 +1,181 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
-public class EnemyAI : MonoBehaviour
+public class EnemyAI : MonoBehaviour, IDamageable
 {
 
-    public enum PhaseLevel
-    {
-        One,
-        Two,
-        Three
-    }
     public Transform player;
     public GuardianDataManager guardianData;
-    public AttackRandomizer attackRandomizer;
-  
-    [SerializeField] private float enemyHealth;
-    [SerializeField] private float enemyMinAttackPower;
-    [SerializeField] private float enemyMaxAttackPower;
-    [SerializeField] private float enemyDefense;
+    EnemyAttackController attackController;
+    EnemyStateHandler stateHandler;
+   
+
+    [Header("EnemyStats")]
+    [SerializeField] private float enemyCurrentHealth;
+    [SerializeField] private int enemyMaxHealth;
+    [SerializeField] private int enemyCurrentStamina;
+    [SerializeField] private int enemyMaxStamina;
+    [SerializeField] private int enemyDefense;
+    [SerializeField] private int enemyMinAP;
+    [SerializeField] private int enemyMaxAP;
     [SerializeField] private float enemySpeed;
 
-     private float enemyDamage;
+    private float enemyDamage;
 
+
+
+
+    private Animator anim;
     private UnityEngine.AI.NavMeshAgent navMeshAgent;
 
+
     int strafeDirection = 1;
+    [SerializeField] private float strafeDistance = 6f;
+    [Header("Raycast Settings")]
+    public float rayDistance = 0f;
+    public Vector3 rayOffset;
+
+
+
+
+    private Vector3 dirToPlayer;
+
 
     private void Awake()
     {
         navMeshAgent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        attackController = GetComponent<EnemyAttackController>();
+        stateHandler = GetComponent<EnemyStateHandler>();
 
-        enemyHealth = guardianData.enemyHealth;
+        enemyMaxHealth = guardianData.enemyHealth;
+        enemyMaxStamina = guardianData.enemyStamina;
+        enemyCurrentHealth = enemyMaxHealth;
+        enemyCurrentStamina = enemyMaxStamina;
         enemyDefense = guardianData.enemyDefense;
         enemySpeed = guardianData.enemySpeed;
+        enemyMinAP = guardianData.enemyMinAttackPower;
+        enemyMaxAP = guardianData.enemyMaxAttackPower;
+
+
+    }
+    private void OnEnable()
+    {
+        EnemyStateHandler.onIdle += StopNavMesh;
+        EnemyStateHandler.onStrafe += EnemyStrafing;
+        EnemyStateHandler.onAttack += StopNavMesh;
+        EnemyStateHandler.onExhaust += StopNavMesh;
+        EnemyStateHandler.onDeath += EnemyDeath;
     }
     private void Start()
     {
-        
-        
-       
+
+
+
         navMeshAgent.speed = enemySpeed;
         navMeshAgent.acceleration = enemySpeed * 2f;
-        
-       
-        
-        InvokeRepeating("SwitchStrafeDirection", 2f, 5f);
-       
+
+
+        if (!attackController.isBusy | player == null)
+            InvokeRepeating("SwitchStrafeDirection", 3f, 5f);
     }
     void Update()
     {
-        enemyDamage = Random.Range(guardianData.enemyMinAttackPower, guardianData.enemyMaxAttackPower);
-        EnemyStrafing();
-        
+
+
+        enemyDamage = Random.Range(enemyMinAP, enemyMaxAP);
+
+
+        if (!attackController.isBusy)
+        {
+            SetTarget();
+        }
+
+        CalculateDistancefromPlayer();
     }
+    public void StopNavMesh()
+    {
+        navMeshAgent.isStopped = true;
+    }
+
     public void EnemyStrafing()
     {
         if (player == null) return;
 
-        // 1. Calculate direction vectors
-        Vector3 dirToPlayer = (player.position - transform.position).normalized;
-        Vector3 sideVector = Vector3.Cross(Vector3.up, dirToPlayer);
-        float strafeDistance = 10f;
-       
-       
-        Vector3 orbitPoint = player.position - (dirToPlayer * strafeDistance);
-        Vector3 targetpos = orbitPoint + (sideVector * strafeDirection * 5f);
-         
-    
 
-    // 3. Update Destination
-    navMeshAgent.SetDestination(targetpos);
+        dirToPlayer = (player.transform.position - transform.position).normalized;
+        Vector3 sideVector = Vector3.Cross(Vector3.up, dirToPlayer);
+
+
+
+        Vector3 orbitPoint = player.transform.position - (dirToPlayer * strafeDistance);
+        Vector3 targetpos = orbitPoint + (sideVector * strafeDirection * 5f);
+
+
+
+
+        navMeshAgent.SetDestination(targetpos);
 
         Quaternion lookrotation = Quaternion.LookRotation(new Vector3(dirToPlayer.x, 0, dirToPlayer.z));
         transform.rotation = Quaternion.Slerp(transform.rotation, lookrotation, Time.deltaTime * 5f);
 
 
+
+    }
+    public void EnemyDeath()
+    {
+        gameObject.SetActive(false);
+    }
+    void ResetState()
+    {
+        if (dirToPlayer.magnitude < strafeDistance)
+        {
+            EnemyStrafing();
+        }
+
+    }
+    void SetTarget()
+    {
+
+        Ray ray = new Ray(transform.position + rayOffset, transform.forward * rayDistance);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit))
+        {
+            if (hit.collider.CompareTag("Player"))
+            {
+                player = hit.transform;
+                stateHandler.enemyState = EnemyStateHandler.EnemyState.IsStrafing;
+               
+            }
+        }
+    }
+    private void OnDrawGizmos()
+    {
+        // Ray1
+        Gizmos.color = Color.red;
+        Gizmos.DrawRay(transform.position + rayOffset, transform.forward * rayDistance);
+
     }
     void SwitchStrafeDirection()
     {
         strafeDirection *= -1;
+
+    }
+    public void TakeDamage(int damage)
+    {
+        int healthDamage = damage ^ 2 / damage + enemyDefense;
+        int staminaDamage = damage/2;
+        enemyCurrentHealth -= healthDamage;
+        enemyCurrentStamina -= staminaDamage;
+        if (enemyCurrentHealth <= 0) stateHandler.enemyState = EnemyStateHandler.EnemyState.OnDeath;
+        if (enemyCurrentStamina <= 0) stateHandler.enemyState = EnemyStateHandler.EnemyState.IsExhausted;
+    }
+    void CalculateDistancefromPlayer()
+    {
+        dirToPlayer = (player.transform.position - transform.position).normalized;
     }
 
 }
