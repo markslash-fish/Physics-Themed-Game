@@ -1,8 +1,12 @@
 using UnityEngine;
+using Unity.Cinemachine;
 
 public class CameraLockOn : MonoBehaviour
 {
+    [SerializeField] CinemachineCamera thirdPersonCam;
+    [SerializeField] CinemachineCamera lockOnCam;
     [SerializeField] PlayerInputReader input;
+
     public Player playerScript;
     public Transform player;
     public Transform currentTarget;
@@ -13,42 +17,36 @@ public class CameraLockOn : MonoBehaviour
 
     private bool isLocked;
 
-void Update()
-{
-    if (isLocked && currentTarget != null)
+    void Update()
     {
-        UpdateLockPosition();
+        if (isLocked && currentTarget != null)
+        {
+            UpdateLockPosition();
+        }
     }
-}
 
     void FindTarget()
     {
-        
-        Collider[] hits = Physics.OverlapSphere(player.position, lockRange);
+        Ray ray = new Ray(player.position + Vector3.up, player.forward);
+        RaycastHit hit;
 
-        float closestDistance = Mathf.Infinity;
-        Transform bestTarget = null;
+        float radius = 2f;
 
-        foreach (var hit in hits)
+        if (Physics.SphereCast(ray, radius, out hit, lockRange))
         {
-            if (hit.CompareTag("Enemy"))
+            if (hit.collider.CompareTag("Enemy"))
             {
-                float dist = Vector3.Distance(player.position, hit.transform.position);
+                currentTarget = hit.collider.transform;
+                isLocked = true;
 
-                if (dist < closestDistance)
-                {
-                    closestDistance = dist;
-                    bestTarget = hit.transform;
-                }
+                playerScript.target = currentTarget;
+
+                Debug.Log("Locked on: " + currentTarget.name);
             }
         }
 
-        if (bestTarget != null)
-        {
-            currentTarget = bestTarget;
-            isLocked = true;
-            playerScript.target = currentTarget;
-        }
+
+        
     }
 
     void Unlock()
@@ -56,6 +54,9 @@ void Update()
         isLocked = false;
         currentTarget = null;
         playerScript.target = null;
+
+        lockOnCam.Priority = 5;
+        thirdPersonCam.Priority = 20;
     }
 
     void UpdateLockPosition()
