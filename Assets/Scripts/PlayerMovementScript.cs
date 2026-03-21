@@ -42,8 +42,7 @@ public class PlayerMovementScript : MonoBehaviour
     }
     private void OnDisable()
     {
-        playerInputReader.onMove -= PlayerMove;
-        playerInputReader.jumpStarted -= PlayerJump;
+        
     }
     private void Update()
     {
@@ -51,7 +50,7 @@ public class PlayerMovementScript : MonoBehaviour
         float x = movement.x;
         float z = movement.y;
 
-        move = new Vector3(x, 0f, z).normalized;
+        move = new Vector3(x, 0f, z);
     }
     private void FixedUpdate()
     {
