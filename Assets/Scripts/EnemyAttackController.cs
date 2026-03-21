@@ -22,13 +22,14 @@ public class EnemyAttackController : MonoBehaviour
 
     private void Awake()
     {
-       if(!isBusy | enemyAI.player != null) InvokeRepeating("ChooseAction", 1f, 1.2f);
+        enemyAI = GetComponent<EnemyAI>();
+        stateHandler = GetComponent<EnemyStateHandler>();
 
     }
     private void Start()
     {
-        enemyAI = GetComponent<EnemyAI>();
-        stateHandler = GetComponent<EnemyStateHandler>();
+
+        if (!isBusy) InvokeRepeating("ChooseAction", 2f, 3f);
     }
     private void OnEnable()
     {
@@ -40,6 +41,7 @@ public class EnemyAttackController : MonoBehaviour
     }
    public  void ChooseAction()
     {
+      
         float distanceToPlayer = Vector3.Distance(transform.position, enemyAI.player.position);
         distance1 = distanceToPlayer;
         if (!isBusy)
@@ -65,7 +67,7 @@ public class EnemyAttackController : MonoBehaviour
         {
             CalculateTotalWeight();
         }
-        Debug.Log("I found " + availableMoves.Count + " moves in range.");
+        Debug.Log(availableMoves.Count);
     }
     void CalculateTotalWeight()
     {
@@ -87,12 +89,15 @@ public class EnemyAttackController : MonoBehaviour
     }
    public void ExecuteMove(CombatMove move)
     {
+
         isBusy = true;
-        StartCoroutine(MoveCooldown(move));
         stateHandler.enemyState = EnemyStateHandler.EnemyState.IsAttacking;
+      
+        StartCoroutine(MoveCooldown(move));
         Debug.Log(move.moveName);
         
     }
+   
   
    IEnumerator MoveCooldown(CombatMove move)
     {
@@ -101,6 +106,7 @@ public class EnemyAttackController : MonoBehaviour
         movesInCooldown.Remove(move);
 
     }
+    
 
 
 

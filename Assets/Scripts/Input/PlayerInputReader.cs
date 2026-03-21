@@ -4,7 +4,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerInputReader : MonoBehaviour, InputSystem_Actions.IPlayerActions
 {
-    [SerializeField]  InputActionAsset inputActionAsset;
+
+    [SerializeField] InputActionAsset inputActionAsset;
     public UnityAction<Vector2> onMove;
     public UnityAction jumpStarted;
     public UnityAction onDodgeStarted;
@@ -17,7 +18,8 @@ public class PlayerInputReader : MonoBehaviour, InputSystem_Actions.IPlayerActio
     public UnityAction onLightAttackFinished;
     public UnityAction onHeavyAttackStarted;
     public UnityAction onHeavyAttackFinished;
-    public UnityAction onSprint;
+    public UnityAction<bool> onSprint;
+    public UnityAction onLockOn;
 
     private InputAction moveAction;
     private InputAction jumpAction;
@@ -28,8 +30,12 @@ public class PlayerInputReader : MonoBehaviour, InputSystem_Actions.IPlayerActio
     private InputAction lAttackAction;
     private InputAction hAttackAction;
     private InputAction sprintAction;
+    private InputAction lockOnAction;
+
+
     void OnEnable()
     {
+        lockOnAction = inputActionAsset.FindAction("LockOn");
         sprintAction = inputActionAsset.FindAction("Sprint");
         moveAction = inputActionAsset.FindAction("Move");
         jumpAction = inputActionAsset.FindAction("Jump");
@@ -39,6 +45,12 @@ public class PlayerInputReader : MonoBehaviour, InputSystem_Actions.IPlayerActio
         skillAction = inputActionAsset.FindAction("Unique Skill");
         lAttackAction = inputActionAsset.FindAction("Light Attack");
         hAttackAction = inputActionAsset.FindAction("Heavy Attack");
+
+        lockOnAction.started += OnLockOn;
+
+        sprintAction.started += OnSprint;
+        sprintAction.performed += OnSprint;
+        sprintAction.canceled += OnSprint;
 
         moveAction.started += OnMove;
         moveAction.performed += OnMove;
@@ -76,12 +88,6 @@ public class PlayerInputReader : MonoBehaviour, InputSystem_Actions.IPlayerActio
         hAttackAction.performed += OnHeavyAttack;
         hAttackAction.canceled += OnHeavyAttack;
 
-
-        sprintAction.started += OnMove;
-        sprintAction.performed += OnMove;
-        sprintAction.canceled += OnMove;
-
-
         moveAction.Enable();
         jumpAction.Enable();
         dodgeAction.Enable();
@@ -90,10 +96,21 @@ public class PlayerInputReader : MonoBehaviour, InputSystem_Actions.IPlayerActio
         skillAction.Enable();
         lAttackAction.Enable();
         hAttackAction.Enable();
+        lockOnAction.Enable();
+        sprintAction.Enable();
     }
 
     void OnDisable()
     {
+
+        lockOnAction.started -= OnLockOn;
+        lockOnAction.performed -= OnLockOn;
+        lockOnAction.canceled -= OnLockOn;
+
+        sprintAction.started -= OnSprint;
+        sprintAction.performed -= OnSprint;
+        sprintAction.canceled -= OnSprint;
+
         moveAction.started -= OnMove;
         moveAction.performed -= OnMove;
         moveAction.canceled -= OnMove;
@@ -130,10 +147,7 @@ public class PlayerInputReader : MonoBehaviour, InputSystem_Actions.IPlayerActio
         hAttackAction.performed -= OnHeavyAttack;
         hAttackAction.canceled -= OnHeavyAttack;
 
-        sprintAction.started -= OnMove;
-        sprintAction.performed -= OnMove;
-        sprintAction.canceled -= OnMove;
-
+        //FUNCTION
     }
     public void OnBlock(InputAction.CallbackContext context)
     {
@@ -174,11 +188,13 @@ public class PlayerInputReader : MonoBehaviour, InputSystem_Actions.IPlayerActio
     {
         if (onUniqueSkillStarted != null && context.started) onUniqueSkillStarted.Invoke();
     }
-
     public void OnSprint(InputAction.CallbackContext context)
     {
-        if (onSprint != null && context.started) onSprint.Invoke();
+        onSprint?.Invoke(context.ReadValueAsButton());
     }
-
+    public void OnLockOn(InputAction.CallbackContext context)
+    {
+        if (onLockOn != null && context.started) onLockOn?.Invoke();
+    }
 
 }

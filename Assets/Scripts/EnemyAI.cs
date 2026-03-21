@@ -12,15 +12,18 @@ public class EnemyAI : MonoBehaviour, IDamageable
     public GuardianDataManager guardianData;
     EnemyAttackController attackController;
     EnemyStateHandler stateHandler;
-    PlayerMovementScript playerMovementScript;
+   
 
-
+    [Header("EnemyStats")]
     [SerializeField] private float enemyCurrentHealth;
     [SerializeField] private int enemyMaxHealth;
+    [SerializeField] private int enemyCurrentStamina;
+    [SerializeField] private int enemyMaxStamina;
     [SerializeField] private int enemyDefense;
     [SerializeField] private int enemyMinAP;
     [SerializeField] private int enemyMaxAP;
     [SerializeField] private float enemySpeed;
+
     private float enemyDamage;
 
 
@@ -29,10 +32,13 @@ public class EnemyAI : MonoBehaviour, IDamageable
     private Animator anim;
     private UnityEngine.AI.NavMeshAgent navMeshAgent;
 
+
     int strafeDirection = 1;
     [SerializeField] private float strafeDistance = 6f;
+    [Header("Raycast Settings")]
     public float rayDistance = 0f;
     public Vector3 rayOffset;
+
 
 
 
@@ -46,7 +52,9 @@ public class EnemyAI : MonoBehaviour, IDamageable
         stateHandler = GetComponent<EnemyStateHandler>();
 
         enemyMaxHealth = guardianData.enemyHealth;
+        enemyMaxStamina = guardianData.enemyStamina;
         enemyCurrentHealth = enemyMaxHealth;
+        enemyCurrentStamina = enemyMaxStamina;
         enemyDefense = guardianData.enemyDefense;
         enemySpeed = guardianData.enemySpeed;
         enemyMinAP = guardianData.enemyMinAttackPower;
@@ -56,8 +64,11 @@ public class EnemyAI : MonoBehaviour, IDamageable
     }
     private void OnEnable()
     {
-
-
+        EnemyStateHandler.onIdle += StopNavMesh;
+        EnemyStateHandler.onStrafe += EnemyStrafing;
+        EnemyStateHandler.onAttack += StopNavMesh;
+        EnemyStateHandler.onExhaust += StopNavMesh;
+        EnemyStateHandler.onDeath += EnemyDeath;
     }
     private void Start()
     {
@@ -68,9 +79,8 @@ public class EnemyAI : MonoBehaviour, IDamageable
         navMeshAgent.acceleration = enemySpeed * 2f;
 
 
-        if(!attackController.isBusy | player == null) 
-        InvokeRepeating("SwitchStrafeDirection", 3f, 5f);
-
+        if (!attackController.isBusy | player == null)
+            InvokeRepeating("SwitchStrafeDirection", 3f, 5f);
     }
     void Update()
     {
@@ -79,16 +89,17 @@ public class EnemyAI : MonoBehaviour, IDamageable
         enemyDamage = Random.Range(enemyMinAP, enemyMaxAP);
 
 
-        if(!attackController.isBusy)
+        if (!attackController.isBusy)
         {
             SetTarget();
         }
-       
+
         CalculateDistancefromPlayer();
-        EnemyStrafing();
-
     }
-
+    public void StopNavMesh()
+    {
+        navMeshAgent.isStopped = true;
+    }
 
     public void EnemyStrafing()
     {
@@ -114,38 +125,6 @@ public class EnemyAI : MonoBehaviour, IDamageable
 
 
     }
-
-    void SwitchStrafeDirection()
-    {
-        strafeDirection *= -1;
-
-    }
-
-
-    public void TakeDamage(int damage)
-    {
-        int damageTaken = damage ^ 2 / damage + enemyDefense;
-        enemyCurrentHealth -= damageTaken;
-        if (enemyCurrentHealth <= 0) stateHandler.enemyState = EnemyStateHandler.EnemyState.OnDeath;
-    }
-    public void EnemyAttack()
-    {
-
-        if (attackController.isBusy) navMeshAgent.isStopped = true;
-
-
-    }
-
-    IEnumerator EnemyDeathAnimation()
-    {
-        yield return new WaitForSeconds(2f);
-        gameObject.SetActive(false);
-    }
-    void CalculateDistancefromPlayer()
-    {
-        dirToPlayer = (player.transform.position - transform.position).normalized;
-    }
-
     public void EnemyDeath()
     {
         gameObject.SetActive(false);
@@ -180,4 +159,23 @@ public class EnemyAI : MonoBehaviour, IDamageable
         Gizmos.DrawRay(transform.position + rayOffset, transform.forward * rayDistance);
 
     }
+    void SwitchStrafeDirection()
+    {
+        strafeDirection *= -1;
+
+    }
+    public void TakeDamage(int damage)
+    {
+        int healthDamage = damage ^ 2 / damage + enemyDefense;
+        int staminaDamage = damage/2;
+        enemyCurrentHealth -= healthDamage;
+        enemyCurrentStamina -= staminaDamage;
+        if (enemyCurrentHealth <= 0) stateHandler.enemyState = EnemyStateHandler.EnemyState.OnDeath;
+        if (enemyCurrentStamina <= 0) stateHandler.enemyState = EnemyStateHandler.EnemyState.IsExhausted;
+    }
+    void CalculateDistancefromPlayer()
+    {
+        dirToPlayer = (player.transform.position - transform.position).normalized;
+    }
+
 }
