@@ -49,7 +49,7 @@ public class Player : MonoBehaviour
     }
     void FixedUpdate()
     {
-        float currentSpeed = isRunning ? 10f : 5f;
+        float currentSpeed = isRunning ? runSpeed : walkSpeed;
 
         Vector3 moveposition = rb.position + move * currentSpeed * Time.deltaTime;
         rb.MovePosition(moveposition);
@@ -73,21 +73,6 @@ public class Player : MonoBehaviour
     {
         isRunning = value;
     }
-    public Transform target;
-
-void LateUpdate()
-{
-    if (target != null)
-    {
-        Vector3 direction = (target.position - transform.position).normalized;
-        direction.y = 0;
-
-        if (direction != Vector3.zero)
-        {
-            Quaternion rot = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * 10f);
-        }
-    }
-}
+    
 
 }

@@ -25,35 +25,40 @@ public class CameraLockOn : MonoBehaviour
         }
     }
 
-    void FindTarget()
+void FindTarget()
+{
+    Collider[] hits = Physics.OverlapSphere(player.position, lockRange);
+
+    float closestDistance = Mathf.Infinity;
+    Transform bestTarget = null;
+
+    foreach (var hit in hits)
     {
-        Ray ray = new Ray(player.position + Vector3.up, player.forward);
-        RaycastHit hit;
-
-        float radius = 2f;
-
-        if (Physics.SphereCast(ray, radius, out hit, lockRange))
+        if (hit.CompareTag("Enemy"))
         {
-            if (hit.collider.CompareTag("Enemy"))
+            float dist = Vector3.Distance(player.position, hit.transform.position);
+
+            if (dist < closestDistance)
             {
-                currentTarget = hit.collider.transform;
-                isLocked = true;
-
-                playerScript.target = currentTarget;
-
-                Debug.Log("Locked on: " + currentTarget.name);
+                closestDistance = dist;
+                bestTarget = hit.transform;
             }
         }
+    }
 
-
+    if (bestTarget != null)
+    {
+        currentTarget = bestTarget;
+        isLocked = true;
         
     }
+}
 
     void Unlock()
     {
         isLocked = false;
         currentTarget = null;
-        playerScript.target = null;
+        
 
         lockOnCam.Priority = 5;
         thirdPersonCam.Priority = 20;
