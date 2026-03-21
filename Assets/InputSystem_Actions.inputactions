@@ -16,6 +16,15 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "Sprint",
+                    "type": "Button",
+                    "id": "d481545d-ad2c-4632-bc4e-ad003917ba7e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Jump",
                     "type": "Button",
                     "id": "a8b3cd94-468e-48e5-8c51-f97b24fa0b21",

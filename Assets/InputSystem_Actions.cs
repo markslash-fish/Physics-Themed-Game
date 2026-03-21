@@ -102,6 +102,15 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
+                    ""name"": ""Sprint"",
+                    ""type"": ""Button"",
+                    ""id"": ""d481545d-ad2c-4632-bc4e-ad003917ba7e"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""Jump"",
                     ""type"": ""Button"",
                     ""id"": ""a8b3cd94-468e-48e5-8c51-f97b24fa0b21"",
@@ -967,6 +976,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         // Player
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
+        m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Heal = m_Player.FindAction("Heal", throwIfNotFound: true);
         m_Player_Block = m_Player.FindAction("Block", throwIfNotFound: true);
@@ -1070,6 +1080,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Player;
     private List<IPlayerActions> m_PlayerActionsCallbackInterfaces = new List<IPlayerActions>();
     private readonly InputAction m_Player_Move;
+    private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Heal;
     private readonly InputAction m_Player_Block;
@@ -1094,6 +1105,10 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Move".
         /// </summary>
         public InputAction @Move => m_Wrapper.m_Player_Move;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Sprint".
+        /// </summary>
+        public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
         /// <summary>
         /// Provides access to the underlying input action "Player/Jump".
         /// </summary>
@@ -1159,6 +1174,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Move.started += instance.OnMove;
             @Move.performed += instance.OnMove;
             @Move.canceled += instance.OnMove;
+            @Sprint.started += instance.OnSprint;
+            @Sprint.performed += instance.OnSprint;
+            @Sprint.canceled += instance.OnSprint;
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
@@ -1200,6 +1218,9 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Move.started -= instance.OnMove;
             @Move.performed -= instance.OnMove;
             @Move.canceled -= instance.OnMove;
+            @Sprint.started -= instance.OnSprint;
+            @Sprint.performed -= instance.OnSprint;
+            @Sprint.canceled -= instance.OnSprint;
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
@@ -1534,6 +1555,13 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnMove(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Sprint" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnSprint(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Jump" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
