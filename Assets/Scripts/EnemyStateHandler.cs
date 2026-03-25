@@ -11,11 +11,11 @@ public class EnemyStateHandler : MonoBehaviour
     [SerializeField] private NavMeshAgent navMeshAgent;
 
 
-    public static event Action onIdle;
-    public static event Action onStrafe;
-    public static event Action onAttack;
-    public static event Action onExhaust;
-    public static event Action onDeath;
+    public event Action onIdle;
+    public event Action onStrafe;
+    public event Action onAttack;
+    public event Action onExhaust;
+    public event Action onDeath;
 
     public enum EnemyState
     {
@@ -25,6 +25,36 @@ public class EnemyStateHandler : MonoBehaviour
         IsExhausted,
         OnDeath
     }
+    private void Awake()
+    {
+        navMeshAgent = GetComponent<NavMeshAgent>();
+        enemyAI = GetComponent<EnemyAI>();
+        attackController = GetComponent<EnemyAttackController>();
+    }
+    private void OnEnable()
+    {
+        onIdle += OnEnemyIdle;
+        onStrafe += OnEnemyStrafe;
+        onAttack += OnEnemyAttack;
+        onExhaust += OnEnemyExhaust;
+        onDeath += OnEnemyDeath;
+    }
+    private void OnDisable()
+    {
+        onIdle -= OnEnemyIdle;
+        onStrafe -= OnEnemyStrafe;
+        onAttack -= OnEnemyAttack;
+        onExhaust -= OnEnemyExhaust;
+        onDeath -= OnEnemyDeath;
+    }
+
+    private void Update()
+    {
+       
+        SetEnemyState();
+
+       
+    }
     void SetEnemyState()
     {
         switch (enemyState)
@@ -32,11 +62,21 @@ public class EnemyStateHandler : MonoBehaviour
             case EnemyState.Idle:
 
                 break;
-            case EnemyState.IsStrafing:
-                enemyAI.EnemyStrafing();
+            case EnemyState.IsStrafing:       
+                if(!navMeshAgent.updatePosition)
+                {
+                    navMeshAgent.nextPosition = transform.position;
+                    navMeshAgent.isStopped = false;
+                    navMeshAgent.updatePosition = true;
+                }
+
+                    enemyAI.EnemyStrafing();
+               
                 break;
             case EnemyState.IsAttacking:
-             
+                navMeshAgent.isStopped = true;
+                navMeshAgent.updatePosition = false;
+
                 break;
             case EnemyState.IsExhausted:
 
@@ -45,19 +85,6 @@ public class EnemyStateHandler : MonoBehaviour
                 enemyAI.EnemyDeath();
                 break;
         }
-    }
-    private void Update()
-    {
-        navMeshAgent = GetComponent<NavMeshAgent>();
-        enemyAI = GetComponent<EnemyAI>();
-        attackController = GetComponent<EnemyAttackController>();
-        SetEnemyState();
-
-        onIdle += OnEnemyIdle;
-        onStrafe += OnEnemyStrafe;
-        onAttack += OnEnemyAttack;
-        onExhaust += OnEnemyExhaust;
-        onDeath += OnEnemyDeath;
     }
     void OnEnemyIdle()
     {

@@ -10,7 +10,7 @@ public class PlayerMovementScript : MonoBehaviour
     [SerializeField] private bool isGrounded;
 
 
-
+    public Transform enemy;
 
     [Header("References")]
     [SerializeField] PlayerInputReader playerInputReader;
@@ -46,6 +46,7 @@ public class PlayerMovementScript : MonoBehaviour
     }
     private void Update()
     {
+
        
         float x = movement.x;
         float z = movement.y;

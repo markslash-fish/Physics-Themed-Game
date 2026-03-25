@@ -160,8 +160,32 @@ PrefabInstance:
       value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3382319263170649067, guid: a19af7f36290b84409226904d71d9e91, type: 3}
-      propertyPath: m_AngularSpeed
+      propertyPath: m_AutoBraking
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3382319263170649067, guid: a19af7f36290b84409226904d71d9e91, type: 3}
+      propertyPath: m_Acceleration
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 3382319263170649067, guid: a19af7f36290b84409226904d71d9e91, type: 3}
+      propertyPath: m_AngularSpeed
+      value: 360
+      objectReference: {fileID: 0}
+    - target: {fileID: 3382319263170649067, guid: a19af7f36290b84409226904d71d9e91, type: 3}
+      propertyPath: m_StoppingDistance
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5353920298918068368, guid: a19af7f36290b84409226904d71d9e91, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5353920298918068368, guid: a19af7f36290b84409226904d71d9e91, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5353920298918068368, guid: a19af7f36290b84409226904d71d9e91, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5353920298918068368, guid: a19af7f36290b84409226904d71d9e91, type: 3}
       propertyPath: m_LocalPosition.x
@@ -211,7 +235,8 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5327117062656165983, guid: a19af7f36290b84409226904d71d9e91, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -221,6 +246,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 818577542869877284, guid: a19af7f36290b84409226904d71d9e91, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1285866167}
+    - targetCorrespondingSourceObject: {fileID: 818577542869877284, guid: a19af7f36290b84409226904d71d9e91, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1285866172}
   m_SourcePrefab: {fileID: 100100000, guid: a19af7f36290b84409226904d71d9e91, type: 3}
 --- !u!1 &373298022 stripped
 GameObject:
@@ -299,6 +327,7 @@ MonoBehaviour:
   moveSpd: 10
   jumpHeight: 5
   isGrounded: 0
+  enemy: {fileID: 0}
   playerInputReader: {fileID: 1217036577}
   attackDelay: 0.2
   canAttack: 0
@@ -541,11 +570,33 @@ MonoBehaviour:
   stateHandler: {fileID: 0}
   moveset:
   - {fileID: 11400000, guid: 28328619d78059145b6c6246ec7e9a05, type: 2}
-  - {fileID: 11400000, guid: 01662b4ecaee85c44815f40c4a03e561, type: 2}
   movesInCooldown: []
   isBusy: 0
+  isTrackingPlayer: 0
   distance1: 0
   inCooldown: 0
+--- !u!95 &1285866172
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1285866163}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: 9a682327f9bc7ba44a8d0911d14c0dee, type: 3}
+  m_Controller: {fileID: 9100000, guid: 3aa474f54dbaf7c43991de2b0a010310, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 1
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1354537733
 GameObject:
   m_ObjectHideFlags: 0
@@ -1043,6 +1094,10 @@ PrefabInstance:
       propertyPath: playerInputReader
       value: 
       objectReference: {fileID: 1217036577}
+    - target: {fileID: 1293705005548607733, guid: de113ff2f29071f4895a3fe96df52b7e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3272960668794980503, guid: de113ff2f29071f4895a3fe96df52b7e, type: 3}
       propertyPath: m_Name
       value: Player

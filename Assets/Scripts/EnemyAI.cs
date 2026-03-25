@@ -26,6 +26,7 @@ public class EnemyAI : MonoBehaviour, IDamageable
 
     private float enemyDamage;
 
+    private bool isTrackingPlayer;
 
 
 
@@ -34,7 +35,7 @@ public class EnemyAI : MonoBehaviour, IDamageable
 
 
     int strafeDirection = 1;
-    [SerializeField] private float strafeDistance = 6f;
+    public float strafeDistance = 6f;
     [Header("Raycast Settings")]
     public float rayDistance = 0f;
     public Vector3 rayOffset;
@@ -42,7 +43,7 @@ public class EnemyAI : MonoBehaviour, IDamageable
 
 
 
-    private Vector3 dirToPlayer;
+    public Vector3 dirToPlayer;
 
 
     private void Awake()
@@ -50,6 +51,7 @@ public class EnemyAI : MonoBehaviour, IDamageable
         navMeshAgent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         attackController = GetComponent<EnemyAttackController>();
         stateHandler = GetComponent<EnemyStateHandler>();
+      
 
         enemyMaxHealth = guardianData.enemyHealth;
         enemyMaxStamina = guardianData.enemyStamina;
@@ -59,32 +61,36 @@ public class EnemyAI : MonoBehaviour, IDamageable
         enemySpeed = guardianData.enemySpeed;
         enemyMinAP = guardianData.enemyMinAttackPower;
         enemyMaxAP = guardianData.enemyMaxAttackPower;
+      
 
 
     }
     private void OnEnable()
     {
-        EnemyStateHandler.onIdle += StopNavMesh;
-        EnemyStateHandler.onStrafe += EnemyStrafing;
-        EnemyStateHandler.onAttack += StopNavMesh;
-        EnemyStateHandler.onExhaust += StopNavMesh;
-        EnemyStateHandler.onDeath += EnemyDeath;
+       
+        stateHandler.onStrafe += EnemyStrafing;
+        stateHandler.onDeath += EnemyDeath;
+    }
+    private void OnDisable()
+    {
+        stateHandler.onStrafe -= EnemyStrafing;
+        stateHandler.onDeath -= EnemyDeath;
     }
     private void Start()
     {
+        EnemyIdle();
 
-
-
+        navMeshAgent.updateRotation = false;
         navMeshAgent.speed = enemySpeed;
-        navMeshAgent.acceleration = enemySpeed * 2f;
+        
 
 
-        if (!attackController.isBusy | player == null)
+        if (!attackController.isBusy | player != null && stateHandler.enemyState == EnemyStateHandler.EnemyState.IsStrafing)
             InvokeRepeating("SwitchStrafeDirection", 3f, 5f);
     }
     void Update()
     {
-
+        
 
         enemyDamage = Random.Range(enemyMinAP, enemyMaxAP);
 
@@ -95,18 +101,28 @@ public class EnemyAI : MonoBehaviour, IDamageable
         }
 
         CalculateDistancefromPlayer();
+
+        dirToPlayer = (player.transform.position - transform.position).normalized;
+        if (isTrackingPlayer && player != null)
+        {
+            ResetEnemyRotation();
+        }
+
     }
-    public void StopNavMesh()
+    void EnemyIdle()
     {
-        navMeshAgent.isStopped = true;
+        if (player != null)
+        {
+            stateHandler.enemyState = EnemyStateHandler.EnemyState.Idle;
+        }
     }
+  
 
     public void EnemyStrafing()
     {
-        if (player == null) return;
+        if (!navMeshAgent.enabled || attackController.isBusy || player == null) return;
 
 
-        dirToPlayer = (player.transform.position - transform.position).normalized;
         Vector3 sideVector = Vector3.Cross(Vector3.up, dirToPlayer);
 
 
@@ -116,15 +132,15 @@ public class EnemyAI : MonoBehaviour, IDamageable
 
 
 
-
+        
         navMeshAgent.SetDestination(targetpos);
 
         Quaternion lookrotation = Quaternion.LookRotation(new Vector3(dirToPlayer.x, 0, dirToPlayer.z));
         transform.rotation = Quaternion.Slerp(transform.rotation, lookrotation, Time.deltaTime * 5f);
 
 
-
     }
+   
     public void EnemyDeath()
     {
         gameObject.SetActive(false);
@@ -177,5 +193,22 @@ public class EnemyAI : MonoBehaviour, IDamageable
     {
         dirToPlayer = (player.transform.position - transform.position).normalized;
     }
+    public void ResetEnemyState()
+    {
+        stateHandler.enemyState = EnemyStateHandler.EnemyState.IsStrafing;
+        attackController.isBusy = false;
+    }
+    private void SetTracking(int state)
+    {
+        isTrackingPlayer = (state == 1);
+    }
+    void ResetEnemyRotation()
+    {
+
+       dirToPlayer.y = 0;
+        Quaternion enemyLookrotation = Quaternion.LookRotation(dirToPlayer);
+        transform.rotation = Quaternion.Slerp(transform.rotation, enemyLookrotation, Time.deltaTime * 5f);
+    }
+
 
 }

@@ -16,20 +16,23 @@ public class EnemyAttackController : MonoBehaviour
     public List<CombatMove> movesInCooldown = new List<CombatMove>();
     private Animator animator;
     public bool isBusy;
+    public bool isTrackingPlayer;
     public float distance1;
     public bool inCooldown;
+    private float distanceToPlayer;
 
+    
 
     private void Awake()
     {
         enemyAI = GetComponent<EnemyAI>();
         stateHandler = GetComponent<EnemyStateHandler>();
-
+        animator = GetComponent<Animator>();
+       
     }
     private void Start()
-    {
-
-        if (!isBusy) InvokeRepeating("ChooseAction", 2f, 3f);
+    { 
+            InvokeRepeating("ChooseAction", 3f, 4f); 
     }
     private void OnEnable()
     {
@@ -37,37 +40,42 @@ public class EnemyAttackController : MonoBehaviour
     }
     private void Update()
     {
-
+        distanceToPlayer = Vector3.Distance(transform.position, enemyAI.player.position);
+       
     }
-   public  void ChooseAction()
+    public  void ChooseAction()
     {
-      
-        float distanceToPlayer = Vector3.Distance(transform.position, enemyAI.player.position);
-        distance1 = distanceToPlayer;
-        if (!isBusy)
+
+        if (isBusy || stateHandler.enemyState == EnemyStateHandler.EnemyState.Idle || stateHandler.enemyState == EnemyStateHandler.EnemyState.IsExhausted || stateHandler.enemyState == EnemyStateHandler.EnemyState.OnDeath)
         {
-            DecideAction(distanceToPlayer);
+            return;
         }
+          
+            DecideAction(distanceToPlayer);
+        
 
     }
     void DecideAction(float distance)
     {
         List<CombatMove> availableMoves = new List<CombatMove>();
-       
-        foreach (var move in moveset)
+        if(!isBusy)
         {
-           
-            if(distance >= move.minRange && distance <= move.maxRange && !movesInCooldown.Contains(move))
+            foreach (var move in moveset)
             {
-               
-                availableMoves.Add(move);
+
+                if (distance >= move.minRange && distance <= move.maxRange && !movesInCooldown.Contains(move))
+                {
+
+                    availableMoves.Add(move);
+                }
             }
+            if (availableMoves.Count > 0)
+            {
+                CalculateTotalWeight();
+            }
+            Debug.Log(availableMoves.Count);
         }
-        if(availableMoves.Count > 0)
-        {
-            CalculateTotalWeight();
-        }
-        Debug.Log(availableMoves.Count);
+      
     }
     void CalculateTotalWeight()
     {
@@ -80,8 +88,9 @@ public class EnemyAttackController : MonoBehaviour
         foreach (var move in moveset)
         {
             iterations += move.baseWeight;
-            if(randomWeight <= iterations && !inCooldown)
+            if (randomWeight <= iterations && !inCooldown)
             {
+               
                 ExecuteMove(move);
                 return;
             }
@@ -92,13 +101,11 @@ public class EnemyAttackController : MonoBehaviour
 
         isBusy = true;
         stateHandler.enemyState = EnemyStateHandler.EnemyState.IsAttacking;
-      
+        animator.SetTrigger(move.animTrigger);
         StartCoroutine(MoveCooldown(move));
         Debug.Log(move.moveName);
         
     }
-   
-  
    IEnumerator MoveCooldown(CombatMove move)
     {
         movesInCooldown.Add(move);
@@ -106,6 +113,9 @@ public class EnemyAttackController : MonoBehaviour
         movesInCooldown.Remove(move);
 
     }
+   
+    
+
     
 
 
