@@ -1,8 +1,9 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
-public class PlayerInputReader : MonoBehaviour, InputSystem_Actions.IPlayerActions
+public class PlayerInputReader : NetworkBehaviour, InputSystem_Actions.IPlayerActions
 {
 
     [SerializeField] InputActionAsset inputActionAsset;
@@ -33,123 +34,132 @@ public class PlayerInputReader : MonoBehaviour, InputSystem_Actions.IPlayerActio
     private InputAction lockOnAction;
 
 
-    void OnEnable()
+
+    public override void OnNetworkSpawn()
     {
-        lockOnAction = inputActionAsset.FindAction("Lock On");
-        sprintAction = inputActionAsset.FindAction("Sprint");
-        moveAction = inputActionAsset.FindAction("Move");
-        jumpAction = inputActionAsset.FindAction("Jump");
-        dodgeAction = inputActionAsset.FindAction("Dodge");
-        blockAction = inputActionAsset.FindAction("Block");
-        healAction = inputActionAsset.FindAction("Heal");
-        skillAction = inputActionAsset.FindAction("Unique Skill");
-        lAttackAction = inputActionAsset.FindAction("Light Attack");
-        hAttackAction = inputActionAsset.FindAction("Heavy Attack");
+        if (IsOwner)
+        {
 
-        lockOnAction.started += OnLockOn;
-        lockOnAction.performed += OnLockOn;
-        lockOnAction.canceled += OnLockOn;
+            lockOnAction = inputActionAsset.FindAction("Lock On");
+            sprintAction = inputActionAsset.FindAction("Sprint");
+            moveAction = inputActionAsset.FindAction("Move");
+            jumpAction = inputActionAsset.FindAction("Jump");
+            dodgeAction = inputActionAsset.FindAction("Dodge");
+            blockAction = inputActionAsset.FindAction("Block");
+            healAction = inputActionAsset.FindAction("Heal");
+            skillAction = inputActionAsset.FindAction("Unique Skill");
+            lAttackAction = inputActionAsset.FindAction("Light Attack");
+            hAttackAction = inputActionAsset.FindAction("Heavy Attack");
 
-        sprintAction.started += OnSprint;
-        sprintAction.performed += OnSprint;
-        sprintAction.canceled += OnSprint;
+            lockOnAction.started += OnLockOn;
+            lockOnAction.performed += OnLockOn;
+            lockOnAction.canceled += OnLockOn;
 
-        moveAction.started += OnMove;
-        moveAction.performed += OnMove;
-        moveAction.canceled += OnMove;
+            sprintAction.started += OnSprint;
+            sprintAction.performed += OnSprint;
+            sprintAction.canceled += OnSprint;
 
-
-        jumpAction.started += OnJump;
-        jumpAction.performed += OnJump;
-        jumpAction.canceled += OnJump;
+            moveAction.started += OnMove;
+            moveAction.performed += OnMove;
+            moveAction.canceled += OnMove;
 
 
-        dodgeAction.started += OnDodge;
-        dodgeAction.performed += OnDodge;
-        dodgeAction.canceled += OnDodge;
+            jumpAction.started += OnJump;
+            jumpAction.performed += OnJump;
+            jumpAction.canceled += OnJump;
 
 
-        blockAction.started += OnBlock;
-        blockAction.performed += OnBlock;
-        blockAction.canceled += OnBlock;
+            dodgeAction.started += OnDodge;
+            dodgeAction.performed += OnDodge;
+            dodgeAction.canceled += OnDodge;
 
 
-        healAction.started += OnHeal;
-        healAction.performed += OnHeal;
-        healAction.canceled += OnHeal;
+            blockAction.started += OnBlock;
+            blockAction.performed += OnBlock;
+            blockAction.canceled += OnBlock;
 
-        skillAction.started += OnUniqueSkill;
-        skillAction.performed += OnUniqueSkill;
-        skillAction.canceled += OnUniqueSkill;
 
-        lAttackAction.started += OnLightAttack;
-        lAttackAction.performed += OnLightAttack;
-        lAttackAction.canceled += OnLightAttack;
+            healAction.started += OnHeal;
+            healAction.performed += OnHeal;
+            healAction.canceled += OnHeal;
 
-        hAttackAction.started += OnHeavyAttack;
-        hAttackAction.performed += OnHeavyAttack;
-        hAttackAction.canceled += OnHeavyAttack;
+            skillAction.started += OnUniqueSkill;
+            skillAction.performed += OnUniqueSkill;
+            skillAction.canceled += OnUniqueSkill;
 
-        moveAction.Enable();
-        jumpAction.Enable();
-        dodgeAction.Enable();
-        blockAction.Enable();
-        healAction.Enable();
-        skillAction.Enable();
-        lAttackAction.Enable();
-        hAttackAction.Enable();
-        lockOnAction.Enable();
-        sprintAction.Enable();
+            lAttackAction.started += OnLightAttack;
+            lAttackAction.performed += OnLightAttack;
+            lAttackAction.canceled += OnLightAttack;
+
+            hAttackAction.started += OnHeavyAttack;
+            hAttackAction.performed += OnHeavyAttack;
+            hAttackAction.canceled += OnHeavyAttack;
+
+            moveAction.Enable();
+            jumpAction.Enable();
+            dodgeAction.Enable();
+            blockAction.Enable();
+            healAction.Enable();
+            skillAction.Enable();
+            lAttackAction.Enable();
+            hAttackAction.Enable();
+            lockOnAction.Enable();
+            sprintAction.Enable();
+        }
+
     }
 
-    void OnDisable()
+   public override void OnNetworkDespawn()
     {
+        if (IsOwner)
+        {
+            lockOnAction.started -= OnLockOn;
+            lockOnAction.performed -= OnLockOn;
+            lockOnAction.canceled -= OnLockOn;
 
-        lockOnAction.started -= OnLockOn;
-        lockOnAction.performed -= OnLockOn;
-        lockOnAction.canceled -= OnLockOn;
+            sprintAction.started -= OnSprint;
+            sprintAction.performed -= OnSprint;
+            sprintAction.canceled -= OnSprint;
 
-        sprintAction.started -= OnSprint;
-        sprintAction.performed -= OnSprint;
-        sprintAction.canceled -= OnSprint;
-
-        moveAction.started -= OnMove;
-        moveAction.performed -= OnMove;
-        moveAction.canceled -= OnMove;
-
-
-        jumpAction.started -= OnJump;
-        jumpAction.performed -= OnJump;
-        jumpAction.canceled -= OnJump;
+            moveAction.started -= OnMove;
+            moveAction.performed -= OnMove;
+            moveAction.canceled -= OnMove;
 
 
-        dodgeAction.started -= OnDodge;
-        dodgeAction.performed -= OnDodge;
-        dodgeAction.canceled -= OnDodge;
+            jumpAction.started -= OnJump;
+            jumpAction.performed -= OnJump;
+            jumpAction.canceled -= OnJump;
 
 
-        blockAction.started -= OnBlock;
-        blockAction.performed -= OnBlock;
-        blockAction.canceled -= OnBlock;
+            dodgeAction.started -= OnDodge;
+            dodgeAction.performed -= OnDodge;
+            dodgeAction.canceled -= OnDodge;
 
 
-        healAction.started -= OnHeal;
-        healAction.performed -= OnHeal;
-        healAction.canceled -= OnHeal;
+            blockAction.started -= OnBlock;
+            blockAction.performed -= OnBlock;
+            blockAction.canceled -= OnBlock;
 
-        skillAction.started -= OnUniqueSkill;
-        skillAction.performed -= OnUniqueSkill;
-        skillAction.canceled -= OnUniqueSkill;
 
-        lAttackAction.started -= OnLightAttack;
-        lAttackAction.performed -= OnLightAttack;
-        lAttackAction.canceled -= OnLightAttack;
+            healAction.started -= OnHeal;
+            healAction.performed -= OnHeal;
+            healAction.canceled -= OnHeal;
 
-        hAttackAction.started -= OnHeavyAttack;
-        hAttackAction.performed -= OnHeavyAttack;
-        hAttackAction.canceled -= OnHeavyAttack;
+            skillAction.started -= OnUniqueSkill;
+            skillAction.performed -= OnUniqueSkill;
+            skillAction.canceled -= OnUniqueSkill;
 
-        //FUNCTION
+            lAttackAction.started -= OnLightAttack;
+            lAttackAction.performed -= OnLightAttack;
+            lAttackAction.canceled -= OnLightAttack;
+
+            hAttackAction.started -= OnHeavyAttack;
+            hAttackAction.performed -= OnHeavyAttack;
+            hAttackAction.canceled -= OnHeavyAttack;
+        }
+       
+
+        
     }
     public void OnBlock(InputAction.CallbackContext context)
     {

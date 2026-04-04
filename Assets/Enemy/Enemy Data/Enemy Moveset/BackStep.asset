@@ -17,4 +17,4 @@ MonoBehaviour:
   maxRange: 4
   baseWeight: 60
   animTrigger: isBackStepping
-  cooldown: 3.5
+  cooldown: 10

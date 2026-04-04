@@ -18,7 +18,7 @@ MonoBehaviour:
   enemyStamina: 100
   enemyDefense: 25
   enemySpeed: 3
-  enemyMinAttackPower: 12
-  enemyMaxAttackPower: 14
+  enemyMinAttackPower: 9
+  enemyMaxAttackPower: 17
   enemyID: 22601
   enemyKey: guardian-broken

@@ -1,11 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
-public class EnemyAI : MonoBehaviour, IDamageable
+public class EnemyAI : NetworkBehaviour, IDamageable
 {
 
     public Transform player;
@@ -15,20 +17,19 @@ public class EnemyAI : MonoBehaviour, IDamageable
    
 
     [Header("EnemyStats")]
-    [SerializeField] private float enemyCurrentHealth;
     [SerializeField] private int enemyMaxHealth;
-    [SerializeField] private int enemyCurrentStamina;
     [SerializeField] private int enemyMaxStamina;
     [SerializeField] private int enemyDefense;
     [SerializeField] private int enemyMinAP;
     [SerializeField] private int enemyMaxAP;
     [SerializeField] private float enemySpeed;
-
-    private float enemyDamage;
+  
+    public int enemyDamage;
 
     private bool isTrackingPlayer;
 
-
+    public NetworkVariable<int> enemyCurrentHealth = new NetworkVariable<int>(0,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
+    public NetworkVariable<int> enemyCurrentStamina = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     private Animator anim;
     private UnityEngine.AI.NavMeshAgent navMeshAgent;
@@ -51,54 +52,57 @@ public class EnemyAI : MonoBehaviour, IDamageable
         navMeshAgent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         attackController = GetComponent<EnemyAttackController>();
         stateHandler = GetComponent<EnemyStateHandler>();
-      
 
+    }
+    public override void OnNetworkSpawn()
+    {
         enemyMaxHealth = guardianData.enemyHealth;
         enemyMaxStamina = guardianData.enemyStamina;
-        enemyCurrentHealth = enemyMaxHealth;
-        enemyCurrentStamina = enemyMaxStamina;
+      
         enemyDefense = guardianData.enemyDefense;
         enemySpeed = guardianData.enemySpeed;
         enemyMinAP = guardianData.enemyMinAttackPower;
         enemyMaxAP = guardianData.enemyMaxAttackPower;
-      
+        if (IsServer)
+        {
+            enemyCurrentHealth.Value = enemyMaxHealth;
+            enemyCurrentStamina.Value = enemyMaxStamina;
+        }
 
 
+        InvokeRepeating("EnemyAttack", 3f, 3.1f);
+        if (!attackController.isBusy | player != null && stateHandler.enemyState.Value == EnemyStateHandler.EnemyState.IsStrafing)
+            InvokeRepeating("SwitchStrafeDirection", 3f, 5f);
     }
     private void OnEnable()
     {
-       
-        stateHandler.onStrafe += EnemyStrafing;
+        stateHandler.onIdle += EnemyIdle;
         stateHandler.onDeath += EnemyDeath;
     }
     private void OnDisable()
     {
-        stateHandler.onStrafe -= EnemyStrafing;
+        stateHandler.onIdle -= EnemyIdle;
         stateHandler.onDeath -= EnemyDeath;
     }
     private void Start()
     {
-        EnemyIdle();
+
 
         navMeshAgent.updateRotation = false;
         navMeshAgent.speed = enemySpeed;
         
 
 
-        if (!attackController.isBusy | player != null && stateHandler.enemyState == EnemyStateHandler.EnemyState.IsStrafing)
-            InvokeRepeating("SwitchStrafeDirection", 3f, 5f);
+       
     }
     void Update()
     {
-        
-
-        enemyDamage = Random.Range(enemyMinAP, enemyMaxAP);
-
-
+        if (!IsServer) return;
         if (!attackController.isBusy)
         {
             SetTarget();
         }
+        if (player == null) return;
 
         CalculateDistancefromPlayer();
 
@@ -113,13 +117,21 @@ public class EnemyAI : MonoBehaviour, IDamageable
     {
         if (player != null)
         {
-            stateHandler.enemyState = EnemyStateHandler.EnemyState.Idle;
+            stateHandler.CurrentState = EnemyStateHandler.EnemyState.Idle;
         }
+    }
+    void EnemyAttack()
+    {
+        if (!IsServer) return;
+        enemyDamage = Random.Range(enemyMinAP, enemyMaxAP);
+        stateHandler.CurrentState = EnemyStateHandler.EnemyState.IsAttacking;
+
     }
   
 
     public void EnemyStrafing()
     {
+        if (!IsServer) return;
         if (!navMeshAgent.enabled || attackController.isBusy || player == null) return;
 
 
@@ -143,7 +155,10 @@ public class EnemyAI : MonoBehaviour, IDamageable
    
     public void EnemyDeath()
     {
-        gameObject.SetActive(false);
+      if(IsServer)
+        {
+            GetComponent<NetworkObject>().Despawn();
+        }
     }
     void ResetState()
     {
@@ -163,18 +178,12 @@ public class EnemyAI : MonoBehaviour, IDamageable
             if (hit.collider.CompareTag("Player"))
             {
                 player = hit.transform;
-                stateHandler.enemyState = EnemyStateHandler.EnemyState.IsStrafing;
+                stateHandler.CurrentState = EnemyStateHandler.EnemyState.IsStrafing;
                
             }
         }
     }
-    private void OnDrawGizmos()
-    {
-        // Ray1
-        Gizmos.color = Color.red;
-        Gizmos.DrawRay(transform.position + rayOffset, transform.forward * rayDistance);
-
-    }
+  
     void SwitchStrafeDirection()
     {
         strafeDirection *= -1;
@@ -182,12 +191,13 @@ public class EnemyAI : MonoBehaviour, IDamageable
     }
     public void TakeDamage(int damage)
     {
-        int healthDamage = damage ^ 2 / damage + enemyDefense;
+        if (!IsServer) return;
+        int healthDamage = (damage * damage) / damage + enemyDefense;
         int staminaDamage = damage/2;
-        enemyCurrentHealth -= healthDamage;
-        enemyCurrentStamina -= staminaDamage;
-        if (enemyCurrentHealth <= 0) stateHandler.enemyState = EnemyStateHandler.EnemyState.OnDeath;
-        if (enemyCurrentStamina <= 0) stateHandler.enemyState = EnemyStateHandler.EnemyState.IsExhausted;
+        enemyCurrentHealth.Value-= healthDamage;
+        enemyCurrentStamina.Value -= staminaDamage;
+        if (enemyCurrentHealth.Value <= 0) stateHandler.CurrentState = EnemyStateHandler.EnemyState.OnDeath;
+        if (enemyCurrentStamina.Value <= 0) stateHandler.CurrentState = EnemyStateHandler.EnemyState.IsExhausted;
     }
     void CalculateDistancefromPlayer()
     {
@@ -195,19 +205,25 @@ public class EnemyAI : MonoBehaviour, IDamageable
     }
     public void ResetEnemyState()
     {
-        stateHandler.enemyState = EnemyStateHandler.EnemyState.IsStrafing;
+        stateHandler.enemyState.Value = EnemyStateHandler.EnemyState.IsStrafing;
         attackController.isBusy = false;
     }
     private void SetTracking(int state)
     {
         isTrackingPlayer = (state == 1);
     }
-    void ResetEnemyRotation()
+    void ResetEnemyRotation() 
     {
-
-       dirToPlayer.y = 0;
+        dirToPlayer.y = 0; 
         Quaternion enemyLookrotation = Quaternion.LookRotation(dirToPlayer);
         transform.rotation = Quaternion.Slerp(transform.rotation, enemyLookrotation, Time.deltaTime * 5f);
+    }
+  
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawRay(transform.position + rayOffset, transform.forward * rayDistance);
+        //AttackSphere
     }
 
 

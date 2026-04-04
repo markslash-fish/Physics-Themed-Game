@@ -1,11 +1,12 @@
 using System;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
 using static EnemyAI;
 
-public class EnemyStateHandler : MonoBehaviour
+public class EnemyStateHandler : NetworkBehaviour
 {
-    public EnemyState enemyState;
+    public NetworkVariable<EnemyState> enemyState = new NetworkVariable<EnemyState>(EnemyState.Idle, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     [SerializeField] private EnemyAI enemyAI;
     [SerializeField] private EnemyAttackController attackController;
     [SerializeField] private NavMeshAgent navMeshAgent;
@@ -47,78 +48,122 @@ public class EnemyStateHandler : MonoBehaviour
         onExhaust -= OnEnemyExhaust;
         onDeath -= OnEnemyDeath;
     }
+    public override void OnNetworkSpawn()
+    {
+        enemyState.OnValueChanged += OnStateChanged;
 
+        SetEnemyState(enemyState.Value);
+    }
+    public override void OnNetworkDespawn()
+    {
+        enemyState.OnValueChanged -= OnStateChanged;
+    }
+
+    public EnemyState CurrentState
+    {
+        get => enemyState.Value;
+        set 
+        {
+            if(IsServer)
+            {
+                if (enemyState.Value == value) return;
+                enemyState.Value = value;
+
+                SetEnemyState(value);
+            }
+            
+        } 
+    }
     private void Update()
     {
-       
-        SetEnemyState();
+        if (!IsServer) return;
+        if (enemyState.Value == EnemyState.IsStrafing)
+        {
+            enemyAI.EnemyStrafing();
+        }
 
-       
+
     }
-    void SetEnemyState()
+   
+    private void OnStateChanged(EnemyState oldState, EnemyState newState)
+    {    if(!IsServer)
+        {
+            SetEnemyState(newState);
+        }
+          
+    }
+    void SetEnemyState(EnemyState newState)
     {
-        switch (enemyState)
+        switch (newState)
         {
             case EnemyState.Idle:
-
+                onIdle?.Invoke();
                 break;
             case EnemyState.IsStrafing:       
-                if(!navMeshAgent.updatePosition)
+                if( IsServer && IsSpawned && !navMeshAgent.updatePosition)
                 {
                     navMeshAgent.nextPosition = transform.position;
                     navMeshAgent.isStopped = false;
                     navMeshAgent.updatePosition = true;
+                   
                 }
+                onStrafe?.Invoke();
 
-                    enemyAI.EnemyStrafing();
-               
                 break;
             case EnemyState.IsAttacking:
-                navMeshAgent.isStopped = true;
-                navMeshAgent.updatePosition = false;
+                if(IsServer && IsSpawned)
+                {
+                    navMeshAgent.isStopped = true;
+                    navMeshAgent.updatePosition = false;
+                    attackController.ChooseAction();
+                    
+                }
+                onAttack?.Invoke();
+
 
                 break;
             case EnemyState.IsExhausted:
+                onExhaust?.Invoke();
 
                 break;
             case EnemyState.OnDeath:
-                enemyAI.EnemyDeath();
+                onDeath?.Invoke();
                 break;
         }
     }
     void OnEnemyIdle()
     {
-        if (enemyState == EnemyState.Idle)
+        if (enemyState.Value == EnemyState.Idle)
         {
-            onIdle?.Invoke();
+           
         }
     }
     void OnEnemyStrafe()
     {
-        if (enemyState == EnemyState.IsStrafing)
+        if (enemyState.Value == EnemyState.IsStrafing)
         {
-            onStrafe?.Invoke();
+           
         }
     }
     void OnEnemyAttack()
     {
-        if(enemyState == EnemyState.IsAttacking)
+        if(enemyState.Value == EnemyState.IsAttacking)
         {
-            onAttack?.Invoke();
+           
         }
     }
     void OnEnemyExhaust()
     {
-        if (enemyState == EnemyState.IsExhausted)
+        if (enemyState.Value == EnemyState.IsExhausted)
         {
-            onExhaust?.Invoke();
+           
         }
     }
     void OnEnemyDeath()
     {
-        if (enemyState == EnemyState.OnDeath)
+        if (enemyState.Value == EnemyState.OnDeath)
         {
-            onDeath?.Invoke();
+            
         }
     }
    

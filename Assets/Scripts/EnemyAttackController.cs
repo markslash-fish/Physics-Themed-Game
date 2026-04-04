@@ -3,9 +3,10 @@ using NUnit.Framework;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using Unity.Netcode;
 
 
-public class EnemyAttackController : MonoBehaviour
+public class EnemyAttackController : NetworkBehaviour
 {
 
     [SerializeField] private EnemyAI enemyAI;
@@ -14,6 +15,7 @@ public class EnemyAttackController : MonoBehaviour
   
     public List<CombatMove> moveset;
     public List<CombatMove> movesInCooldown = new List<CombatMove>();
+    public List<CombatMove> availableMoves = new List<CombatMove>();
     private Animator animator;
     public bool isBusy;
     public bool isTrackingPlayer;
@@ -32,11 +34,15 @@ public class EnemyAttackController : MonoBehaviour
     }
     private void Start()
     { 
-            InvokeRepeating("ChooseAction", 3f, 4f); 
+      
     }
     private void OnEnable()
     {
-       
+        stateHandler.onAttack += ChooseAction;
+    }
+    private void OnDisable()
+    {
+        stateHandler.onAttack -= ChooseAction;
     }
     private void Update()
     {
@@ -45,8 +51,8 @@ public class EnemyAttackController : MonoBehaviour
     }
     public  void ChooseAction()
     {
-
-        if (isBusy || stateHandler.enemyState == EnemyStateHandler.EnemyState.Idle || stateHandler.enemyState == EnemyStateHandler.EnemyState.IsExhausted || stateHandler.enemyState == EnemyStateHandler.EnemyState.OnDeath)
+        if (!IsServer) return;
+        if (isBusy || stateHandler.enemyState.Value == EnemyStateHandler.EnemyState.Idle || stateHandler.enemyState.Value == EnemyStateHandler.EnemyState.IsExhausted || stateHandler.enemyState.Value == EnemyStateHandler.EnemyState.OnDeath)
         {
             return;
         }
@@ -57,7 +63,7 @@ public class EnemyAttackController : MonoBehaviour
     }
     void DecideAction(float distance)
     {
-        List<CombatMove> availableMoves = new List<CombatMove>();
+        availableMoves.Clear();
         if(!isBusy)
         {
             foreach (var move in moveset)
@@ -80,12 +86,12 @@ public class EnemyAttackController : MonoBehaviour
     void CalculateTotalWeight()
     {
         float totalWeight = 0;
-        foreach (var move in moveset) totalWeight += move.baseWeight;
+        foreach (var move in availableMoves) totalWeight += move.baseWeight;
 
         float randomWeight = UnityEngine.Random.Range(0, totalWeight);
         float iterations = 0;
 
-        foreach (var move in moveset)
+        foreach (var move in availableMoves)
         {
             iterations += move.baseWeight;
             if (randomWeight <= iterations && !inCooldown)
@@ -100,7 +106,6 @@ public class EnemyAttackController : MonoBehaviour
     {
 
         isBusy = true;
-        stateHandler.enemyState = EnemyStateHandler.EnemyState.IsAttacking;
         animator.SetTrigger(move.animTrigger);
         StartCoroutine(MoveCooldown(move));
         Debug.Log(move.moveName);
@@ -113,12 +118,4 @@ public class EnemyAttackController : MonoBehaviour
         movesInCooldown.Remove(move);
 
     }
-   
-    
-
-    
-
-
-
-
 }
