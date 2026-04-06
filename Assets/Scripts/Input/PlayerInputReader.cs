@@ -21,7 +21,7 @@ public class PlayerInputReader : MonoBehaviour, InputSystem_Actions.IPlayerActio
     public UnityAction<bool> onSprint;
     public UnityAction onLockOn;
 
-    private InputAction moveAction;
+    public InputAction moveAction;
     private InputAction jumpAction;
     private InputAction dodgeAction;
     private InputAction blockAction;
@@ -35,7 +35,7 @@ public class PlayerInputReader : MonoBehaviour, InputSystem_Actions.IPlayerActio
 
     void OnEnable()
     {
-        lockOnAction = inputActionAsset.FindAction("LockOn");
+        lockOnAction = inputActionAsset.FindAction("Lock On");
         sprintAction = inputActionAsset.FindAction("Sprint");
         moveAction = inputActionAsset.FindAction("Move");
         jumpAction = inputActionAsset.FindAction("Jump");
