@@ -78,13 +78,6 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.7855627
-        functionName: EnableNextCombo
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
       - time: 0.82647324
         functionName: DealLightDamage
         data: 
@@ -94,6 +87,13 @@ ModelImporter:
         messageOptions: 0
       - time: 0.9208861
         functionName: EnableMove
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.95868933
+        functionName: EnableNextCombo
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0

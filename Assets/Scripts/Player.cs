@@ -7,6 +7,13 @@ public class Player : MonoBehaviour
     [SerializeField] Transform cameraTransform;
     [SerializeField] Transform groundCheck;
 
+    [Header("Dodge")]
+    [SerializeField] float dodgeForce = 8f;
+
+    bool isBlocking = false;
+    bool isDodging = false;
+    float dodgeTimer = 0f;
+
     [Header("Movement")]
     [SerializeField] private float jumpHeight = 5f;
     [SerializeField] private float walkSpeed = 5f;
@@ -41,8 +48,21 @@ public class Player : MonoBehaviour
 
     bool isHeavyAttacking = false;
 
+        [Header("Stats")]
+    public float damageReduction = 0f;
+    public float cooldownReduction = 0f;
+    public float heavyDamageBonus = 1f;
+
+    bool hasGloveSkill = false;
+  
+
+
+
     void OnEnable()
     {
+        playerInputReader.onBlockStarted += StartBlock;
+        playerInputReader.onBlockFinished += StopBlock;
+        playerInputReader.onDodgeStarted += Dodge;
         playerInputReader.onSprint += SetSprint;
         playerInputReader.onMove += PlayerMove;
         playerInputReader.jumpStarted += PlayerJump;
@@ -53,6 +73,9 @@ public class Player : MonoBehaviour
 
     void OnDisable()
     {
+        playerInputReader.onBlockStarted -= StartBlock;
+        playerInputReader.onBlockFinished -= StopBlock;
+        playerInputReader.onDodgeStarted -= Dodge;
         playerInputReader.onSprint -= SetSprint;
         playerInputReader.onMove -= PlayerMove;
         playerInputReader.jumpStarted -= PlayerJump;
@@ -220,6 +243,10 @@ rb.MovePosition(rb.position + velocity * Time.deltaTime);
 
         isHeavyAttacking = true;
         anim.SetTrigger("HeavyAttack");
+        if (hasGloveSkill)
+        {
+            Invoke(nameof(StrongPunchShockWave),0.25f);
+        }
     }
 
     // ======================
@@ -273,10 +300,105 @@ public void Combo3Move()
     rb.AddForce(dash, ForceMode.VelocityChange);
 }
 
+
+
+public void Dodge()
+{
+    if (isDodging) return;
+    if (!isGrounded) return;
+
+    isDodging = true;
+    DisableMove();
+
+    anim.SetTrigger("Dodge");
+
+    Vector3 dodgeDir = move;
+
+    if (dodgeDir == Vector3.zero)
+    {
+        dodgeDir = transform.forward;
+    }
+
+    rb.AddForce(dodgeDir * dodgeForce, ForceMode.VelocityChange);
+
+float dodgeTime = 0.6f * (1 - cooldownReduction);
+Invoke(nameof(EndDodge), dodgeTime);
+}
+
+void EndDodge()
+{
+    isDodging = false;
+    EnableMove();
+}
+void StartBlock()
+{
+    if (isBlocking) return;
+
+    isBlocking = true;
+    anim.SetBool("Block", true);
+}
+
+void StopBlock()
+{
+    isBlocking = false;
+    anim.SetBool("Block", false);
+}
+public void TakeDamage(bool heavy)
+{
+    float finalDamage = heavy ? 50 : 25;
+
+    finalDamage *= (1 - damageReduction);
+
+    if (heavy)
+        anim.SetTrigger("HeavyHit");
+    else
+        anim.SetTrigger("Hit");
+}
+
+//Boots
 public void AddBootStats(float speedBonus, float jumpBonus)
 {
     walkSpeed += speedBonus;
     runSpeed += speedBonus;
     jumpHeight += jumpBonus;
 }
+//Gloves
+public void AddWeaponStats(float bonus)
+{
+    heavyDamageBonus += bonus;
+    hasGloveSkill = true;
+}
+void StrongPunchShockWave()
+{
+    float radius = 3f;
+
+    Collider[] enemies = Physics.OverlapSphere(transform.position, radius);
+
+    foreach(Collider enemy in enemies)
+    {
+        if(enemy.CompareTag("Enemy"))
+        {
+            EnemyDebuff e = enemy.GetComponent<EnemyDebuff>();
+
+            if(e != null)
+            {
+                int damage = Mathf.RoundToInt(heavyDamageBonus * 40);
+
+                e.TakeDamage(damage);
+                e.ArmorBreak(5f);
+            }
+        }
+    }
+}
+//Armor
+public void AddArmorStats(float reduction)
+{
+    damageReduction += reduction;
+}
+//Monocle
+public void AddMonocleStats(float reduction)
+{
+    cooldownReduction += reduction;
+}
+
 }

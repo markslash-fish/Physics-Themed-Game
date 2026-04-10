@@ -18,8 +18,6 @@ public class ItemPickup : MonoBehaviour
                 EquipmentManager manager = FindObjectOfType<EquipmentManager>();
                 manager.EquipItem(item);
                 
-                Player player = FindObjectOfType<Player>();
-                player.AddBootStats(item.speedBonus, item.jumpBonus);
 
                 Destroy(itemVisual);
                 

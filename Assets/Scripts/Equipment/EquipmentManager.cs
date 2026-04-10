@@ -2,26 +2,40 @@ using UnityEngine;
 
 public class EquipmentManager : MonoBehaviour
 {
-    public Transform headSlot;
+    public Transform MonocleSlot;
     public Transform armorSlot;
-    public Transform weaponSlot;
+    public Transform leftGauntletSlot;
+    public Transform rightGauntletSlot;
     public Transform leftBootSlot;
     public Transform rightBootSlot;
 
-    GameObject currentHelmet;
+    GameObject currentMonocle;
     GameObject currentArmor;
-    GameObject currentWeapon;
+    GameObject currentGauntletL;
+    GameObject currentGauntletR;
     GameObject currentBootL;
     GameObject currentBootR;
+
+    Player player;
+
+    void Start()
+    {
+        player = FindObjectOfType<Player>();
+    }
 
     public void EquipItem(EquipmentItem item)
     {
         Debug.Log("ITEM TYPE: " + item.type);
         switch(item.type)
         {
-            case EquipmentType.Helmet:
-                if(currentHelmet) Destroy(currentHelmet);
-                currentHelmet = Instantiate(item.prefabLeft, headSlot);
+            case EquipmentType.Monocle:
+                if(currentMonocle) Destroy(currentMonocle);
+                currentMonocle = Instantiate(item.prefabLeft, MonocleSlot);
+
+                currentMonocle.transform.localPosition = Vector3.zero;
+                currentMonocle.transform.localRotation = Quaternion.identity;
+
+                player.AddMonocleStats(item.cooldownReduction);
                 break;
 
             case EquipmentType.Armor:
@@ -31,13 +45,31 @@ public class EquipmentManager : MonoBehaviour
 
                 currentArmor.transform.localPosition = Vector3.zero;
                 currentArmor.transform.localRotation = Quaternion.identity;
+
+                player.AddArmorStats(item.damageReduction);
                 break;
 
             case EquipmentType.Weapon:
-                if(currentWeapon) Destroy(currentWeapon);
-                currentWeapon = Instantiate(item.prefabLeft, weaponSlot);
-                break;
 
+                Debug.Log("EQUIPPING GAUNTLETS");
+
+                if(currentGauntletL) Destroy(currentGauntletL);
+                if(currentGauntletR) Destroy(currentGauntletR);
+
+                currentGauntletL = Instantiate(item.prefabLeft, leftGauntletSlot);
+                currentGauntletR = Instantiate(item.prefabRight, rightGauntletSlot);
+
+                currentGauntletL.transform.localPosition = Vector3.zero;
+                currentGauntletL.transform.localRotation = Quaternion.identity;
+
+                currentGauntletR.transform.localPosition = Vector3.zero;
+                currentGauntletR.transform.localRotation = Quaternion.identity;
+
+
+                player.AddWeaponStats(item.heavyDamageBonus);
+
+            break;
+            
             case EquipmentType.Boots:
              Debug.Log("EQUIPPING BOOTS");
                 if(currentBootL) Destroy(currentBootL);
@@ -46,7 +78,13 @@ public class EquipmentManager : MonoBehaviour
                 currentBootL = Instantiate(item.prefabLeft, leftBootSlot);
                 currentBootR = Instantiate(item.prefabRight, rightBootSlot);
 
-                Player player = FindObjectOfType<Player>();
+                currentBootL.transform.localPosition = Vector3.zero;
+                currentBootL.transform.localRotation = Quaternion.identity;
+
+                currentBootR.transform.localPosition = Vector3.zero;
+                currentBootR.transform.localRotation = Quaternion.identity;
+
+
                 player.AddBootStats(item.speedBonus, item.jumpBonus);
 
                 break;

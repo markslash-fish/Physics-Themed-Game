@@ -1,8 +1,19 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class HealthSystem : MonoBehaviour
 {
+    public Animator animator;
+
+    [Header("Potion Throw")]
+    public GameObject thrownPotionPrefab;
+    public Transform throwPoint;
+    public float throwForce = 15f;
+
+    [Header("Potion")]
+    public GameObject potionObject;
+
     [Header("Health")]
     public float maxHealth = 100f;
     private float currentHealth;
@@ -19,6 +30,8 @@ public class HealthSystem : MonoBehaviour
     {
         currentHealth = maxHealth;
         currentStamina = maxStamina;
+        
+        potionObject.SetActive(false);
 
         if (bossUI != null)
         {
@@ -36,11 +49,23 @@ public class HealthSystem : MonoBehaviour
         {
             TakeDamage(10);
         }
+        // TEST BASIC HIT
+if (Keyboard.current.uKey.wasPressedThisFrame)
+{
+    animator.SetTrigger("Hit");
+}
+
+// TEST HEAVY HIT
+if (Keyboard.current.iKey.wasPressedThisFrame)
+{
+    animator.SetTrigger("HeavyHit");
+}
 
         // TEST HEAL
         if (Keyboard.current.jKey.wasPressedThisFrame)
         {
-            Heal(15);
+            StartCoroutine(ShowPotionDelay());
+            animator.SetTrigger("Heal");
         }
 
         // TEST STAMINA USE
@@ -50,7 +75,55 @@ public class HealthSystem : MonoBehaviour
         }
 
         RegenerateStamina();
+        
+        if (Keyboard.current.tKey.wasPressedThisFrame)
+        
+        {
+            Debug.Log("T key pressed");
+            ThrowBottle();
+        }
     }
+    public void HealPlayer()
+{
+     Heal(15);
+     StartCoroutine(HidePotionDelay());
+     
+}
+IEnumerator HidePotionDelay()
+{
+    yield return new WaitForSeconds(1.2f); // delay seconds
+    potionObject.SetActive(false);
+}
+IEnumerator ShowPotionDelay()
+{
+    yield return new WaitForSeconds(0.5f); // delay bago lumabas
+    potionObject.SetActive(true);
+}
+public void ThrowBottle()
+{
+    Debug.Log("ThrowBottle called");
+
+    if (thrownPotionPrefab == null)
+    {
+        Debug.LogError("ThrownPotionPrefab is NOT assigned!");
+        return;
+    }
+
+    if (throwPoint == null)
+    {
+        Debug.LogError("ThrowPoint is NOT assigned!");
+        return;
+    }
+
+    GameObject bottle = Instantiate(thrownPotionPrefab, throwPoint.position, throwPoint.rotation);
+    Debug.Log("Bottle spawned: " + bottle.name);
+
+    Rigidbody rb = bottle.GetComponent<Rigidbody>();
+    if (rb != null)
+    {
+        rb.AddForce(throwPoint.forward * throwForce, ForceMode.Impulse);
+    }
+}
 
     // HEALTH FUNCTIONS
     public void TakeDamage(float damage)

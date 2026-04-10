@@ -151,7 +151,16 @@ public class PlayerInputReader : MonoBehaviour, InputSystem_Actions.IPlayerActio
     }
     public void OnBlock(InputAction.CallbackContext context)
     {
-        if (onBlockStarted != null && context.started) onBlockStarted.Invoke();
+        if (context.started)
+        {
+           onBlockStarted?.Invoke();
+        }
+        
+        if (context.canceled)
+
+        {
+            onBlockFinished?.Invoke();
+        }
     }
 
     public void OnDodge(InputAction.CallbackContext context)
