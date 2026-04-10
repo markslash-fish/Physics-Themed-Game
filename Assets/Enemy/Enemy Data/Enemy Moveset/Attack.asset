@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CombatMove
   moveName: Attack
   minRange: 0
-  maxRange: 4
+  maxRange: 7
   baseWeight: 45
-  animTrigger: isAttacking
-  cooldown: 3.5
+  animTrigger: isBlitzAttack1
+  cooldown: 4

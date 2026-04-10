@@ -176,7 +176,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""Lock On"",
                     ""type"": ""Button"",
-                    ""id"": ""6090a735-1172-4f49-925a-1bb96bca808e"",
+                    ""id"": ""4a41af24-f8e3-45ff-839e-8fa0c1ff98a7"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -373,7 +373,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""5ef7a47e-27b3-4f01-b5cf-9f88a293b543"",
+                    ""id"": ""b1ff2d77-6231-41ea-b9a8-10b43cb8c6ac"",
                     ""path"": ""<Keyboard>/tab"",
                     ""interactions"": """",
                     ""processors"": """",
