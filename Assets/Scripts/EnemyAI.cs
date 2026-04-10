@@ -10,10 +10,11 @@ using Random = UnityEngine.Random;
 public class EnemyAI : NetworkBehaviour, IDamageable
 {
 
-    public Transform player;
+    public Transform targetPlayer = null;
     public GuardianDataManager guardianData;
     EnemyAttackController attackController;
     EnemyStateHandler stateHandler;
+    EnemyAnimationController animationController;
    
 
     [Header("EnemyStats")]
@@ -23,6 +24,10 @@ public class EnemyAI : NetworkBehaviour, IDamageable
     [SerializeField] private int enemyMinAP;
     [SerializeField] private int enemyMaxAP;
     [SerializeField] private float enemySpeed;
+    [SerializeField] private float attackTimer;
+    [SerializeField] private float attackCooldown;
+
+    [SerializeField] private bool enemyAttackStarted;
   
     public int enemyDamage;
 
@@ -35,13 +40,13 @@ public class EnemyAI : NetworkBehaviour, IDamageable
     private UnityEngine.AI.NavMeshAgent navMeshAgent;
 
 
-    int strafeDirection = 1;
+    public int strafeDirection = 1;
     public float strafeDistance = 6f;
     [Header("Raycast Settings")]
-    public float rayDistance = 0f;
-    public Vector3 rayOffset;
+    public float sphereRadius = 0f;
+    public Vector3 sphereOffset;
 
-
+    public LayerMask playerLayer;
 
 
     public Vector3 dirToPlayer;
@@ -52,13 +57,17 @@ public class EnemyAI : NetworkBehaviour, IDamageable
         navMeshAgent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         attackController = GetComponent<EnemyAttackController>();
         stateHandler = GetComponent<EnemyStateHandler>();
-
+        animationController = GetComponent<EnemyAnimationController>();
     }
     public override void OnNetworkSpawn()
     {
         enemyMaxHealth = guardianData.enemyHealth;
         enemyMaxStamina = guardianData.enemyStamina;
-      
+
+
+        stateHandler.enemyState.OnValueChanged += OnStateChanged;
+        OnStateChanged(stateHandler.enemyState.Value, stateHandler.enemyState.Value);
+
         enemyDefense = guardianData.enemyDefense;
         enemySpeed = guardianData.enemySpeed;
         enemyMinAP = guardianData.enemyMinAttackPower;
@@ -69,117 +78,99 @@ public class EnemyAI : NetworkBehaviour, IDamageable
             enemyCurrentStamina.Value = enemyMaxStamina;
         }
 
-
-        InvokeRepeating("EnemyAttack", 3f, 3.1f);
-        if (!attackController.isBusy | player != null && stateHandler.enemyState.Value == EnemyStateHandler.EnemyState.IsStrafing)
+        if (!attackController.isBusy)
             InvokeRepeating("SwitchStrafeDirection", 3f, 5f);
-    }
-    private void OnEnable()
-    {
-        stateHandler.onIdle += EnemyIdle;
-        stateHandler.onDeath += EnemyDeath;
-    }
-    private void OnDisable()
-    {
-        stateHandler.onIdle -= EnemyIdle;
-        stateHandler.onDeath -= EnemyDeath;
     }
     private void Start()
     {
-
-
         navMeshAgent.updateRotation = false;
         navMeshAgent.speed = enemySpeed;
-        
-
-
-       
     }
     void Update()
     {
         if (!IsServer) return;
-        if (!attackController.isBusy)
-        {
-            SetTarget();
-        }
-        if (player == null) return;
+
+        if (stateHandler.CurrentState == EnemyStateHandler.EnemyState.IsStrafing && !enemyAttackStarted) StartCoroutine(AttackRoutine());
+        if (targetPlayer == null) return;
 
         CalculateDistancefromPlayer();
 
-        dirToPlayer = (player.transform.position - transform.position).normalized;
-        if (isTrackingPlayer && player != null)
+        dirToPlayer = (targetPlayer.transform.position - transform.position).normalized;
+        if (isTrackingPlayer && targetPlayer != null)
         {
             ResetEnemyRotation();
         }
 
     }
-    void EnemyIdle()
-    {
-        if (player != null)
-        {
-            stateHandler.CurrentState = EnemyStateHandler.EnemyState.Idle;
-        }
-    }
-    void EnemyAttack()
+    private void OnStateChanged(EnemyStateHandler.EnemyState oldState, EnemyStateHandler.EnemyState newState)
     {
         if (!IsServer) return;
-        enemyDamage = Random.Range(enemyMinAP, enemyMaxAP);
-        stateHandler.CurrentState = EnemyStateHandler.EnemyState.IsAttacking;
-
+        if (newState == EnemyStateHandler.EnemyState.OnDeath)
+        {
+            GetComponent<NetworkObject>().Despawn();
+        }
+        else if (newState == EnemyStateHandler.EnemyState.IsAttacking)
+        {
+            SetTarget();
+            enemyDamage = Random.Range(enemyMinAP, enemyMaxAP);
+            navMeshAgent.isStopped = true;
+            navMeshAgent.updatePosition = false;
+            attackController.ChooseAction();
+     
+        }
+        else if(newState == EnemyStateHandler.EnemyState.IsStrafing)
+        {
+          
+            navMeshAgent.isStopped = false;
+            navMeshAgent.nextPosition = transform.position;
+            navMeshAgent.updatePosition = true;
+            
+        }
+        else if(newState == EnemyStateHandler.EnemyState.Idle)
+        {
+            animationController.PlayIdle();
+            navMeshAgent.isStopped = true;
+            navMeshAgent.updatePosition = false;
+        }
     }
-  
-
     public void EnemyStrafing()
     {
         if (!IsServer) return;
-        if (!navMeshAgent.enabled || attackController.isBusy || player == null) return;
-
 
         Vector3 sideVector = Vector3.Cross(Vector3.up, dirToPlayer);
 
-
-
-        Vector3 orbitPoint = player.transform.position - (dirToPlayer * strafeDistance);
+        Vector3 orbitPoint = targetPlayer.transform.position - (dirToPlayer * strafeDistance);
         Vector3 targetpos = orbitPoint + (sideVector * strafeDirection * 5f);
-
-
-
-        
+  
         navMeshAgent.SetDestination(targetpos);
 
         Quaternion lookrotation = Quaternion.LookRotation(new Vector3(dirToPlayer.x, 0, dirToPlayer.z));
         transform.rotation = Quaternion.Slerp(transform.rotation, lookrotation, Time.deltaTime * 5f);
-
-
     }
-   
-    public void EnemyDeath()
+    private void OnTriggerEnter(Collider other)
     {
-      if(IsServer)
+        if (other.CompareTag("Player"))
         {
-            GetComponent<NetworkObject>().Despawn();
+            SetTarget();
+          
+            
         }
-    }
-    void ResetState()
-    {
-        if (dirToPlayer.magnitude < strafeDistance)
-        {
-            EnemyStrafing();
-        }
-
     }
     void SetTarget()
     {
+        float closestPlayer = Mathf.Infinity;
 
-        Ray ray = new Ray(transform.position + rayOffset, transform.forward * rayDistance);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit))
+        Collider[] playersHit = Physics.OverlapSphere(transform.position, sphereRadius, playerLayer);
+
+        foreach (Collider  player in playersHit)
         {
-            if (hit.collider.CompareTag("Player"))
+            Vector3 directionToPlayer = (player.transform.position - transform.position);
+
+            float distance = directionToPlayer.sqrMagnitude;
+            if (distance < closestPlayer)
             {
-                player = hit.transform;
-                stateHandler.CurrentState = EnemyStateHandler.EnemyState.IsStrafing;
-               
+                closestPlayer = distance;
+                targetPlayer = player.transform;
             }
         }
     }
@@ -201,7 +192,7 @@ public class EnemyAI : NetworkBehaviour, IDamageable
     }
     void CalculateDistancefromPlayer()
     {
-        dirToPlayer = (player.transform.position - transform.position).normalized;
+        dirToPlayer = (targetPlayer.transform.position - transform.position).normalized;
     }
     public void ResetEnemyState()
     {
@@ -221,10 +212,19 @@ public class EnemyAI : NetworkBehaviour, IDamageable
   
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawRay(transform.position + rayOffset, transform.forward * rayDistance);
-        //AttackSphere
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position + sphereOffset, sphereRadius);
+      
     }
+    private IEnumerator AttackRoutine()
+    {
+        enemyAttackStarted = true;
+        float randomInterval = Random.Range(3f, 4f);
+        yield return new WaitForSeconds(randomInterval);
+        stateHandler.CurrentState = EnemyStateHandler.EnemyState.IsAttacking;
+        enemyAttackStarted = false;
+    }
+  
 
 
 }

@@ -137,11 +137,13 @@ MonoBehaviour:
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 100
   playerInputReader: {fileID: -7517794867648157497}
+  itemManager: {fileID: 11400000, guid: f2e1d5482a2c50f44bf362666e437095, type: 2}
   groundMask:
     serializedVersion: 2
     m_Bits: 64
   groundCheck: {fileID: 7719889428967506170}
   groundDistance: 0.1
+  tite: 0
   playerDamage: 0
   playerDefense: 0
   playerMaxHealth: 0

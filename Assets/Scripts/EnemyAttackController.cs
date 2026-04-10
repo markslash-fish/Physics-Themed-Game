@@ -38,15 +38,15 @@ public class EnemyAttackController : NetworkBehaviour
     }
     private void OnEnable()
     {
-        stateHandler.onAttack += ChooseAction;
+  
     }
     private void OnDisable()
     {
-        stateHandler.onAttack -= ChooseAction;
+      
     }
     private void Update()
     {
-        distanceToPlayer = Vector3.Distance(transform.position, enemyAI.player.position);
+        distanceToPlayer = Vector3.Distance(transform.position, enemyAI.targetPlayer.position);
        
     }
     public  void ChooseAction()
@@ -79,7 +79,12 @@ public class EnemyAttackController : NetworkBehaviour
             {
                 CalculateTotalWeight();
             }
-            Debug.Log(availableMoves.Count);
+            else if( availableMoves.Count == 0)
+            {
+                stateHandler.CurrentState = EnemyStateHandler.EnemyState.IsStrafing;
+
+            }
+                Debug.Log(availableMoves.Count);
         }
       
     }

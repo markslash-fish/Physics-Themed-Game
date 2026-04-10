@@ -1703,6 +1703,8 @@ GameObject:
   - component: {fileID: 8150169023674932191}
   - component: {fileID: -8629523355977800943}
   - component: {fileID: 7445422629681898957}
+  - component: {fileID: 3584908886173798765}
+  - component: {fileID: 3893347915894478918}
   m_Layer: 3
   m_Name: Blitz
   m_TagString: Untagged
@@ -1738,7 +1740,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 2531589438
+  GlobalObjectIdHash: 4059933905
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1764,7 +1766,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   ShowTopMostFoldoutHeaderGroup: 1
-  player: {fileID: 0}
+  targetPlayer: {fileID: 0}
   guardianData: {fileID: 11400000, guid: 0bb8a1a3d00151a41b6f3b62722c5946, type: 2}
   enemyMaxHealth: 0
   enemyMaxStamina: 0
@@ -1772,6 +1774,8 @@ MonoBehaviour:
   enemyMinAP: 0
   enemyMaxAP: 0
   enemySpeed: 0
+  attackTimer: 0
+  attackCooldown: 4
   enemyDamage: 0
   enemyCurrentHealth:
     UpdateTraits:
@@ -1783,9 +1787,13 @@ MonoBehaviour:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
     m_InternalValue: 0
+  strafeDirection: 1
   strafeDistance: 6
-  rayDistance: 10
-  rayOffset: {x: 0, y: 2, z: 0}
+  sphereRadius: 20
+  sphereOffset: {x: 0, y: 2, z: 0}
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 128
   dirToPlayer: {x: 0, y: 0, z: 0}
 --- !u!195 &540563784833611018
 NavMeshAgent:
@@ -1853,6 +1861,7 @@ MonoBehaviour:
   enemyAI: {fileID: 5013341616212112963}
   attackController: {fileID: 2814586940348408356}
   navMeshAgent: {fileID: 540563784833611018}
+  animationController: {fileID: 0}
 --- !u!95 &5217020738047964434
 Animator:
   serializedVersion: 7
@@ -1940,6 +1949,13 @@ MonoBehaviour:
   TransitionStateInfoList:
   - IsCrossFadeExit: 0
     Layer: 0
+    OriginatingState: 2081823275
+    DestinationState: 205498017
+    TransitionDuration: 0.25
+    TriggerNameHash: -1342954477
+    TransitionIndex: 1
+  - IsCrossFadeExit: 0
+    Layer: 0
     OriginatingState: 765711723
     DestinationState: 205498017
     TransitionDuration: 0.25
@@ -1951,10 +1967,22 @@ MonoBehaviour:
       NameHash: -1342954477
       Synchronize: 1
       ParameterType: 9
-    - name: Blend
-      NameHash: 1784438316
+    - name: IsStrafing
+      NameHash: 417244036
       Synchronize: 1
-      ParameterType: 1
+      ParameterType: 4
+    - name: IsIdle
+      NameHash: 2058724655
+      Synchronize: 1
+      ParameterType: 4
+    - name: IsAttacking
+      NameHash: -1130678506
+      Synchronize: 1
+      ParameterType: 4
+    - name: IsStrafingRight
+      NameHash: 1807710922
+      Synchronize: 1
+      ParameterType: 4
   AnimatorParametersExpanded: 0
 --- !u!114 &7445422629681898957
 MonoBehaviour:
@@ -1970,3 +1998,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AnimationRouter
   leftHand: {fileID: 379082205887174160}
   rightHand: {fileID: 4595643897205214494}
+--- !u!114 &3584908886173798765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8906905872426638273}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e5ff46522f7f0447af40012c072c334, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimationController
+  ShowTopMostFoldoutHeaderGroup: 1
+--- !u!135 &3893347915894478918
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8906905872426638273}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 10
+  m_Center: {x: 0, y: 1, z: 0}

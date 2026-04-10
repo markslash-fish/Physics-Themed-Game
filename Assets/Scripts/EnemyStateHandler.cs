@@ -10,6 +10,7 @@ public class EnemyStateHandler : NetworkBehaviour
     [SerializeField] private EnemyAI enemyAI;
     [SerializeField] private EnemyAttackController attackController;
     [SerializeField] private NavMeshAgent navMeshAgent;
+    [SerializeField] private EnemyAnimationController animationController;
 
 
     public event Action onIdle;
@@ -31,6 +32,7 @@ public class EnemyStateHandler : NetworkBehaviour
         navMeshAgent = GetComponent<NavMeshAgent>();
         enemyAI = GetComponent<EnemyAI>();
         attackController = GetComponent<EnemyAttackController>();
+        animationController = GetComponent<EnemyAnimationController>();
     }
     private void OnEnable()
     {
@@ -80,6 +82,8 @@ public class EnemyStateHandler : NetworkBehaviour
         if (enemyState.Value == EnemyState.IsStrafing)
         {
             enemyAI.EnemyStrafing();
+            animationController.PlayStrafe();
+
         }
 
 
@@ -100,23 +104,21 @@ public class EnemyStateHandler : NetworkBehaviour
                 onIdle?.Invoke();
                 break;
             case EnemyState.IsStrafing:       
-                if( IsServer && IsSpawned && !navMeshAgent.updatePosition)
+                if(IsServer)
                 {
-                    navMeshAgent.nextPosition = transform.position;
-                    navMeshAgent.isStopped = false;
-                    navMeshAgent.updatePosition = true;
+                 
                    
                 }
+
                 onStrafe?.Invoke();
 
                 break;
             case EnemyState.IsAttacking:
-                if(IsServer && IsSpawned)
+                if(IsServer)
                 {
-                    navMeshAgent.isStopped = true;
-                    navMeshAgent.updatePosition = false;
-                    attackController.ChooseAction();
-                    
+                  
+                   
+
                 }
                 onAttack?.Invoke();
 
