@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 750dffef66c7a034294db73061f619d0, type: 3}
+  m_Name: Force Gaunlets
+  m_EditorClassIdentifier: Assembly-CSharp::ItemManager
+  itemPrefab1: {fileID: 3473993267493287810, guid: 5572106f7528ff648b40d719240dc034, type: 3}
+  itemPrefab2: {fileID: 5486838025569844415, guid: 0c51f3c1b9e90e24c92a3711fca74ee6, type: 3}
+  equipmentType: 2
+  itemName: Force Gaunlets
+  skillCooldown: 0
+  animTrigger: isForceSkill
+  baseDamage: 0

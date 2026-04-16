@@ -1,6 +1,8 @@
+using Unity.Cinemachine;
+using Unity.Netcode;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : NetworkBehaviour, IDamageable
 {
     [Header("References")]
     [SerializeField] PlayerInputReader playerInputReader;
@@ -28,7 +30,7 @@ public class Player : MonoBehaviour
 
     public Vector2 movement;
     public Vector3 move;
-    
+
 
     public bool isGrounded;
     public bool isRunning;
@@ -48,18 +50,21 @@ public class Player : MonoBehaviour
 
     bool isHeavyAttacking = false;
 
-        [Header("Stats")]
-    public float damageReduction = 0f;
-    public float cooldownReduction = 0f;
-    public float heavyDamageBonus = 1f;
+    [Header("Stats")]
+    public NetworkVariable<int> playerBaseCurrentHealth = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    [SerializeField] public int playerBaseMaxHealth;
+    [SerializeField] public int playerBaseMinAP;
+    [SerializeField] public int playerBaseMaxAP;
+    [SerializeField] public int playerBaseDamage;
+    [SerializeField] public int playerBaseDefense;
+    [SerializeField] public int playerDamage;
+    public CinemachineCamera playerCam;
 
-    bool hasGloveSkill = false;
-  
 
 
-
-    void OnEnable()
+    public override void OnNetworkSpawn()
     {
+      
         playerInputReader.onBlockStarted += StartBlock;
         playerInputReader.onBlockFinished += StopBlock;
         playerInputReader.onDodgeStarted += Dodge;
@@ -71,8 +76,9 @@ public class Player : MonoBehaviour
         playerInputReader.onHeavyAttackStarted += HeavyAttack;
     }
 
-    void OnDisable()
+    public override void OnNetworkDespawn()
     {
+
         playerInputReader.onBlockStarted -= StartBlock;
         playerInputReader.onBlockFinished -= StopBlock;
         playerInputReader.onDodgeStarted -= Dodge;
@@ -88,45 +94,52 @@ public class Player : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
-
+        playerInputReader = GetComponent<PlayerInputReader>();
     }
 
     void Update()
     {
+
+        if (IsOwner) {
+            CheckGround();
+            CalculateMovement();
+            HandleMovementAnimation();
+            HandleComboReset();
+
+        }
+
+    }
+
+    void FixedUpdate()
+    {
+        if (!IsOwner) return;
         
-        CheckGround();
-        CalculateMovement();
-        HandleMovementAnimation();
-        HandleComboReset();
-       
+            if (!canMove) return;
+
+
+
+        if (move != Vector3.zero)
+            {
+                Quaternion rot = Quaternion.LookRotation(move);
+                transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * 10f);
+            }
+
+            float currentSpeed = isRunning ? runSpeed : walkSpeed;
+
+            if (isGrounded && verticalVelocity < 0)
+            {
+                verticalVelocity = -2f;
+            }
+
+            verticalVelocity += gravity * Time.deltaTime;
+
+            Vector3 velocity = move * currentSpeed;
+            velocity.y = verticalVelocity;
+
+            rb.MovePosition(rb.position + velocity * Time.deltaTime);
+        
+      
     }
-
-void FixedUpdate()
-{
-    if (!canMove) 
-    {
-        return;
-    }
-    if (move != Vector3.zero)
-    {
-        Quaternion rot = Quaternion.LookRotation(move);
-        transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * 10f);
-    }
-
-    float currentSpeed = isRunning ? runSpeed : walkSpeed;
-
-if (isGrounded && verticalVelocity < 0)
-{
-    verticalVelocity = -2f;
-}
-
-verticalVelocity += gravity * Time.deltaTime;
-
-Vector3 velocity = move * currentSpeed;
-velocity.y = verticalVelocity;
-
-rb.MovePosition(rb.position + velocity * Time.deltaTime);
-}
 
     // ======================
     // MOVEMENT
@@ -173,7 +186,7 @@ rb.MovePosition(rb.position + velocity * Time.deltaTime);
         Vector3 velocity = move * currentSpeed;
         velocity.y = verticalVelocity;
 
-      
+
     }
 
     void PlayerMove(Vector2 input)
@@ -202,6 +215,10 @@ rb.MovePosition(rb.position + velocity * Time.deltaTime);
 
         anim.SetBool("isIdle", !isMoving);
         anim.SetBool("isRunning", isMoving);
+    }
+    public void PlayerInteract()
+    {
+
     }
 
     // ======================
@@ -243,10 +260,7 @@ rb.MovePosition(rb.position + velocity * Time.deltaTime);
 
         isHeavyAttacking = true;
         anim.SetTrigger("HeavyAttack");
-        if (hasGloveSkill)
-        {
-            Invoke(nameof(StrongPunchShockWave),0.25f);
-        }
+
     }
 
     // ======================
@@ -284,121 +298,73 @@ rb.MovePosition(rb.position + velocity * Time.deltaTime);
         isHeavyAttacking = false;
     }
 
-public void DisableMove()
-{
-    canMove = false;
-}
-
-public void EnableMove()
-{
-    canMove = true;
-}
-public void Combo3Move()
-{
-    Vector3 dash = transform.forward * combo3Force;
-
-    rb.AddForce(dash, ForceMode.VelocityChange);
-}
-
-
-
-public void Dodge()
-{
-    if (isDodging) return;
-    if (!isGrounded) return;
-
-    isDodging = true;
-    DisableMove();
-
-    anim.SetTrigger("Dodge");
-
-    Vector3 dodgeDir = move;
-
-    if (dodgeDir == Vector3.zero)
+    public void DisableMove()
     {
-        dodgeDir = transform.forward;
+        canMove = false;
     }
 
-    rb.AddForce(dodgeDir * dodgeForce, ForceMode.VelocityChange);
-
-float dodgeTime = 0.6f * (1 - cooldownReduction);
-Invoke(nameof(EndDodge), dodgeTime);
-}
-
-void EndDodge()
-{
-    isDodging = false;
-    EnableMove();
-}
-void StartBlock()
-{
-    if (isBlocking) return;
-
-    isBlocking = true;
-    anim.SetBool("Block", true);
-}
-
-void StopBlock()
-{
-    isBlocking = false;
-    anim.SetBool("Block", false);
-}
-public void TakeDamage(bool heavy)
-{
-    float finalDamage = heavy ? 50 : 25;
-
-    finalDamage *= (1 - damageReduction);
-
-    if (heavy)
-        anim.SetTrigger("HeavyHit");
-    else
-        anim.SetTrigger("Hit");
-}
-
-//Boots
-public void AddBootStats(float speedBonus, float jumpBonus)
-{
-    walkSpeed += speedBonus;
-    runSpeed += speedBonus;
-    jumpHeight += jumpBonus;
-}
-//Gloves
-public void AddWeaponStats(float bonus)
-{
-    heavyDamageBonus += bonus;
-    hasGloveSkill = true;
-}
-void StrongPunchShockWave()
-{
-    float radius = 3f;
-
-    Collider[] enemies = Physics.OverlapSphere(transform.position, radius);
-
-    foreach(Collider enemy in enemies)
+    public void EnableMove()
     {
-        if(enemy.CompareTag("Enemy"))
+        canMove = true;
+    }
+    public void Combo3Move()
+    {
+        Vector3 dash = transform.forward * combo3Force;
+
+        rb.AddForce(dash, ForceMode.VelocityChange);
+    }
+
+
+
+    public void Dodge()
+    {
+        if (isDodging) return;
+        if (!isGrounded) return;
+
+        isDodging = true;
+        DisableMove();
+
+        anim.SetTrigger("Dodge");
+
+        Vector3 dodgeDir = move;
+
+        if (dodgeDir == Vector3.zero)
         {
-            EnemyDebuff e = enemy.GetComponent<EnemyDebuff>();
+            dodgeDir = transform.forward;
+        }
 
-            if(e != null)
-            {
-                int damage = Mathf.RoundToInt(heavyDamageBonus * 40);
+        rb.AddForce(dodgeDir * dodgeForce, ForceMode.VelocityChange);
 
-                e.TakeDamage(damage);
-                e.ArmorBreak(5f);
-            }
+        float dodgeTime = 0.6f * 1;
+        Invoke(nameof(EndDodge), dodgeTime);
+    }
+
+    void EndDodge()
+    {
+        isDodging = false;
+        EnableMove();
+    }
+    void StartBlock()
+    {
+        if (isBlocking) return;
+
+        isBlocking = true;
+        anim.SetBool("Block", true);
+    }
+
+    void StopBlock()
+    {
+        isBlocking = false;
+        anim.SetBool("Block", false);
+    }
+
+    public void TakeDamage(int damage)
+    {
+        int healthDamage = (damage * damage) / damage + playerBaseDefense;
+        playerBaseCurrentHealth.Value -= healthDamage;
+        if (playerBaseCurrentHealth.Value <= 0)
+        {
+            GetComponent<NetworkObject>().Despawn();
         }
     }
-}
-//Armor
-public void AddArmorStats(float reduction)
-{
-    damageReduction += reduction;
-}
-//Monocle
-public void AddMonocleStats(float reduction)
-{
-    cooldownReduction += reduction;
-}
-
 }

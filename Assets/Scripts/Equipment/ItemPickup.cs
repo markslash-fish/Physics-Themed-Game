@@ -1,8 +1,9 @@
+using Unity.Netcode;
 using UnityEngine;
 
 public class ItemPickup : MonoBehaviour
 {
-    public EquipmentItem item;
+    public ItemManager item;
     public GameObject itemVisual;
     public GameObject equipPrompt;
 
@@ -15,11 +16,11 @@ public class ItemPickup : MonoBehaviour
             if(Input.GetKeyDown(KeyCode.E))
             {
                 Debug.Log("E PRESSED");
-                EquipmentManager manager = FindObjectOfType<EquipmentManager>();
+                EquipmentManager manager = FindFirstObjectByType<EquipmentManager>();
                 manager.EquipItem(item);
-                
 
-                Destroy(itemVisual);
+
+                itemVisual.GetComponent<NetworkObject>().Despawn();
                 
                 equipPrompt.SetActive(false);
             }
