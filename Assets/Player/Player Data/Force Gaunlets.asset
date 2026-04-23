@@ -12,10 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 750dffef66c7a034294db73061f619d0, type: 3}
   m_Name: Force Gaunlets
   m_EditorClassIdentifier: Assembly-CSharp::ItemManager
+  itemName: Force Gaunlets
   itemPrefab1: {fileID: 3473993267493287810, guid: 5572106f7528ff648b40d719240dc034, type: 3}
   itemPrefab2: {fileID: 5486838025569844415, guid: 0c51f3c1b9e90e24c92a3711fca74ee6, type: 3}
   equipmentType: 2
-  itemName: Force Gaunlets
-  skillCooldown: 0
   animTrigger: isForceSkill
-  baseDamage: 0
+  skillCooldown: 10
+  baseDamage: 32
+  attackBonus: 12
+  defenseBonus: 8
+  healthBonus: 18
+  staminaBonus: 12
+  speedBonus: 0
+  senseBonus: 0

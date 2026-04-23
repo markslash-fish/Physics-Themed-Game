@@ -4,17 +4,22 @@ using UnityEngine;
 
 public class Player : NetworkBehaviour, IDamageable
 {
+    public enum PlayerState { None, IsJumping, IsDodging, IsAttacking, IsBlocking, IsHealing }
+    public PlayerState playerState;
+
+  public bool isBusy => playerState != PlayerState.None;
+
     [Header("References")]
     [SerializeField] PlayerInputReader playerInputReader;
     [SerializeField] Transform cameraTransform;
     [SerializeField] Transform groundCheck;
 
     [Header("Dodge")]
-    [SerializeField] float dodgeForce = 8f;
+    [SerializeField] float dodgeForce = 12f;
 
-    bool isBlocking = false;
-    bool isDodging = false;
-    float dodgeTimer = 0f;
+    public  bool isBlocking = false;
+    public bool isDodging = false;
+  
 
     [Header("Movement")]
     [SerializeField] private float jumpHeight = 5f;
@@ -22,7 +27,7 @@ public class Player : NetworkBehaviour, IDamageable
     [SerializeField] private float runSpeed = 10f;
     [SerializeField] float gravity = -20f;
     float verticalVelocity;
-    [SerializeField] float combo3Force = 6f;
+  
 
     [Header("Ground Check")]
     public LayerMask groundMask;
@@ -41,39 +46,65 @@ public class Player : NetworkBehaviour, IDamageable
     // ======================
     // COMBAT
     // ======================
-    int comboStep = 0;
-    bool canCombo = false;
-    bool canMove = true;
+    public int comboStep = 0;
+    public bool canCombo = false;
+    public bool canMove = true;
 
-    float comboTimer = 0f;
-    float comboResetTime = 1f;
+    public float comboTimer = 0f;
+    public float comboResetTime = 1f;
 
-    bool isHeavyAttacking = false;
+   public bool isHeavyAttacking = false;
 
     [Header("Stats")]
-    public NetworkVariable<int> playerBaseCurrentHealth = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public NetworkVariable<int> playerBaseCurrentHealth = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     [SerializeField] public int playerBaseMaxHealth;
+    public NetworkVariable<int> playerBaseCurrentStamina = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public int playerBaseMaxStamina;
     [SerializeField] public int playerBaseMinAP;
     [SerializeField] public int playerBaseMaxAP;
     [SerializeField] public int playerBaseDamage;
     [SerializeField] public int playerBaseDefense;
+    [SerializeField] public float playerBaseSense;
     [SerializeField] public int playerDamage;
-    public CinemachineCamera playerCam;
+    [SerializeField] public string skillTrigger;
+    [SerializeField] public int potionCount;
+    public CinemachineCamera playerThirdPersonCam;
+    public CinemachineCamera playerLockOnCam;
 
 
 
     public override void OnNetworkSpawn()
     {
-      
+        potionCount = 3;
+        if(IsOwner)
+        {
+            playerThirdPersonCam.Priority = 100;
+            
+        }
+        else
+        {
+            playerThirdPersonCam.Priority = 0;
+           
+        }
+
+        playerBaseMaxHealth = 100;
+        playerBaseCurrentHealth.Value = playerBaseMaxHealth;
+        playerBaseMaxStamina = 100;
+        playerBaseCurrentStamina.Value = playerBaseMaxStamina;
+        playerBaseMinAP = 10;
+        playerBaseMaxAP = 12;
+        playerBaseDefense = 9;
+        playerBaseSense = 0.25f;
+
         playerInputReader.onBlockStarted += StartBlock;
         playerInputReader.onBlockFinished += StopBlock;
         playerInputReader.onDodgeStarted += Dodge;
         playerInputReader.onSprint += SetSprint;
         playerInputReader.onMove += PlayerMove;
         playerInputReader.jumpStarted += PlayerJump;
-
-        playerInputReader.onLightAttackStarted += Attack;
-        playerInputReader.onHeavyAttackStarted += HeavyAttack;
+        playerInputReader.onHeal += PlayerHeal;
+        playerInputReader.onLightAttackStarted += PlayerLightAttack;
+        playerInputReader.onHeavyAttackStarted += PlayerHeavyAttack;
     }
 
     public override void OnNetworkDespawn()
@@ -85,9 +116,10 @@ public class Player : NetworkBehaviour, IDamageable
         playerInputReader.onSprint -= SetSprint;
         playerInputReader.onMove -= PlayerMove;
         playerInputReader.jumpStarted -= PlayerJump;
+        playerInputReader.onHeal -= PlayerHeal;
 
-        playerInputReader.onLightAttackStarted -= Attack;
-        playerInputReader.onHeavyAttackStarted -= HeavyAttack;
+        playerInputReader.onLightAttackStarted -= PlayerLightAttack;
+        playerInputReader.onHeavyAttackStarted -= PlayerHeavyAttack;
     }
 
     void Start()
@@ -103,10 +135,66 @@ public class Player : NetworkBehaviour, IDamageable
         if (IsOwner) {
             CheckGround();
             CalculateMovement();
-            HandleMovementAnimation();
             HandleComboReset();
 
         }
+
+        if(playerState == PlayerState.IsJumping)
+        {
+            playerInputReader.jumpAction.Disable();
+            playerInputReader.dodgeAction.Disable();
+            playerInputReader.healAction.Disable();
+            playerInputReader.blockAction.Disable();
+            playerInputReader.lAttackAction.Disable();
+            playerInputReader.hAttackAction.Disable();
+        }
+        else if (playerState == PlayerState.IsAttacking)
+        {
+            playerInputReader.dodgeAction.Disable();
+            playerInputReader.healAction.Disable();
+            playerInputReader.blockAction.Disable();
+            playerInputReader.moveAction.Disable();
+            playerInputReader.jumpAction.Disable();
+        }
+        else if (playerState == PlayerState.IsDodging) 
+        {
+            playerInputReader.moveAction.Disable();
+            playerInputReader.dodgeAction.Disable();
+            playerInputReader.jumpAction.Disable();
+            playerInputReader.healAction.Disable();
+            playerInputReader.blockAction.Disable();
+            playerInputReader.lAttackAction.Disable();
+            playerInputReader.hAttackAction.Disable();
+        }
+        else if (playerState == PlayerState.IsBlocking)
+        {
+            playerInputReader.jumpAction.Disable();
+            playerInputReader.healAction.Disable();
+            playerInputReader.lAttackAction.Disable();
+            playerInputReader.hAttackAction.Disable();
+            playerInputReader.dodgeAction.Disable();
+        }
+        else if (playerState == PlayerState.IsHealing)
+        {
+            playerInputReader.jumpAction.Disable();
+            playerInputReader.healAction.Disable();
+            playerInputReader.lAttackAction.Disable();
+            playerInputReader.hAttackAction.Disable();
+            playerInputReader.dodgeAction.Disable();
+            playerInputReader.blockAction.Disable();
+
+        }
+        else 
+        {
+            playerInputReader.jumpAction.Enable();
+            playerInputReader.lAttackAction.Enable();
+            playerInputReader.hAttackAction.Enable();
+            playerInputReader.dodgeAction.Enable();
+            playerInputReader.blockAction.Enable();
+            playerInputReader.healAction.Enable();
+            playerInputReader.moveAction.Enable();
+        }
+
 
     }
 
@@ -114,9 +202,9 @@ public class Player : NetworkBehaviour, IDamageable
     {
         if (!IsOwner) return;
         
-            if (!canMove) return;
+            if (!canMove && isBusy) return;
 
-
+      
 
         if (move != Vector3.zero)
             {
@@ -136,7 +224,8 @@ public class Player : NetworkBehaviour, IDamageable
             Vector3 velocity = move * currentSpeed;
             velocity.y = verticalVelocity;
 
-            rb.MovePosition(rb.position + velocity * Time.deltaTime);
+      
+        rb.MovePosition(rb.position + velocity * Time.deltaTime);
         
       
     }
@@ -151,6 +240,7 @@ public class Player : NetworkBehaviour, IDamageable
 
     void CalculateMovement()
     {
+     
         float x = movement.x;
         float z = movement.y;
 
@@ -196,71 +286,76 @@ public class Player : NetworkBehaviour, IDamageable
 
     void PlayerJump()
     {
+        if (isBusy) return;
+
+       
         if (isGrounded)
-        {
-            verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
-            anim.SetTrigger("jumpTrigger");
-        }
+            {
+             playerState = PlayerState.IsJumping;
+             verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            
+            }
+        
+       
     }
 
     void SetSprint(bool value)
     {
         isRunning = value;
     }
-
-    void HandleMovementAnimation()
-    {
-        float speed = move.magnitude;
-        bool isMoving = speed > 0.1f;
-
-        anim.SetBool("isIdle", !isMoving);
-        anim.SetBool("isRunning", isMoving);
-    }
     public void PlayerInteract()
     {
 
     }
+    public void PlayerHeal()
+    {
+        if (isBusy && playerBaseCurrentHealth.Value == playerBaseMaxHealth || potionCount == 0) return;
+        playerState = PlayerState.IsHealing;
+    }
+    
 
     // ======================
     // LIGHT ATTACK COMBO
     // ======================
-    public void Attack()
+    public void PlayerLightAttack()
     {
-        DisableMove();
+        if (isBusy && playerState != PlayerState.IsAttacking) return;
         if (isHeavyAttacking) return;
+
+        playerState = PlayerState.IsAttacking;
 
         comboTimer = 0f;
 
         if (comboStep == 0)
         {
             comboStep = 1;
-            anim.SetInteger("LightAttack", 1);
+           
         }
         else if (comboStep == 1 && canCombo)
         {
             comboStep = 2;
             canCombo = false;
-            anim.SetInteger("LightAttack", 2);
+            
         }
         else if (comboStep == 2 && canCombo)
         {
             comboStep = 3;
             canCombo = false;
-            anim.SetInteger("LightAttack", 3);
+            
         }
     }
 
     // ======================
     // HEAVY ATTACK
     // ======================
-    public void HeavyAttack()
+    public void PlayerHeavyAttack()
     {
+        if (isBusy) return;
+        playerState = PlayerState.IsAttacking;
         if (comboStep != 0) return;
         if (isHeavyAttacking) return;
 
         isHeavyAttacking = true;
-        anim.SetTrigger("HeavyAttack");
-
     }
 
     // ======================
@@ -268,6 +363,7 @@ public class Player : NetworkBehaviour, IDamageable
     // ======================
     void HandleComboReset()
     {
+
         if (comboStep > 0)
         {
             comboTimer += Time.deltaTime;
@@ -275,6 +371,7 @@ public class Player : NetworkBehaviour, IDamageable
             if (comboTimer >= comboResetTime)
             {
                 ResetCombo();
+              
             }
         }
     }
@@ -295,7 +392,10 @@ public class Player : NetworkBehaviour, IDamageable
 
     public void EndHeavyAttack()
     {
+        playerState = PlayerState.None;
         isHeavyAttacking = false;
+       
+
     }
 
     public void DisableMove()
@@ -307,25 +407,19 @@ public class Player : NetworkBehaviour, IDamageable
     {
         canMove = true;
     }
-    public void Combo3Move()
-    {
-        Vector3 dash = transform.forward * combo3Force;
-
-        rb.AddForce(dash, ForceMode.VelocityChange);
-    }
+   
 
 
 
     public void Dodge()
     {
-        if (isDodging) return;
+        if (isBusy) return;
+
+        playerState = PlayerState.IsDodging;
         if (!isGrounded) return;
 
+        anim.applyRootMotion = false;
         isDodging = true;
-        DisableMove();
-
-        anim.SetTrigger("Dodge");
-
         Vector3 dodgeDir = move;
 
         if (dodgeDir == Vector3.zero)
@@ -333,38 +427,46 @@ public class Player : NetworkBehaviour, IDamageable
             dodgeDir = transform.forward;
         }
 
-        rb.AddForce(dodgeDir * dodgeForce, ForceMode.VelocityChange);
+        rb.AddForce(dodgeDir * dodgeForce, ForceMode.Impulse);
 
-        float dodgeTime = 0.6f * 1;
-        Invoke(nameof(EndDodge), dodgeTime);
+       
+       
     }
 
-    void EndDodge()
-    {
-        isDodging = false;
-        EnableMove();
-    }
     void StartBlock()
     {
+        if (isBusy) return;
         if (isBlocking) return;
-
+        playerState = PlayerState.IsBlocking;
         isBlocking = true;
-        anim.SetBool("Block", true);
+      
     }
 
     void StopBlock()
     {
+        playerState = PlayerState.None;
         isBlocking = false;
-        anim.SetBool("Block", false);
     }
 
     public void TakeDamage(int damage)
     {
         int healthDamage = (damage * damage) / damage + playerBaseDefense;
         playerBaseCurrentHealth.Value -= healthDamage;
+        
+        anim.SetTrigger("Hit");
         if (playerBaseCurrentHealth.Value <= 0)
         {
             GetComponent<NetworkObject>().Despawn();
         }
+    }
+    public void PlayerCameraLockOn()
+    {
+       
+      
+    }
+    void ResetState()
+    {
+        anim.applyRootMotion = true;
+        playerState = PlayerState.None;
     }
 }

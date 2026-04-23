@@ -12,10 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 750dffef66c7a034294db73061f619d0, type: 3}
   m_Name: Mass Vest
   m_EditorClassIdentifier: Assembly-CSharp::ItemManager
+  itemName: Mass Vest
   itemPrefab1: {fileID: 5921868965508839357, guid: 39e7631ea3aec464ea2319437985baff, type: 3}
   itemPrefab2: {fileID: 0}
   equipmentType: 1
-  itemName: Mass Vest
-  skillCooldown: 0
   animTrigger: isMassSkill
-  baseDamage: 0
+  skillCooldown: 10
+  baseDamage: 25
+  attackBonus: 6
+  defenseBonus: 36
+  healthBonus: 27
+  staminaBonus: 0
+  speedBonus: -2
+  senseBonus: 0

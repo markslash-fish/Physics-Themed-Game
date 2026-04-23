@@ -1,8 +1,9 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
+using Unity.Netcode;
 
-public class HealthSystem : MonoBehaviour
+public class HealthSystem : NetworkBehaviour
 {
     public Animator animator;
 
@@ -40,49 +41,9 @@ public class HealthSystem : MonoBehaviour
         }
     }
 
-    void Update()
-    {
-        if (Keyboard.current == null) return;
-
-        // TEST DAMAGE
-        if (Keyboard.current.hKey.wasPressedThisFrame)
-        {
-            TakeDamage(10);
-        }
-        // TEST BASIC HIT
-if (Keyboard.current.uKey.wasPressedThisFrame)
-{
-    animator.SetTrigger("Hit");
-}
-
+  
 // TEST HEAVY HIT
-if (Keyboard.current.iKey.wasPressedThisFrame)
-{
-    animator.SetTrigger("HeavyHit");
-}
 
-        // TEST HEAL
-        if (Keyboard.current.jKey.wasPressedThisFrame)
-        {
-            StartCoroutine(ShowPotionDelay());
-            animator.SetTrigger("Heal");
-        }
-
-        // TEST STAMINA USE
-        if (Keyboard.current.kKey.wasPressedThisFrame)
-        {
-            UseStamina(20);
-        }
-
-        RegenerateStamina();
-        
-        if (Keyboard.current.tKey.wasPressedThisFrame)
-        
-        {
-            Debug.Log("T key pressed");
-            ThrowBottle();
-        }
-    }
     public void HealPlayer()
 {
      Heal(15);
@@ -94,11 +55,7 @@ IEnumerator HidePotionDelay()
     yield return new WaitForSeconds(1.2f); // delay seconds
     potionObject.SetActive(false);
 }
-IEnumerator ShowPotionDelay()
-{
-    yield return new WaitForSeconds(0.5f); // delay bago lumabas
-    potionObject.SetActive(true);
-}
+
 public void ThrowBottle()
 {
     Debug.Log("ThrowBottle called");

@@ -62,7 +62,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 5eab39b3a8961504cbe23ad3e2d736dd, type: 3}
       propertyPath: m_Name
-      value: potion2empty (2)
+      value: potion2empty (2) 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 5eab39b3a8961504cbe23ad3e2d736dd, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

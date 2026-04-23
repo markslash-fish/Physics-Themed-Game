@@ -23,21 +23,21 @@ public class PlayerInputReader : NetworkBehaviour, InputSystem_Actions.IPlayerAc
     public UnityAction onLockOn;
 
     public InputAction moveAction;
-    private InputAction jumpAction;
-    private InputAction dodgeAction;
-    private InputAction blockAction;
-    private InputAction skillAction;
-    private InputAction healAction;
-    private InputAction lAttackAction;
-    private InputAction hAttackAction;
-    private InputAction sprintAction;
-    private InputAction lockOnAction;
-
+    public InputAction jumpAction;
+    public InputAction dodgeAction;
+    public InputAction blockAction;
+    public InputAction skillAction;
+    public InputAction healAction;
+    public InputAction lAttackAction;
+    public InputAction hAttackAction;
+    public InputAction sprintAction;
+    public InputAction lockOnAction;
 
    public override void OnNetworkSpawn()
     {
         if(IsOwner)
         {
+       
             lockOnAction = inputActionAsset.FindAction("Lock On");
             sprintAction = inputActionAsset.FindAction("Sprint");
             moveAction = inputActionAsset.FindAction("Move");
@@ -193,7 +193,7 @@ public class PlayerInputReader : NetworkBehaviour, InputSystem_Actions.IPlayerAc
 
     public void OnLightAttack(InputAction.CallbackContext context)
     {
-        if (onLightAttackStarted != null && context.canceled) onLightAttackStarted.Invoke();
+        if (onLightAttackStarted != null && context.performed) onLightAttackStarted.Invoke();
     }
 
     public void OnMove(InputAction.CallbackContext context)

@@ -12,10 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 750dffef66c7a034294db73061f619d0, type: 3}
   m_Name: Time Monocle
   m_EditorClassIdentifier: Assembly-CSharp::ItemManager
+  itemName: Time Monocle
   itemPrefab1: {fileID: 7350521721871415352, guid: 12f708e4d8320614aa361abffcb24a2c, type: 3}
   itemPrefab2: {fileID: 0}
   equipmentType: 0
-  itemName: Time Monocle
-  skillCooldown: 0
   animTrigger: isTimeSkill
+  skillCooldown: 30
   baseDamage: 0
+  attackBonus: 0
+  defenseBonus: 0
+  healthBonus: 9
+  staminaBonus: 0
+  speedBonus: 2
+  senseBonus: 0.4
