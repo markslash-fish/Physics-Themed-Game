@@ -58,8 +58,8 @@ ModelImporter:
       hasAdditiveReferencePose: 0
       loopTime: 1
       loopBlend: 0
-      loopBlendOrientation: 0
-      loopBlendPositionY: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
@@ -295,48 +295,48 @@ ModelImporter:
         length: 0
         modified: 0
     skeleton:
-    - name: PlayerBaseFixed(Clone)
+    - name: PlayerBaseFixed 1(Clone)
       parentName: 
       position: {x: 0, y: 0, z: 0}
       rotation: {x: 0, y: 0, z: 0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: arms
-      parentName: PlayerBaseFixed(Clone)
+      parentName: PlayerBaseFixed 1(Clone)
       position: {x: -0, y: 0, z: 0}
       rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
       scale: {x: 81.47658, y: 81.47658, z: 81.47658}
     - name: eyes
-      parentName: PlayerBaseFixed(Clone)
+      parentName: PlayerBaseFixed 1(Clone)
       position: {x: -0, y: 0, z: 0}
       rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
       scale: {x: 81.47658, y: 81.47658, z: 81.47658}
     - name: hair
-      parentName: PlayerBaseFixed(Clone)
+      parentName: PlayerBaseFixed 1(Clone)
       position: {x: -0, y: 0, z: 0}
       rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
       scale: {x: 81.47658, y: 81.47658, z: 81.47658}
     - name: head
-      parentName: PlayerBaseFixed(Clone)
+      parentName: PlayerBaseFixed 1(Clone)
       position: {x: -0, y: 0, z: 0}
       rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
       scale: {x: 81.47658, y: 81.47658, z: 81.47658}
     - name: headlight
-      parentName: PlayerBaseFixed(Clone)
+      parentName: PlayerBaseFixed 1(Clone)
       position: {x: -0, y: 0, z: 0}
       rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
       scale: {x: 81.47658, y: 81.47658, z: 81.47658}
     - name: lowerbody
-      parentName: PlayerBaseFixed(Clone)
+      parentName: PlayerBaseFixed 1(Clone)
       position: {x: -0, y: 0, z: 0}
       rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
       scale: {x: 81.47658, y: 81.47658, z: 81.47658}
     - name: neck
-      parentName: PlayerBaseFixed(Clone)
+      parentName: PlayerBaseFixed 1(Clone)
       position: {x: -0, y: 0, z: 0}
       rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
       scale: {x: 81.47658, y: 81.47658, z: 81.47658}
     - name: rig
-      parentName: PlayerBaseFixed(Clone)
+      parentName: PlayerBaseFixed 1(Clone)
       position: {x: -0, y: 0, z: 0}
       rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
       scale: {x: 81.47658, y: 81.47658, z: 81.47658}
@@ -646,7 +646,7 @@ ModelImporter:
       rotation: {x: -0.015367506, y: 0.90798044, z: -0.41866863, w: -0.0072059273}
       scale: {x: 1.0000012, y: 0.9999932, z: 1.000006}
     - name: torso
-      parentName: PlayerBaseFixed(Clone)
+      parentName: PlayerBaseFixed 1(Clone)
       position: {x: -0, y: 0, z: 0}
       rotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071067}
       scale: {x: 81.47658, y: 81.47658, z: 81.47658}
@@ -662,7 +662,7 @@ ModelImporter:
     hasTranslationDoF: 0
     hasExtraRoot: 1
     skeletonHasParents: 1
-  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: 93e303c96134f5a4c9d0d1f64f05b316, type: 3}
+  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: 863d99d9158a4fb468a64a792711bc30, type: 3}
   autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 3
   humanoidOversampling: 1

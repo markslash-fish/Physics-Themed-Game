@@ -8,9 +8,8 @@ using UnityEngine;
 public class EnemyAttackHitboxScript : NetworkBehaviour
 {
     public List<Collider> ignoredColliders = new List<Collider>();
-    [SerializeField] EnemyAI enemyAI;
-    [SerializeField] EnemyStateHandler stateHandler;
-    [SerializeField] PlayerMovementScript playerMovementScript;
+    [SerializeField] EnemyAI enemyAI = null;
+    [SerializeField] Player player = null;
     [SerializeField] private Vector3 attackPointOffset;
     [SerializeField] private float attackRange;
     [SerializeField] private string targetTag, hitBoxType;
@@ -28,7 +27,7 @@ public class EnemyAttackHitboxScript : NetworkBehaviour
     private void Awake()
     {
         enemyAI = GetComponentInParent<EnemyAI>();
-        playerMovementScript = GetComponentInParent<PlayerMovementScript>();
+        player = GetComponentInParent<Player>();
     }
    
 
@@ -87,7 +86,7 @@ public class EnemyAttackHitboxScript : NetworkBehaviour
                 {
                    if(!ignoredColliders.Contains(entity))
                    {
-                    int damage = (hitBoxType == "Player") ? playerMovementScript.playerDamage : enemyAI.enemyDamage;
+                    int damage = (hitBoxType == "Player") ? player.playerDamage : enemyAI.enemyDamage;
                     damageable.TakeDamage(damage);
                     ignoredColliders.Add(entity);
 

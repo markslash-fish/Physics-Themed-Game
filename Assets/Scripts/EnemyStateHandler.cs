@@ -90,7 +90,7 @@ public class EnemyStateHandler : NetworkBehaviour
     }
    
     private void OnStateChanged(EnemyState oldState, EnemyState newState)
-    {    if(!IsServer)
+    {    if(!IsServer )
         {
             SetEnemyState(newState);
         }

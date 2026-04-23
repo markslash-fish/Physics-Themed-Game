@@ -12,8 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 750dffef66c7a034294db73061f619d0, type: 3}
   m_Name: Speed Boots
   m_EditorClassIdentifier: Assembly-CSharp::SkillsManager
-  itemPrefab: {fileID: 0}
   itemName: Speed Boots
-  skillCooldown: 12
+  itemPrefab1: {fileID: 1900429936606026873, guid: efb16e05f4242be498a499742009d642, type: 3}
+  itemPrefab2: {fileID: 5163447462005451351, guid: 749d4304135734e4eb97193780c4a0a7, type: 3}
+  equipmentType: 3
   animTrigger: isSpeedSkill
+  skillCooldown: 7
   baseDamage: 25
+  attackBonus: 3
+  defenseBonus: 0
+  healthBonus: 9
+  staminaBonus: 0
+  speedBonus: 4
+  senseBonus: 0.2

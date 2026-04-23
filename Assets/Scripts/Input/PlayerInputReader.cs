@@ -22,24 +22,22 @@ public class PlayerInputReader : NetworkBehaviour, InputSystem_Actions.IPlayerAc
     public UnityAction<bool> onSprint;
     public UnityAction onLockOn;
 
-    private InputAction moveAction;
-    private InputAction jumpAction;
-    private InputAction dodgeAction;
-    private InputAction blockAction;
-    private InputAction skillAction;
-    private InputAction healAction;
-    private InputAction lAttackAction;
-    private InputAction hAttackAction;
-    private InputAction sprintAction;
-    private InputAction lockOnAction;
+    public InputAction moveAction;
+    public InputAction jumpAction;
+    public InputAction dodgeAction;
+    public InputAction blockAction;
+    public InputAction skillAction;
+    public InputAction healAction;
+    public InputAction lAttackAction;
+    public InputAction hAttackAction;
+    public InputAction sprintAction;
+    public InputAction lockOnAction;
 
-
-
-    public override void OnNetworkSpawn()
+   public override void OnNetworkSpawn()
     {
-        if (IsOwner)
+        if(IsOwner)
         {
-
+       
             lockOnAction = inputActionAsset.FindAction("Lock On");
             sprintAction = inputActionAsset.FindAction("Sprint");
             moveAction = inputActionAsset.FindAction("Move");
@@ -52,8 +50,6 @@ public class PlayerInputReader : NetworkBehaviour, InputSystem_Actions.IPlayerAc
             hAttackAction = inputActionAsset.FindAction("Heavy Attack");
 
             lockOnAction.started += OnLockOn;
-            lockOnAction.performed += OnLockOn;
-            lockOnAction.canceled += OnLockOn;
 
             sprintAction.started += OnSprint;
             sprintAction.performed += OnSprint;
@@ -106,12 +102,12 @@ public class PlayerInputReader : NetworkBehaviour, InputSystem_Actions.IPlayerAc
             lockOnAction.Enable();
             sprintAction.Enable();
         }
-
+      
     }
 
    public override void OnNetworkDespawn()
     {
-        if (IsOwner)
+        if(IsOwner)
         {
             lockOnAction.started -= OnLockOn;
             lockOnAction.performed -= OnLockOn;
@@ -156,14 +152,23 @@ public class PlayerInputReader : NetworkBehaviour, InputSystem_Actions.IPlayerAc
             hAttackAction.started -= OnHeavyAttack;
             hAttackAction.performed -= OnHeavyAttack;
             hAttackAction.canceled -= OnHeavyAttack;
-        }
-       
 
-        
+        }
+
+        //FUNCTION
     }
     public void OnBlock(InputAction.CallbackContext context)
     {
-        if (onBlockStarted != null && context.started) onBlockStarted.Invoke();
+        if (context.started)
+        {
+           onBlockStarted?.Invoke();
+        }
+        
+        if (context.canceled)
+
+        {
+            onBlockFinished?.Invoke();
+        }
     }
 
     public void OnDodge(InputAction.CallbackContext context)
@@ -188,7 +193,7 @@ public class PlayerInputReader : NetworkBehaviour, InputSystem_Actions.IPlayerAc
 
     public void OnLightAttack(InputAction.CallbackContext context)
     {
-        if (onLightAttackStarted != null && context.canceled) onLightAttackStarted.Invoke();
+        if (onLightAttackStarted != null && context.performed) onLightAttackStarted.Invoke();
     }
 
     public void OnMove(InputAction.CallbackContext context)

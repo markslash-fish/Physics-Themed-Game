@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 750dffef66c7a034294db73061f619d0, type: 3}
+  m_Name: Mass Vest
+  m_EditorClassIdentifier: Assembly-CSharp::ItemManager
+  itemName: Mass Vest
+  itemPrefab1: {fileID: 5921868965508839357, guid: 39e7631ea3aec464ea2319437985baff, type: 3}
+  itemPrefab2: {fileID: 0}
+  equipmentType: 1
+  animTrigger: isMassSkill
+  skillCooldown: 10
+  baseDamage: 25
+  attackBonus: 6
+  defenseBonus: 36
+  healthBonus: 27
+  staminaBonus: 0
+  speedBonus: -2
+  senseBonus: 0
