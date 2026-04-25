@@ -155,6 +155,7 @@ public class Player : NetworkBehaviour, IDamageable
             playerInputReader.blockAction.Disable();
             playerInputReader.moveAction.Disable();
             playerInputReader.jumpAction.Disable();
+            playerInputReader.hAttackAction.Disable();
         }
         else if (playerState == PlayerState.IsDodging) 
         {

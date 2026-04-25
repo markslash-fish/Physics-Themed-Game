@@ -1638,9 +1638,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4228715553116800409}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0.83985656, y: -0.11760808, z: 0.4961435, w: 0.18614773}
+  m_LocalPosition: {x: -0.00012, y: 0.00018, z: -0.00003}
+  m_LocalScale: {x: 0.9, y: 0.9, z: 0.9}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1685590010136973368}
@@ -2358,9 +2358,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5778840314250905424}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0.67566454, y: -0.0015936939, z: -0.71506196, w: 0.17933609}
+  m_LocalPosition: {x: 0.00005, y: 0.00071, z: -0.00068}
+  m_LocalScale: {x: 0.9, y: 0.9, z: 0.9}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1241550257616553629}
@@ -2501,7 +2501,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 5.07757, y: -10.26779, z: 38.35684}
-  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_LocalScale: {x: 1.8, y: 1.8, z: 1.8}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2819344902670104981}
@@ -2587,7 +2587,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 112
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!114 &9214761043581794811
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2600,7 +2600,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1764149282
+  GlobalObjectIdHash: 1738339513
   InScenePlacedSourceGlobalObjectIdHash: 3174027574
   DeferredDespawnTick: 0
   Ownership: 1
@@ -2634,10 +2634,9 @@ MonoBehaviour:
   isBlocking: 0
   isDodging: 0
   jumpHeight: 2
-  walkSpeed: 8
+  walkSpeed: 4
   runSpeed: 10
   gravity: -20
-  combo3Force: 6
   groundMask:
     serializedVersion: 2
     m_Bits: 64
@@ -3205,13 +3204,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7004629374535549379}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.116729826, y: -0.010637446, z: -0.025692424, w: 0.9927743}
-  m_LocalPosition: {x: 0, y: 0.00073587004, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0.001, z: 0.0002}
+  m_LocalScale: {x: 0.11, y: 0.11, z: 0.11}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 44820771020586417}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!1 &7078230388575136115
 GameObject:
   m_ObjectHideFlags: 0
@@ -3318,7 +3317,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6964257620919101111}
   - component: {fileID: 5666090026989353675}
-  - component: {fileID: 1480057447111699622}
   - component: {fileID: 3240510778612880724}
   m_Layer: 7
   m_Name: Third Person Camera
@@ -3385,36 +3383,6 @@ MonoBehaviour:
       BarrelClipping: 0.25
       Anamorphism: 0
   BlendHint: 0
---- !u!114 &1480057447111699622
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7384631186651149135}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca7de3aefa901374ba29464584a3109a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineDecollider
-  CameraRadius: 0.4
-  Decollision:
-    Enabled: 0
-    ObstacleLayers:
-      serializedVersion: 2
-      m_Bits: 1
-    UseFollowTarget:
-      Enabled: 0
-      YOffset: 0
-    Damping: 0.5
-    SmoothingTime: 0
-  TerrainResolution:
-    Enabled: 1
-    TerrainLayers:
-      serializedVersion: 2
-      m_Bits: 1
-    MaximumRaycast: 10
-    Damping: 0.5
 --- !u!114 &3240510778612880724
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3428,8 +3396,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ThirdPersonCamera
   target: {fileID: 7283492180231401998}
-  distance: 15
-  height: 8
+  distance: 5
+  height: 3
   followSpeed: 10
   rotateSpeed: 5
 --- !u!1 &7425999968281322555
