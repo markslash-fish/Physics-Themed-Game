@@ -1196,10 +1196,9 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   ignoredColliders: []
   enemyAI: {fileID: 5013341616212112963}
-  stateHandler: {fileID: 8381441362086260198}
-  playerMovementScript: {fileID: 8302558362954878411, guid: de113ff2f29071f4895a3fe96df52b7e, type: 3}
+  player: {fileID: 0}
   attackPointOffset: {x: 0, y: 0, z: 0}
-  attackRange: 2
+  attackRange: 1.7
   targetTag: 
   hitBoxType: Enemy
   targetMask:
@@ -1258,10 +1257,9 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   ignoredColliders: []
   enemyAI: {fileID: 5013341616212112963}
-  stateHandler: {fileID: 8381441362086260198}
-  playerMovementScript: {fileID: 8302558362954878411, guid: de113ff2f29071f4895a3fe96df52b7e, type: 3}
+  player: {fileID: 0}
   attackPointOffset: {x: 0, y: 0, z: 0}
-  attackRange: 2
+  attackRange: 1.7
   targetTag: 
   hitBoxType: Enemy
   targetMask:
@@ -1776,6 +1774,7 @@ MonoBehaviour:
   enemySpeed: 0
   attackTimer: 0
   attackCooldown: 4
+  enemyAttackStarted: 0
   enemyDamage: 0
   enemyCurrentHealth:
     UpdateTraits:
@@ -1857,7 +1856,7 @@ MonoBehaviour:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 1
+    m_InternalValue: 0
   enemyAI: {fileID: 5013341616212112963}
   attackController: {fileID: 2814586940348408356}
   navMeshAgent: {fileID: 540563784833611018}
@@ -1967,20 +1966,20 @@ MonoBehaviour:
       NameHash: -1342954477
       Synchronize: 1
       ParameterType: 9
-    - name: IsStrafing
-      NameHash: 417244036
+    - name: isStrafing
+      NameHash: 1468244052
       Synchronize: 1
       ParameterType: 4
-    - name: IsIdle
-      NameHash: 2058724655
+    - name: isIdle
+      NameHash: 2098831385
       Synchronize: 1
       ParameterType: 4
-    - name: IsAttacking
-      NameHash: -1130678506
+    - name: isAttacking
+      NameHash: 973584577
       Synchronize: 1
       ParameterType: 4
-    - name: IsStrafingRight
-      NameHash: 1807710922
+    - name: isStrafingRight
+      NameHash: -478526380
       Synchronize: 1
       ParameterType: 4
   AnimatorParametersExpanded: 0
