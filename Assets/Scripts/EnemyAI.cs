@@ -63,34 +63,38 @@ public class EnemyAI : NetworkBehaviour, IDamageable
     {
         enemyMaxHealth = guardianData.enemyHealth;
         enemyMaxStamina = guardianData.enemyStamina;
-
-
-        stateHandler.enemyState.OnValueChanged += OnStateChanged;
-        OnStateChanged(stateHandler.enemyState.Value, stateHandler.enemyState.Value);
-
+        enemyCurrentHealth.Value = enemyMaxHealth;
+        enemyCurrentStamina.Value = enemyMaxStamina;
         enemyDefense = guardianData.enemyDefense;
         enemySpeed = guardianData.enemySpeed;
         enemyMinAP = guardianData.enemyMinAttackPower;
         enemyMaxAP = guardianData.enemyMaxAttackPower;
-        if (IsServer)
-        {
-            enemyCurrentHealth.Value = enemyMaxHealth;
-            enemyCurrentStamina.Value = enemyMaxStamina;
-        }
+        navMeshAgent.speed = enemySpeed;
+
+        stateHandler.enemyState.OnValueChanged += OnStateChanged;
+        OnStateChanged(stateHandler.enemyState.Value, stateHandler.enemyState.Value);
+
+     
+        
 
         if (!attackController.isBusy)
             InvokeRepeating("SwitchStrafeDirection", 3f, 5f);
+      
     }
     private void Start()
     {
         navMeshAgent.updateRotation = false;
-        navMeshAgent.speed = enemySpeed;
+        
+    }
+    public override void OnNetworkDespawn()
+    {
+        stateHandler.enemyState.OnValueChanged -= OnStateChanged;
     }
     void Update()
     {
         if (!IsServer) return;
 
-        if (stateHandler.CurrentState == EnemyStateHandler.EnemyState.IsStrafing && !enemyAttackStarted) StartCoroutine(AttackRoutine());
+     
         if (targetPlayer == null) return;
 
         CalculateDistancefromPlayer();
@@ -120,7 +124,7 @@ public class EnemyAI : NetworkBehaviour, IDamageable
         }
         else if(newState == EnemyStateHandler.EnemyState.IsStrafing)
         {
-          
+            StartCoroutine(AttackRoutine());
             navMeshAgent.isStopped = false;
             navMeshAgent.nextPosition = transform.position;
             navMeshAgent.updatePosition = true;
@@ -152,7 +156,7 @@ public class EnemyAI : NetworkBehaviour, IDamageable
         if (other.CompareTag("Player"))
         {
             SetTarget();
-          
+            stateHandler.CurrentState = EnemyStateHandler.EnemyState.IsStrafing;
             
         }
     }
@@ -180,7 +184,7 @@ public class EnemyAI : NetworkBehaviour, IDamageable
         strafeDirection *= -1;
 
     }
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage, Vector3 hitDir)
     {
         if (!IsServer) return;
         int healthDamage = (damage * damage) / damage + enemyDefense;
@@ -218,6 +222,10 @@ public class EnemyAI : NetworkBehaviour, IDamageable
     }
     private IEnumerator AttackRoutine()
     {
+        while(attackController.isBusy)
+        {
+            yield return null;
+        }
         enemyAttackStarted = true;
         float randomInterval = Random.Range(3f, 4f);
         yield return new WaitForSeconds(randomInterval);

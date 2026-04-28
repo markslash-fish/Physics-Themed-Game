@@ -17,6 +17,7 @@ public class PlayerAnimationController : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+       
         inputReader.jumpStarted += PlayJump;
         inputReader.onBlockStarted += PlayBlock;
         inputReader.onBlockFinished += StopBlock;
@@ -24,6 +25,7 @@ public class PlayerAnimationController : NetworkBehaviour
         inputReader.onHeavyAttackStarted += PlayHeavyAttack;
         inputReader.onDodgeStarted += PlayDodge;
         inputReader.onHeal += PlayHeal;
+        player.onHurt += PlayHit;
 
     }
     private void Awake()
@@ -136,9 +138,14 @@ public class PlayerAnimationController : NetworkBehaviour
         }
        
     }
+    void PlayHit()
+    {
+            
+            anim.SetTrigger("Hit");
+    }
     IEnumerator ShowPotionDelay()
     {
-        yield return new WaitForSeconds(0.5f); // delay bago lumabas
+        yield return new WaitForSeconds(0.6f); // delay bago lumabas
         potionObject.SetActive(true);
         yield return new WaitForSeconds(2.2f);
         potionObject.SetActive(false);

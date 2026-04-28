@@ -169,31 +169,40 @@ public class PlayerInputReader : NetworkBehaviour, InputSystem_Actions.IPlayerAc
         {
             onBlockFinished?.Invoke();
         }
+        else
+        {
+            return;
+        }
     }
 
     public void OnDodge(InputAction.CallbackContext context)
     {
         if (onDodgeStarted != null && context.started) onDodgeStarted.Invoke();
+        else return;
     }
 
     public void OnHeal(InputAction.CallbackContext context)
     {
         if (onHeal != null && context.started) onHeal.Invoke();
+        else return;
     }
 
     public void OnHeavyAttack(InputAction.CallbackContext context)
     {
         if (onHeavyAttackStarted != null && context.performed) onHeavyAttackStarted.Invoke();
+        else return;
     }
 
     public void OnJump(InputAction.CallbackContext context)
     {
         if (jumpStarted != null && context.started) jumpStarted.Invoke();
+        else return;
     }
 
     public void OnLightAttack(InputAction.CallbackContext context)
     {
         if (onLightAttackStarted != null && context.performed) onLightAttackStarted.Invoke();
+        else return;
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -204,6 +213,7 @@ public class PlayerInputReader : NetworkBehaviour, InputSystem_Actions.IPlayerAc
     public void OnUniqueSkill(InputAction.CallbackContext context)
     {
         if (onUniqueSkillStarted != null && context.started) onUniqueSkillStarted.Invoke();
+        else return;
     }
     public void OnSprint(InputAction.CallbackContext context)
     {
@@ -212,6 +222,7 @@ public class PlayerInputReader : NetworkBehaviour, InputSystem_Actions.IPlayerAc
     public void OnLockOn(InputAction.CallbackContext context)
     {
         if (onLockOn != null && context.started) onLockOn?.Invoke();
+        else return;
     }
 
 }
