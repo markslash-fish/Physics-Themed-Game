@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 840e04e85b7e4fe4f96448008d4ead2a, type: 3}
-  m_Name: Attack
+  m_Name: 3-hit Attack
   m_EditorClassIdentifier: Assembly-CSharp::CombatMove
-  moveName: Attack
-  minRange: 0
+  moveName: 3-Hit Attack
+  minRange: 1
   maxRange: 7
   baseWeight: 45
   animTrigger: isBlitzAttack1
-  cooldown: 4
+  cooldown: 7
