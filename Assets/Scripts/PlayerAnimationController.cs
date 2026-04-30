@@ -140,8 +140,11 @@ public class PlayerAnimationController : NetworkBehaviour
     }
     void PlayHit()
     {
-            
+     
+        
             anim.SetTrigger("Hit");
+        
+           
     }
     IEnumerator ShowPotionDelay()
     {

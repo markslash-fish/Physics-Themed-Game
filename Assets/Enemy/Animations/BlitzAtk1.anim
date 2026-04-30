@@ -43729,7 +43729,7 @@ AnimationClip:
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 3.1666667
+    m_StopTime: 2.8000002
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0
@@ -86334,20 +86334,20 @@ AnimationClip:
     intParameter: 0
     messageOptions: 0
   - time: 2.5333333
-    functionName: TriggerLeftHandDamage
-    data: 
-    objectReferenceParameter: {fileID: 0}
-    floatParameter: 0.35
-    intParameter: 0
-    messageOptions: 0
-  - time: 2.5333333
     functionName: TriggerRightHandDamage
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0.35
     intParameter: 0
     messageOptions: 0
-  - time: 3.1666667
+  - time: 2.5333333
+    functionName: TriggerLeftHandDamage
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0.35
+    intParameter: 0
+    messageOptions: 0
+  - time: 2.8
     functionName: ResetEnemyState
     data: 
     objectReferenceParameter: {fileID: 0}
