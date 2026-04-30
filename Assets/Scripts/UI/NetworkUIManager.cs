@@ -22,13 +22,13 @@ public class NetworkUIManager : MonoBehaviour
     {
         
     }
-    private void HostButtonOnClick()
+    public void HostButtonOnClick()
     {
         NetworkManager.Singleton.StartHost();
         NetworkManager.Singleton.SceneManager.LoadScene("Main Game", UnityEngine.SceneManagement.LoadSceneMode.Single);
            
     }
-    private void ClientButtonOnClick()
+    public void ClientButtonOnClick()
     {
         NetworkManager.Singleton.StartClient();
     }
