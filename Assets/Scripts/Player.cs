@@ -25,7 +25,7 @@ public class Player : NetworkBehaviour, IDamageable
     [Header("Movement")]
     [SerializeField] private float jumpHeight = 5f;
     [SerializeField] private float walkSpeed = 5f;
-    [SerializeField] private float runSpeed = 10f;
+    [SerializeField] private float runSpeed = 7f;
     [SerializeField] float gravity = -20f;
     float verticalVelocity;
   
@@ -72,6 +72,8 @@ public class Player : NetworkBehaviour, IDamageable
     public CinemachineCamera playerThirdPersonCam;
     public CinemachineCamera playerLockOnCam;
 
+  
+
     public event Action onHurt;
 
 
@@ -81,12 +83,13 @@ public class Player : NetworkBehaviour, IDamageable
         if(IsOwner)
         {
             playerThirdPersonCam.Priority = 100;
-            
+            playerLockOnCam.Priority = 90;
         }
         else
         {
             playerThirdPersonCam.Priority = 0;
-           
+            playerLockOnCam.Priority = 0;
+
         }
         playerBaseCurrentHealth.OnValueChanged += (oldVal, newVal) => {
             if (newVal < oldVal)
@@ -112,6 +115,7 @@ public class Player : NetworkBehaviour, IDamageable
         playerInputReader.onHeal += PlayerHeal;
         playerInputReader.onLightAttackStarted += PlayerLightAttack;
         playerInputReader.onHeavyAttackStarted += PlayerHeavyAttack;
+        playerInputReader.onLockOn += PlayerCameraLockOn;
     }
 
     public override void OnNetworkDespawn()
@@ -164,8 +168,8 @@ public class Player : NetworkBehaviour, IDamageable
             playerInputReader.jumpAction.Disable();
             playerInputReader.hAttackAction.Disable();
         }
-        else if (playerState == PlayerState.IsDodging) 
-        {
+        else if (playerState == PlayerState.IsDodging)
+        { 
             playerInputReader.moveAction.Disable();
             playerInputReader.dodgeAction.Disable();
             playerInputReader.jumpAction.Disable();
@@ -193,8 +197,20 @@ public class Player : NetworkBehaviour, IDamageable
             playerInputReader.blockAction.Disable();
 
         }
+        else if (playerState == PlayerState.IsHurt)
+        {
+            playerInputReader.moveAction.Disable();
+            playerInputReader.jumpAction.Disable();
+            playerInputReader.healAction.Disable();
+            playerInputReader.lAttackAction.Disable();
+            playerInputReader.hAttackAction.Disable();
+            playerInputReader.dodgeAction.Disable();
+            playerInputReader.blockAction.Disable();
+
+        }
         else 
         {
+          
             playerInputReader.jumpAction.Enable();
             playerInputReader.lAttackAction.Enable();
             playerInputReader.hAttackAction.Enable();
@@ -210,8 +226,10 @@ public class Player : NetworkBehaviour, IDamageable
     void FixedUpdate()
     {
         if (!IsOwner) return;
-        
-            if (!canMove && isBusy) return;
+
+        if (playerState == PlayerState.IsHurt) return;
+
+        if (!canMove && isBusy) return;
 
       
 
@@ -461,11 +479,11 @@ public class Player : NetworkBehaviour, IDamageable
     {
 
         int healthDamage = (damage * damage) / (damage + playerBaseDefense);
-        float knockbackForce = (damage <20)? 5f: 10f;
+        float knockbackForce = (damage <20)? 8f: 12f;
         playerBaseCurrentHealth.Value -= healthDamage;
         playerState = Player.PlayerState.IsHurt;
 
-        ApplyKnockbackServerRpc(knockbackForce, hitDir);
+     
         ApplyKnockbackClientRpc(knockbackForce, hitDir);
         if (playerBaseCurrentHealth.Value <= 0)
         {
@@ -474,28 +492,32 @@ public class Player : NetworkBehaviour, IDamageable
       
        
     }
-    [ClientRpc]
+
+    [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Everyone)]
     private void ApplyKnockbackClientRpc(float force, Vector3 dir)
     {
-        // This tells the Client: "Ignore your local input and move!"
+       
         ApplyPlayerKnockback(force, dir);
     }
-    [ServerRpc]
-    private void ApplyKnockbackServerRpc(float force, Vector3 dir)
-    {
-        // This tells the Client: "Ignore your local input and move!"
-        ApplyPlayerKnockback(force, dir);
-    }
-  
+
+
     public void ApplyPlayerKnockback(float knockbackForce, Vector3 hitDir)
     {
-        rb.AddForce(hitDir * knockbackForce, ForceMode.VelocityChange);
+        playerState = PlayerState.IsHurt; // Ensure state is set for everyone
         anim.applyRootMotion = false;
-        Debug.Log("knockback");
+
+        // CRITICAL: Clear current velocity so the knockback isn't fighting old movement
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        // Apply the force
+        rb.AddForce(hitDir * knockbackForce, ForceMode.Impulse);
+
+        Debug.Log("Knockback Applied");
     }
     public void PlayerCameraLockOn()
     {
-       
+      
     }
     void ResetState()
     {

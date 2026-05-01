@@ -1738,7 +1738,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 4059933905
+  GlobalObjectIdHash: 2531589438
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1833,6 +1833,7 @@ MonoBehaviour:
   stateHandler: {fileID: 8381441362086260198}
   moveset:
   - {fileID: 11400000, guid: 28328619d78059145b6c6246ec7e9a05, type: 2}
+  - {fileID: 11400000, guid: 01662b4ecaee85c44815f40c4a03e561, type: 2}
   movesInCooldown: []
   availableMoves: []
   isBusy: 0
