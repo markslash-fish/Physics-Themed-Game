@@ -5117,14 +5117,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: FINAL_MAP
       objectReference: {fileID: 0}
-    - target: {fileID: 6058695236181596931, guid: eeee88ae86cb0c2438447b895060a26a, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 52.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 6058695236181596931, guid: eeee88ae86cb0c2438447b895060a26a, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 18.3
-      objectReference: {fileID: 0}
     - target: {fileID: 8139015921602662668, guid: eeee88ae86cb0c2438447b895060a26a, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
