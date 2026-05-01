@@ -12,7 +12,8 @@ public class ThirdPersonCamera : MonoBehaviour
 
     void Start()
     {
-
+        Cursor.lockState = CursorLockMode.Locked; // lock cursor sa gitna
+        Cursor.visible = false; // hide mouse
     }
     void LateUpdate()
     {

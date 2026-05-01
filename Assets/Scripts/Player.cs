@@ -5,11 +5,6 @@ using UnityEngine;
 
 public class Player : NetworkBehaviour, IDamageable
 {
-    [Header("After Image")]
-public GameObject ghostPrefab;
-public float ghostSpawnDelay = 0.05f;
-float ghostTimer = 0f;
-    
     public enum PlayerState { None, IsJumping, IsDodging, IsAttacking, IsBlocking, IsHealing, IsHurt }
     public PlayerState playerState;
 
@@ -148,19 +143,6 @@ float ghostTimer = 0f;
             CheckGround();
             CalculateMovement();
             HandleComboReset();
-
-if (!IsOwner) return;
-
-if (isDodging)
-{
-    ghostTimer += Time.deltaTime;
-
-    if (ghostTimer >= ghostSpawnDelay)
-    {
-        SpawnGhostServerRpc(transform.position, transform.rotation);
-        ghostTimer = 0f;
-    }
-}
 
         }
 
@@ -520,34 +502,4 @@ if (isDodging)
         anim.applyRootMotion = true;
         playerState = PlayerState.None;
     }
-
-// =========================
-// MULTIPLAYER AFTER IMAGE
-// =========================
-
-[ServerRpc]
-void SpawnGhostServerRpc(Vector3 pos, Quaternion rot)
-{
-    SpawnGhostClientRpc(pos, rot);
-}
-
-[ClientRpc]
-void SpawnGhostClientRpc(Vector3 pos, Quaternion rot)
-{
-    GameObject ghost = Instantiate(ghostPrefab, pos, rot);
-
-    Animator ghostAnim = ghost.GetComponent<Animator>();
-    Animator myAnim = GetComponent<Animator>();
-
-    if (ghostAnim != null && myAnim != null)
-    {
-        ghostAnim.Play(myAnim.GetCurrentAnimatorStateInfo(0).fullPathHash, 0, 0f);
-        ghostAnim.speed = 0f;
-    }
-}
-public void EndDodge()
-{
-    isDodging = false;
-    ghostTimer = 0f;
-}
 }
