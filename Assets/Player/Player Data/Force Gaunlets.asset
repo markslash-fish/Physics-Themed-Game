@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Force Gaunlets
   m_EditorClassIdentifier: Assembly-CSharp::ItemManager
   itemName: Force Gaunlets
-  itemPrefab1: {fileID: 3473993267493287810, guid: 5572106f7528ff648b40d719240dc034, type: 3}
-  itemPrefab2: {fileID: 5486838025569844415, guid: 0c51f3c1b9e90e24c92a3711fca74ee6, type: 3}
+  itemPrefab1: {fileID: 1107929768701054393, guid: 220e4b720c402ab4089f4684b5d8ee76, type: 3}
+  itemPrefab2: {fileID: 4416635703675512374, guid: 20ae0a416cb24d74f8d158a46bee83e2, type: 3}
   equipmentType: 2
   animTrigger: isForceSkill
   skillCooldown: 10

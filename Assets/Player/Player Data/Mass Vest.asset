@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Mass Vest
   m_EditorClassIdentifier: Assembly-CSharp::ItemManager
   itemName: Mass Vest
-  itemPrefab1: {fileID: 5921868965508839357, guid: 39e7631ea3aec464ea2319437985baff, type: 3}
+  itemPrefab1: {fileID: 6516632111279676710, guid: bc2d001004b516742b4954cfae176e5b, type: 3}
   itemPrefab2: {fileID: 0}
   equipmentType: 1
   animTrigger: isMassSkill

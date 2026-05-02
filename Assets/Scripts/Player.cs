@@ -1,10 +1,11 @@
+using System;
 using Unity.Cinemachine;
 using Unity.Netcode;
 using UnityEngine;
 
 public class Player : NetworkBehaviour, IDamageable
 {
-    public enum PlayerState { None, IsJumping, IsDodging, IsAttacking, IsBlocking, IsHealing }
+    public enum PlayerState { None, IsJumping, IsDodging, IsAttacking, IsBlocking, IsHealing, IsHurt }
     public PlayerState playerState;
 
   public bool isBusy => playerState != PlayerState.None;
@@ -56,9 +57,9 @@ public class Player : NetworkBehaviour, IDamageable
    public bool isHeavyAttacking = false;
 
     [Header("Stats")]
-    public NetworkVariable<int> playerBaseCurrentHealth = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public NetworkVariable<int> playerBaseCurrentHealth = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     [SerializeField] public int playerBaseMaxHealth;
-    public NetworkVariable<int> playerBaseCurrentStamina = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public NetworkVariable<int> playerBaseCurrentStamina = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     public int playerBaseMaxStamina;
     [SerializeField] public int playerBaseMinAP;
     [SerializeField] public int playerBaseMaxAP;
@@ -71,6 +72,7 @@ public class Player : NetworkBehaviour, IDamageable
     public CinemachineCamera playerThirdPersonCam;
     public CinemachineCamera playerLockOnCam;
 
+    public event Action onHurt;
 
 
     public override void OnNetworkSpawn()
@@ -86,14 +88,19 @@ public class Player : NetworkBehaviour, IDamageable
             playerThirdPersonCam.Priority = 0;
            
         }
-
-        playerBaseMaxHealth = 100;
+        playerBaseCurrentHealth.OnValueChanged += (oldVal, newVal) => {
+            if (newVal < oldVal)
+            {
+                onHurt?.Invoke();
+            }
+        };
+        playerBaseMaxHealth = 200;
         playerBaseCurrentHealth.Value = playerBaseMaxHealth;
         playerBaseMaxStamina = 100;
         playerBaseCurrentStamina.Value = playerBaseMaxStamina;
         playerBaseMinAP = 10;
         playerBaseMaxAP = 12;
-        playerBaseDefense = 9;
+        playerBaseDefense = 50;
         playerBaseSense = 0.25f;
 
         playerInputReader.onBlockStarted += StartBlock;
@@ -117,7 +124,7 @@ public class Player : NetworkBehaviour, IDamageable
         playerInputReader.onMove -= PlayerMove;
         playerInputReader.jumpStarted -= PlayerJump;
         playerInputReader.onHeal -= PlayerHeal;
-
+       
         playerInputReader.onLightAttackStarted -= PlayerLightAttack;
         playerInputReader.onHeavyAttackStarted -= PlayerHeavyAttack;
     }
@@ -155,6 +162,7 @@ public class Player : NetworkBehaviour, IDamageable
             playerInputReader.blockAction.Disable();
             playerInputReader.moveAction.Disable();
             playerInputReader.jumpAction.Disable();
+            playerInputReader.hAttackAction.Disable();
         }
         else if (playerState == PlayerState.IsDodging) 
         {
@@ -176,6 +184,7 @@ public class Player : NetworkBehaviour, IDamageable
         }
         else if (playerState == PlayerState.IsHealing)
         {
+            playerInputReader.dodgeAction.Disable();
             playerInputReader.jumpAction.Disable();
             playerInputReader.healAction.Disable();
             playerInputReader.lAttackAction.Disable();
@@ -448,21 +457,45 @@ public class Player : NetworkBehaviour, IDamageable
         isBlocking = false;
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage, Vector3 hitDir)
     {
-        int healthDamage = (damage * damage) / damage + playerBaseDefense;
+
+        int healthDamage = (damage * damage) / (damage + playerBaseDefense);
+        float knockbackForce = (damage <20)? 5f: 10f;
         playerBaseCurrentHealth.Value -= healthDamage;
-        
-        anim.SetTrigger("Hit");
+        playerState = Player.PlayerState.IsHurt;
+
+        ApplyKnockbackServerRpc(knockbackForce, hitDir);
+        ApplyKnockbackClientRpc(knockbackForce, hitDir);
         if (playerBaseCurrentHealth.Value <= 0)
         {
             GetComponent<NetworkObject>().Despawn();
         }
+      
+       
+    }
+    [ClientRpc]
+    private void ApplyKnockbackClientRpc(float force, Vector3 dir)
+    {
+        // This tells the Client: "Ignore your local input and move!"
+        ApplyPlayerKnockback(force, dir);
+    }
+    [ServerRpc]
+    private void ApplyKnockbackServerRpc(float force, Vector3 dir)
+    {
+        // This tells the Client: "Ignore your local input and move!"
+        ApplyPlayerKnockback(force, dir);
+    }
+  
+    public void ApplyPlayerKnockback(float knockbackForce, Vector3 hitDir)
+    {
+        rb.AddForce(hitDir * knockbackForce, ForceMode.VelocityChange);
+        anim.applyRootMotion = false;
+        Debug.Log("knockback");
     }
     public void PlayerCameraLockOn()
     {
        
-      
     }
     void ResetState()
     {

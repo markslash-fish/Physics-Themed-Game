@@ -87,7 +87,9 @@ public class EnemyAttackHitboxScript : NetworkBehaviour
                    if(!ignoredColliders.Contains(entity))
                    {
                     int damage = (hitBoxType == "Player") ? player.playerDamage : enemyAI.enemyDamage;
-                    damageable.TakeDamage(damage);
+                    Vector3 hitDir = (entity.transform.position - transform.parent.position).normalized;
+                    hitDir.y = 0.15f;
+                    damageable.TakeDamage(damage, hitDir);
                     ignoredColliders.Add(entity);
 
                     Debug.Log("AAAAAAAAAAAAA");

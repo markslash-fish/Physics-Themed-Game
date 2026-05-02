@@ -10,22 +10,26 @@ public class ItemPickup : NetworkBehaviour
 
     bool playerNear;
 
-    
 
+    private void Start()
+    {
+        equipPrompt.SetActive(false);
+    }
     void Update()
     {
         if(playerNear)
         {
-            if(Input.GetKeyDown(KeyCode.E))
+            
+            if (Input.GetKeyDown(KeyCode.E))
             {
 
 
 
-
+              
                 RequestEquipServerRPC();
 
 
-
+               
             }
            
         }
@@ -54,6 +58,7 @@ public class ItemPickup : NetworkBehaviour
         }
         equipPrompt.SetActive(false);
         itemVisual.GetComponent<NetworkObject>().Despawn();
+        this.enabled = false;
     }
     void OnTriggerEnter(Collider other)
     {
