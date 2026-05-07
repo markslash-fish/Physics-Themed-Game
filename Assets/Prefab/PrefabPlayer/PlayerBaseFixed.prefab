@@ -378,6 +378,61 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2954629287978016886}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1367004801966654977
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8941936124416518216}
+  - component: {fileID: 767419803006335653}
+  m_Layer: 0
+  m_Name: Target Group
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8941936124416518216
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1367004801966654977}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.75000024, z: 0}
+  m_LocalScale: {x: 0.5555556, y: 0.5555556, z: 0.5555556}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7283492180231401998}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &767419803006335653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1367004801966654977}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5eb80d8e62d9d145bb50fb783c0f731, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineTargetGroup
+  PositionMode: 0
+  RotationMode: 1
+  UpdateMethod: 2
+  Targets:
+  - Object: {fileID: 3399163945616968328}
+    Weight: 1
+    Radius: 1
+  - Object: {fileID: 3399163945616968328}
+    Weight: 1
+    Radius: 1
+  m_LegacyTargets: []
 --- !u!1 &1445947572669730991
 GameObject:
   m_ObjectHideFlags: 0
@@ -539,6 +594,112 @@ MonoBehaviour:
   playerMask:
     serializedVersion: 2
     m_Bits: 128
+--- !u!1 &1979258685486041318
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4815273150066707248}
+  - component: {fileID: 4650176941812897797}
+  - component: {fileID: 1120935291745350635}
+  m_Layer: 7
+  m_Name: State-Driven Camera
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4815273150066707248
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1979258685486041318}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7542455642855753517}
+  - {fileID: 1017288822997136610}
+  m_Father: {fileID: 7283492180231401998}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4650176941812897797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1979258685486041318}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 325a6a3050a061e4b8aa51386c30e8e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineStateDrivenCamera
+  Priority:
+    Enabled: 0
+    m_Value: 0
+  OutputChannel: 1
+  StandbyUpdate: 2
+  m_StreamingVersion: 20241001
+  m_LegacyPriority: 0
+  DefaultTarget:
+    Enabled: 0
+    Target:
+      TrackingTarget: {fileID: 0}
+      LookAtTarget: {fileID: 0}
+      CustomLookAtTarget: 0
+  DefaultBlend:
+    Style: 1
+    Time: 0.5
+    CustomCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  CustomBlends: {fileID: 0}
+  AnimatedTarget: {fileID: 1120935291745350635}
+  LayerIndex: 0
+  Instructions:
+  - FullHash: 0
+    Camera: {fileID: 5594277325252247119}
+    ActivateAfter: 0
+    MinDuration: 0
+  - FullHash: 0
+    Camera: {fileID: 2284169820178440717}
+    ActivateAfter: 0
+    MinDuration: 0
+  HashOfParent: []
+  m_LegacyLookAt: {fileID: 0}
+  m_LegacyFollow: {fileID: 0}
+--- !u!95 &1120935291745350635
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1979258685486041318}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: f997efee40b058a4a851f752f048037d, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &2002699538466746812
 GameObject:
   m_ObjectHideFlags: 0
@@ -550,9 +711,7 @@ GameObject:
   - component: {fileID: 7542455642855753517}
   - component: {fileID: 5594277325252247119}
   - component: {fileID: 8099749426557078541}
-  - component: {fileID: 4985758463294141298}
   - component: {fileID: 8595628712329541939}
-  - component: {fileID: 2684020079328221954}
   m_Layer: 7
   m_Name: Lock-On Camera
   m_TagString: Untagged
@@ -568,12 +727,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2002699538466746812}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.28370264, y: -0.11708529, z: -0.034925386, w: 0.9510963}
-  m_LocalPosition: {x: -2.8208723, y: 5.704328, z: -21.309355}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.2777778, y: 0, z: -1.1111112}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7283492180231401998}
+  m_Father: {fileID: 4815273150066707248}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5594277325252247119
 MonoBehaviour:
@@ -596,7 +755,7 @@ MonoBehaviour:
   m_LegacyPriority: 0
   Target:
     TrackingTarget: {fileID: 7283492180231401998}
-    LookAtTarget: {fileID: 3399163945616968328}
+    LookAtTarget: {fileID: 8941936124416518216}
     CustomLookAtTarget: 1
   Lens:
     FieldOfView: 60.000004
@@ -644,35 +803,6 @@ MonoBehaviour:
     CameraRadius: 0.2
     DampingIntoCollision: 0
     DampingFromCollision: 0.5
---- !u!114 &4985758463294141298
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2002699538466746812}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f38bda98361e1de48a4ca2bd86ea3c17, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineRotationComposer
-  Composition:
-    ScreenPosition: {x: 0, y: 0}
-    DeadZone:
-      Enabled: 0
-      Size: {x: 0.2, y: 0.2}
-    HardLimits:
-      Enabled: 0
-      Size: {x: 0.8, y: 0.8}
-      Offset: {x: 0, y: 0}
-  CenterOnActivate: 1
-  TargetOffset: {x: 0, y: 0, z: 0}
-  Damping: {x: 0.5, y: 0.5}
-  Lookahead:
-    Enabled: 0
-    Time: 0
-    Smoothing: 0
-    IgnoreY: 0
 --- !u!114 &8595628712329541939
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -693,24 +823,7 @@ MonoBehaviour:
   camDetectionRange: 12
   targetLayer:
     serializedVersion: 2
-    m_Bits: 512
---- !u!114 &2684020079328221954
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2002699538466746812}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5eb80d8e62d9d145bb50fb783c0f731, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineTargetGroup
-  PositionMode: 0
-  RotationMode: 0
-  UpdateMethod: 2
-  Targets: []
-  m_LegacyTargets: []
+    m_Bits: 8
 --- !u!1 &2028228223976744879
 GameObject:
   m_ObjectHideFlags: 0
@@ -2931,12 +3044,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6167484466743613674}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.017664764, y: -0.48465917, z: 0.009790377, w: 0.87446994}
-  m_LocalPosition: {x: 1.1786928, y: 0.80618066, z: -0.73672193}
-  m_LocalScale: {x: 0.5555556, y: 0.5555556, z: 0.5555556}
+  m_LocalRotation: {x: 0.36632064, y: 0.097656704, z: -0.038693458, w: 0.9245405}
+  m_LocalPosition: {x: -0.41815442, y: 2.6314032, z: -1.9573022}
+  m_LocalScale: {x: 0.5555556, y: 0.55555564, z: 0.55555564}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7283492180231401998}
+  m_Father: {fileID: 4815273150066707248}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2284169820178440717
 MonoBehaviour:
@@ -3015,7 +3128,7 @@ MonoBehaviour:
     SplineCurvature: 0.5
   RecenteringTarget: 2
   HorizontalAxis:
-    Value: -57.99324
+    Value: 12.05928
     Center: 0
     Range: {x: -180, y: 180}
     Wrap: 1
@@ -3025,7 +3138,7 @@ MonoBehaviour:
       Time: 2
     Restrictions: 0
   VerticalAxis:
-    Value: -9.9737215
+    Value: 26.636198
     Center: 17.5
     Range: {x: -10, y: 45}
     Wrap: 0
@@ -3265,10 +3378,9 @@ Transform:
   - {fileID: 8264230672696799507}
   - {fileID: 6417667740218721676}
   - {fileID: 3128271803241810353}
-  - {fileID: 1017288822997136610}
   - {fileID: 3399163945616968328}
-  - {fileID: 7542455642855753517}
-  - {fileID: 2019785331030506612}
+  - {fileID: 8941936124416518216}
+  - {fileID: 4815273150066707248}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &6188842549224692989
@@ -3718,6 +3830,10 @@ MonoBehaviour:
       ParameterType: 9
     - name: Blend
       NameHash: 1784438316
+      Synchronize: 1
+      ParameterType: 1
+    - name: isSprinting
+      NameHash: 1125312739
       Synchronize: 1
       ParameterType: 1
   AnimatorParametersExpanded: 0
