@@ -23,10 +23,25 @@ public class PlayerAnimationController : NetworkBehaviour
         inputReader.onBlockFinished += StopBlock;
         inputReader.onLightAttackStarted += PlayLightAttack;
         inputReader.onHeavyAttackStarted += PlayHeavyAttack;
+        inputReader.onSprintStarted += PlaySprint;
+        inputReader.onSprintFinished += EndSprint;
         inputReader.onDodgeStarted += PlayDodge;
         inputReader.onHeal += PlayHeal;
         player.onHurt += PlayHit;
 
+    }
+    public override void OnNetworkDespawn()
+    {
+        inputReader.jumpStarted -= PlayJump;
+        inputReader.onBlockStarted -= PlayBlock;
+        inputReader.onBlockFinished -= StopBlock;
+        inputReader.onLightAttackStarted -= PlayLightAttack;
+        inputReader.onHeavyAttackStarted -= PlayHeavyAttack;
+        inputReader.onSprintStarted -= PlaySprint;
+        inputReader.onSprintFinished -= EndSprint;
+        inputReader.onDodgeStarted -= PlayDodge;
+        inputReader.onHeal -= PlayHeal;
+        player.onHurt -= PlayHit;
     }
     private void Awake()
     {
@@ -140,12 +155,28 @@ public class PlayerAnimationController : NetworkBehaviour
     }
     void PlayHit()
     {
-     
-        
+ 
+            anim.ResetControllerState();
             anim.SetTrigger("Hit");
         
            
     }
+    void PlaySprint(bool sprinting)
+    {
+     
+
+        
+            anim.SetFloat("isSprinting", 1.2f);
+        
+    }
+    void EndSprint(bool sprinting)
+    {
+   
+        
+            anim.SetFloat("isSprinting", 0.8f);
+        
+    }
+       
     IEnumerator ShowPotionDelay()
     {
         yield return new WaitForSeconds(0.6f); // delay bago lumabas

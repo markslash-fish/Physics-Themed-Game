@@ -1703,6 +1703,8 @@ GameObject:
   - component: {fileID: 7445422629681898957}
   - component: {fileID: 3584908886173798765}
   - component: {fileID: 3893347915894478918}
+  - component: {fileID: -9064407985613565095}
+  - component: {fileID: 4480817286823279098}
   m_Layer: 3
   m_Name: Blitz
   m_TagString: Untagged
@@ -1834,6 +1836,7 @@ MonoBehaviour:
   moveset:
   - {fileID: 11400000, guid: 28328619d78059145b6c6246ec7e9a05, type: 2}
   - {fileID: 11400000, guid: 01662b4ecaee85c44815f40c4a03e561, type: 2}
+  - {fileID: 11400000, guid: ea36cdff7cf85214c97b2980b768ee0c, type: 2}
   movesInCooldown: []
   availableMoves: []
   isBusy: 0
@@ -1961,6 +1964,20 @@ MonoBehaviour:
     TransitionDuration: 0.25
     TriggerNameHash: -1342954477
     TransitionIndex: 0
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 765711723
+    DestinationState: -1839716244
+    TransitionDuration: 0.25
+    TriggerNameHash: 922580393
+    TransitionIndex: 2
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 765711723
+    DestinationState: -2129205218
+    TransitionDuration: 0.25
+    TriggerNameHash: -480079957
+    TransitionIndex: 3
   AnimatorParameterEntries:
     ParameterEntries:
     - name: isBlitzAttack1
@@ -1983,6 +2000,14 @@ MonoBehaviour:
       NameHash: -478526380
       Synchronize: 1
       ParameterType: 4
+    - name: isBlitzAttack2
+      NameHash: 922580393
+      Synchronize: 1
+      ParameterType: 9
+    - name: isBackStep
+      NameHash: -480079957
+      Synchronize: 1
+      ParameterType: 9
   AnimatorParametersExpanded: 0
 --- !u!114 &7445422629681898957
 MonoBehaviour:
@@ -2032,3 +2057,51 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 10
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!65 &-9064407985613565095
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8906905872426638273}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 1088
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.3, y: 1.9819207, z: 1.3}
+  m_Center: {x: 0, y: 0.9960654, z: 0}
+--- !u!54 &4480817286823279098
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8906905872426638273}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 112
+  m_CollisionDetection: 0

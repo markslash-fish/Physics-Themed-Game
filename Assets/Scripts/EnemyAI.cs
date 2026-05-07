@@ -74,12 +74,9 @@ public class EnemyAI : NetworkBehaviour, IDamageable
         stateHandler.enemyState.OnValueChanged += OnStateChanged;
         OnStateChanged(stateHandler.enemyState.Value, stateHandler.enemyState.Value);
 
-     
-        
+        InvokeRepeating("SwitchStrafeDirection", 5.2f, 7.7f);
 
-        if (!attackController.isBusy)
-            InvokeRepeating("SwitchStrafeDirection", 3f, 5f);
-      
+
     }
     private void Start()
     {
@@ -128,6 +125,7 @@ public class EnemyAI : NetworkBehaviour, IDamageable
             navMeshAgent.isStopped = false;
             navMeshAgent.nextPosition = transform.position;
             navMeshAgent.updatePosition = true;
+          
             
         }
         else if(newState == EnemyStateHandler.EnemyState.Idle)
@@ -141,6 +139,7 @@ public class EnemyAI : NetworkBehaviour, IDamageable
     {
         if (!IsServer) return;
 
+       
         Vector3 sideVector = Vector3.Cross(Vector3.up, dirToPlayer);
 
         Vector3 orbitPoint = targetPlayer.transform.position - (dirToPlayer * strafeDistance);
@@ -232,7 +231,6 @@ public class EnemyAI : NetworkBehaviour, IDamageable
         stateHandler.CurrentState = EnemyStateHandler.EnemyState.IsAttacking;
         enemyAttackStarted = false;
     }
-  
 
-
+   
 }

@@ -25,12 +25,12 @@ float ghostTimer = 0f;
 
     public  bool isBlocking = false;
     public bool isDodging = false;
-  
+
 
     [Header("Movement")]
-    [SerializeField] private float jumpHeight = 5f;
-    [SerializeField] private float walkSpeed = 5f;
-    [SerializeField] private float runSpeed = 7f;
+    [SerializeField] private float jumpHeight;
+    [SerializeField] private float walkSpeed;
+    [SerializeField] private float runSpeed;
     [SerializeField] float gravity = -20f;
     float verticalVelocity;
   
@@ -84,6 +84,9 @@ float ghostTimer = 0f;
 
     public override void OnNetworkSpawn()
     {
+        jumpHeight = 2.2f;
+        walkSpeed = 4f;
+        runSpeed = 5.8f;
         potionCount = 3;
         if(IsOwner)
         {
@@ -114,9 +117,10 @@ float ghostTimer = 0f;
         playerInputReader.onBlockStarted += StartBlock;
         playerInputReader.onBlockFinished += StopBlock;
         playerInputReader.onDodgeStarted += Dodge;
-        playerInputReader.onSprint += SetSprint;
+        playerInputReader.onSprintStarted += SetSprint;
         playerInputReader.onMove += PlayerMove;
         playerInputReader.jumpStarted += PlayerJump;
+        playerInputReader.onSprintFinished += EndSprint;
         playerInputReader.onHeal += PlayerHeal;
         playerInputReader.onLightAttackStarted += PlayerLightAttack;
         playerInputReader.onHeavyAttackStarted += PlayerHeavyAttack;
@@ -129,7 +133,8 @@ float ghostTimer = 0f;
         playerInputReader.onBlockStarted -= StartBlock;
         playerInputReader.onBlockFinished -= StopBlock;
         playerInputReader.onDodgeStarted -= Dodge;
-        playerInputReader.onSprint -= SetSprint;
+        playerInputReader.onSprintStarted -= SetSprint;
+        playerInputReader.onSprintFinished -= EndSprint;
         playerInputReader.onMove -= PlayerMove;
         playerInputReader.jumpStarted -= PlayerJump;
         playerInputReader.onHeal -= PlayerHeal;
@@ -170,6 +175,7 @@ if (isDodging)
 
         if(playerState == PlayerState.IsJumping)
         {
+            playerInputReader.sprintAction.Disable();
             playerInputReader.jumpAction.Disable();
             playerInputReader.dodgeAction.Disable();
             playerInputReader.healAction.Disable();
@@ -179,6 +185,7 @@ if (isDodging)
         }
         else if (playerState == PlayerState.IsAttacking)
         {
+            playerInputReader.sprintAction.Disable();
             playerInputReader.dodgeAction.Disable();
             playerInputReader.healAction.Disable();
             playerInputReader.blockAction.Disable();
@@ -187,7 +194,8 @@ if (isDodging)
             playerInputReader.hAttackAction.Disable();
         }
         else if (playerState == PlayerState.IsDodging)
-        { 
+        {
+            playerInputReader.sprintAction.Disable();
             playerInputReader.moveAction.Disable();
             playerInputReader.dodgeAction.Disable();
             playerInputReader.jumpAction.Disable();
@@ -198,6 +206,7 @@ if (isDodging)
         }
         else if (playerState == PlayerState.IsBlocking)
         {
+            playerInputReader.sprintAction.Disable();
             playerInputReader.jumpAction.Disable();
             playerInputReader.healAction.Disable();
             playerInputReader.lAttackAction.Disable();
@@ -206,6 +215,7 @@ if (isDodging)
         }
         else if (playerState == PlayerState.IsHealing)
         {
+            playerInputReader.sprintAction.Disable();
             playerInputReader.dodgeAction.Disable();
             playerInputReader.jumpAction.Disable();
             playerInputReader.healAction.Disable();
@@ -217,6 +227,7 @@ if (isDodging)
         }
         else if (playerState == PlayerState.IsHurt)
         {
+            playerInputReader.sprintAction.Disable();
             playerInputReader.moveAction.Disable();
             playerInputReader.jumpAction.Disable();
             playerInputReader.healAction.Disable();
@@ -228,7 +239,7 @@ if (isDodging)
         }
         else 
         {
-          
+            playerInputReader.sprintAction.Enable();
             playerInputReader.jumpAction.Enable();
             playerInputReader.lAttackAction.Enable();
             playerInputReader.hAttackAction.Enable();
@@ -346,6 +357,13 @@ if (isDodging)
 
     void SetSprint(bool value)
     {
+        value = true;
+        isRunning = value;
+   
+    }
+    void EndSprint(bool value)
+    {
+        value = false;
         isRunning = value;
     }
     public void PlayerInteract()
