@@ -113,11 +113,11 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.83955574
-        functionName: DealLightDamage
+      - time: 0.8344124
+        functionName: TriggerLeftHandDamage
         data: 
         objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
+        floatParameter: 0.3
         intParameter: 0
         messageOptions: 0
       - time: 0.88940096
@@ -127,7 +127,7 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.9382564
+      - time: 0.90676033
         functionName: ResetState
         data: 
         objectReferenceParameter: {instanceID: 0}

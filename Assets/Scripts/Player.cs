@@ -17,6 +17,7 @@ float ghostTimer = 0f;
 
     [Header("References")]
     [SerializeField] PlayerInputReader playerInputReader;
+    [SerializeField] PlayerCamLockOn camLock;
     [SerializeField] Transform cameraTransform;
     [SerializeField] Transform groundCheck;
 
@@ -29,7 +30,8 @@ float ghostTimer = 0f;
 
     [Header("Movement")]
     [SerializeField] private float jumpHeight;
-    [SerializeField] private float walkSpeed;
+    [SerializeField] private float baseWalkSpeed;
+    [SerializeField] private float currentWalkSpeed;
     [SerializeField] private float runSpeed;
     [SerializeField] float gravity = -20f;
     float verticalVelocity;
@@ -74,9 +76,8 @@ float ghostTimer = 0f;
     [SerializeField] public int playerDamage;
     [SerializeField] public string skillTrigger;
     [SerializeField] public int potionCount;
-    public CinemachineCamera playerThirdPersonCam;
-    public CinemachineCamera playerLockOnCam;
-
+    public CinemachineStateDrivenCamera stateCam;
+   
   
 
     public event Action onHurt;
@@ -85,18 +86,19 @@ float ghostTimer = 0f;
     public override void OnNetworkSpawn()
     {
         jumpHeight = 2.2f;
-        walkSpeed = 4f;
+        baseWalkSpeed = 4f;
+        currentWalkSpeed = 2f;
         runSpeed = 5.8f;
         potionCount = 3;
         if(IsOwner)
         {
-            playerThirdPersonCam.Priority = 100;
-            playerLockOnCam.Priority = 90;
+            stateCam.Priority = 100;
+            gameObject.tag = "Player";
         }
         else
         {
-            playerThirdPersonCam.Priority = 0;
-            playerLockOnCam.Priority = 0;
+            stateCam.Priority = 0;
+          
 
         }
         playerBaseCurrentHealth.OnValueChanged += (oldVal, newVal) => {
@@ -268,7 +270,7 @@ if (isDodging)
                 transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * 10f);
             }
 
-            float currentSpeed = isRunning ? runSpeed : walkSpeed;
+            float currentSpeed = isRunning ? runSpeed : baseWalkSpeed;
 
             if (isGrounded && verticalVelocity < 0)
             {
@@ -277,7 +279,7 @@ if (isDodging)
 
             verticalVelocity += gravity * Time.deltaTime;
 
-            Vector3 velocity = move * currentSpeed;
+            Vector3 velocity = isBlocking? move * currentWalkSpeed : move * currentSpeed;
             velocity.y = verticalVelocity;
 
       
@@ -302,7 +304,17 @@ if (isDodging)
 
         Vector3 forward = cameraTransform.forward;
         Vector3 right = cameraTransform.right;
-
+        if (camLock.currentEnemy != null) // You'll need to expose these variables
+        {
+            // Direction from player to enemy
+            forward = (camLock.currentEnemy.position - transform.position).normalized;
+            right = Quaternion.Euler(0, 90, 0) * forward;
+        }
+        else
+        {
+            forward = cameraTransform.forward;
+            right = cameraTransform.right;
+        }
         forward.y = 0;
         right.y = 0;
 
@@ -320,7 +332,8 @@ if (isDodging)
             transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * 10f);
         }
 
-        float currentSpeed = isRunning ? runSpeed : walkSpeed;
+        float currentSpeed = isRunning ? runSpeed : baseWalkSpeed;
+        
 
         if (isGrounded && verticalVelocity < 0)
         {
@@ -329,7 +342,7 @@ if (isDodging)
 
         verticalVelocity += gravity * Time.deltaTime;
 
-        Vector3 velocity = move * currentSpeed;
+        Vector3 velocity = isBlocking? move * currentSpeed : move * currentWalkSpeed;
         velocity.y = verticalVelocity;
 
 
@@ -382,6 +395,7 @@ if (isDodging)
     // ======================
     public void PlayerLightAttack()
     {
+        playerDamage = UnityEngine.Random.Range(playerBaseMinAP, playerBaseMaxAP);
         if (isBusy && playerState != PlayerState.IsAttacking) return;
         if (isHeavyAttacking) return;
 
@@ -413,6 +427,8 @@ if (isDodging)
     // ======================
     public void PlayerHeavyAttack()
     {
+        int baseDamage = UnityEngine.Random.Range(playerBaseMinAP, playerBaseMaxAP);
+        playerDamage = baseDamage * 3;
         if (isBusy) return;
         playerState = PlayerState.IsAttacking;
         if (comboStep != 0) return;
@@ -513,8 +529,9 @@ if (isDodging)
 
     public void TakeDamage(int damage, Vector3 hitDir)
     {
-
+        if (isDodging) return;
         int healthDamage = (damage * damage) / (damage + playerBaseDefense);
+        float staminaDamage = (healthDamage / 4);
         float knockbackForce = (damage <20)? 8f: 12f;
         playerBaseCurrentHealth.Value -= healthDamage;
         playerState = Player.PlayerState.IsHurt;
@@ -553,7 +570,13 @@ if (isDodging)
     }
     public void PlayerCameraLockOn()
     {
-      
+        if (!IsOwner) return;
+
+     
+        if (camLock != null)
+        {
+            camLock.ToggleLockOn();
+        }
     }
     void ResetState()
     {
