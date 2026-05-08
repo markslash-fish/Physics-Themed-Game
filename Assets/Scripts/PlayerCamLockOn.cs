@@ -6,8 +6,7 @@ public class PlayerCamLockOn : NetworkBehaviour
 {
     [Header("References")]
     public CinemachineTargetGroup targetGroup;
-    public Animator cameraStateAnimator; // To swap between 3rd Person & LockOn
-  
+    public Animator cameraStateAnimator;
 
     [Header("Settings")]
     public float detectionRadius = 15f;
@@ -17,29 +16,45 @@ public class PlayerCamLockOn : NetworkBehaviour
 
     void Update()
     {
+        if (!IsOwner) return;
 
-        if (!IsOwner || currentEnemy == null) return;
-
-        float dist = Vector3.Distance(transform.position, currentEnemy.position);
-        if (dist > detectionRadius + 2f) // Buffer of 2m to prevent flickering
+        // Logic: If we have a reference, we MUST validate it
+        if (currentEnemy != null)
         {
-            ClearLockOn();
+            bool isEnemyGone = false;
+
+            // Check if the reference itself became null/destroyed
+            if (currentEnemy == null)
+            {
+                isEnemyGone = true;
+            }
+            else
+            {
+                // Check if the object is disabled or about to be destroyed
+                if (!currentEnemy.gameObject.activeInHierarchy)
+                {
+                    isEnemyGone = true;
+                }
+            }
+
+            if (isEnemyGone)
+            {
+                Debug.Log("Enemy lost or despawned. Resetting camera.");
+                ClearLockOn();
+                return;
+            }
+
+            // Standard Distance Check
+            float dist = Vector3.Distance(transform.position, currentEnemy.position);
+            if (dist > detectionRadius + 2f)
+            {
+                ClearLockOn();
+            }
         }
+    }
 
-    }
-    public override void OnNetworkSpawn()
-    {
-        if (!IsOwner) return;
-
-    }
-    public override void OnNetworkDespawn()
-    {
-        if (!IsOwner) return;
-      
-    }
     public void ToggleLockOn()
     {
-      
         if (currentEnemy != null)
         {
             ClearLockOn();
@@ -47,7 +62,6 @@ public class PlayerCamLockOn : NetworkBehaviour
         }
 
         AttemptLockOn();
-        Debug.Log("Locked");
     }
 
     void AttemptLockOn()
@@ -56,7 +70,7 @@ public class PlayerCamLockOn : NetworkBehaviour
         float closestDist = Mathf.Infinity;
         Transform bestTarget = null;
 
-        if (enemies.Length == 0) return; 
+        if (enemies.Length == 0) return;
 
         foreach (var col in enemies)
         {
@@ -71,22 +85,30 @@ public class PlayerCamLockOn : NetworkBehaviour
         if (bestTarget != null)
         {
             currentEnemy = bestTarget;
+            // Add the enemy to the Cinemachine Target Group
             targetGroup.AddMember(currentEnemy, 1f, 2f);
 
-         
+            // Switch the State-Driven Camera to the LockOn state
             cameraStateAnimator.SetBool("IsLockedOn", true);
-
-          
         }
     }
 
     public void ClearLockOn()
     {
+        // Ensure we tell the animator to switch back FIRST
+        if (cameraStateAnimator != null)
+        {
+            cameraStateAnimator.SetBool("IsLockedOn", false);
+            // Force the animator to update this frame
+            cameraStateAnimator.Update(0);
+        }
+
         if (currentEnemy != null)
         {
             targetGroup.RemoveMember(currentEnemy);
             currentEnemy = null;
         }
-        cameraStateAnimator.SetBool("IsLockedOn", false);
+
+        Debug.Log("Lock On Cleared.");
     }
 }

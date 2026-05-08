@@ -1,3 +1,4 @@
+using TMPro;
 using Unity.AppUI.UI;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
@@ -8,14 +9,18 @@ using UnityEngine.UIElements;
 public class NetworkUIManager : MonoBehaviour
 {
     [SerializeField] private UnityEngine.UI.Button hostButton;
-    [SerializeField] private UnityEngine.UI.Button clientButton;
-
+    [SerializeField] private UnityEngine.UI.Button startButton;
+    [SerializeField] private UnityEngine.UI.Button joinButton;
+    [SerializeField] private TMP_InputField portInputField;
+    [SerializeField] private TMP_Text portText;
 
 
     private void Start()
     {
         hostButton.onClick.AddListener(HostButtonOnClick);
-        clientButton.onClick.AddListener(ClientButtonOnClick);
+
+        startButton.onClick.AddListener(StartGame);
+        joinButton.onClick.AddListener(JoinGame);
     }
 
 
@@ -25,16 +30,48 @@ public class NetworkUIManager : MonoBehaviour
     }
     public void HostButtonOnClick()
     {
-      
+        ushort lobbyPort = (ushort)Random.Range(7777, 30000);
+
+        // 2. Reference the Transport and set the port
+        var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+        if (transport != null)
+        {
+            transport.ConnectionData.Port = lobbyPort;
+            Debug.Log($"Hosting on Port: {lobbyPort}");
+        }
 
 
         NetworkManager.Singleton.StartHost();
-        NetworkManager.Singleton.SceneManager.LoadScene("Main Game", UnityEngine.SceneManagement.LoadSceneMode.Single);
 
-           
+        portText.SetText("Port: " + lobbyPort.ToString());
+
     }
-    public void ClientButtonOnClick()
+  
+    
+    public void StartGame()
     {
+        NetworkManager.Singleton.SceneManager.LoadScene("Main Game", UnityEngine.SceneManagement.LoadSceneMode.Single);
+    }
+    public void JoinGame()
+    {
+        var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+
+        if (transport != null && !string.IsNullOrEmpty(portInputField.text))
+        {
+            // Parse the text from the InputField into a ushort
+            if (ushort.TryParse(portInputField.text, out ushort targetPort))
+            {
+                transport.ConnectionData.Port = targetPort;
+                Debug.Log($"Attempting to join on Port: {targetPort}");
+            }
+            else
+            {
+                Debug.LogError("Invalid Port entered!");
+                return; // Stop if the port is invalid
+            }
+        }
+
+   
         NetworkManager.Singleton.StartClient();
     }
 }
