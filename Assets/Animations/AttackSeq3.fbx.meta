@@ -79,6 +79,20 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
+      - time: 0.069124356
+        functionName: EnableRightTrail
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.10599082
+        functionName: PlayRightSwing
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       - time: 0.20098042
         functionName: DealLightDamage
         data: 
@@ -86,7 +100,21 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.32352942
+      - time: 0.22119822
+        functionName: PlayImpactRight
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.25345626
+        functionName: DisableLeftTrail
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.32048064
         functionName: Combo3Move
         data: 
         objectReferenceParameter: {instanceID: 0}
@@ -95,6 +123,27 @@ ModelImporter:
         messageOptions: 0
       - time: 0.68123406
         functionName: DealLightDamage
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.7327189
+        functionName: PlayImpactRight
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.8387097
+        functionName: DisableRightTrail
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.875576
+        functionName: StopRightSwing
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0

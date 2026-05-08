@@ -19,7 +19,8 @@ public class PlayerInputReader : NetworkBehaviour, InputSystem_Actions.IPlayerAc
     public UnityAction onLightAttackFinished;
     public UnityAction onHeavyAttackStarted;
     public UnityAction onHeavyAttackFinished;
-    public UnityAction<bool> onSprint;
+    public UnityAction<bool> onSprintStarted;
+    public UnityAction<bool> onSprintFinished;
     public UnityAction onLockOn;
 
     public InputAction moveAction;
@@ -177,7 +178,7 @@ public class PlayerInputReader : NetworkBehaviour, InputSystem_Actions.IPlayerAc
 
     public void OnDodge(InputAction.CallbackContext context)
     {
-        if (onDodgeStarted != null && context.started) onDodgeStarted.Invoke();
+        if (onDodgeStarted != null && context.performed) onDodgeStarted.Invoke();
         else return;
     }
 
@@ -217,7 +218,16 @@ public class PlayerInputReader : NetworkBehaviour, InputSystem_Actions.IPlayerAc
     }
     public void OnSprint(InputAction.CallbackContext context)
     {
-        onSprint?.Invoke(context.ReadValueAsButton());
+        if (onSprintStarted != null && context.performed)
+        {
+            onSprintStarted?.Invoke(context.ReadValueAsButton());
+        }
+        else if(onSprintFinished != null && context.canceled)
+        {
+            onSprintFinished?.Invoke(context.ReadValueAsButton());
+        }
+            return;
+        
     }
     public void OnLockOn(InputAction.CallbackContext context)
     {

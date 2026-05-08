@@ -206,8 +206,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 5.07757, y: -10.26779, z: 41.956837}
+  m_LocalRotation: {x: 0.12018969, y: -0.2228244, z: 0.027694425, w: 0.96702474}
+  m_LocalPosition: {x: 6.619848, y: -8.027983, z: 35.187897}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -306,7 +306,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &410087040
 Light:
   m_ObjectHideFlags: 0
@@ -1203,7 +1203,7 @@ MonoBehaviour:
   m_DisconnectTimeoutMS: 30000
   ConnectionData:
     Address: 127.0.0.1
-    Port: 785
+    Port: 767
     WebSocketPath: /
     ServerListenAddress: 127.0.0.1
     ClientBindPort: 0
@@ -1227,7 +1227,7 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 2108523836}
-    PlayerPrefab: {fileID: 6352987617116327525, guid: 1d6a352702ad38445b3c31f0ed9d56dc, type: 3}
+    PlayerPrefab: {fileID: 4336909444125087712, guid: 474c954e2f5291747940fc67aef7bfbe, type: 3}
     Prefabs:
       NetworkPrefabsLists:
       - {fileID: 11400000, guid: dfb7b63373323f54fba161ef8b5b916e, type: 2}

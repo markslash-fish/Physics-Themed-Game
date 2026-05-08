@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 840e04e85b7e4fe4f96448008d4ead2a, type: 3}
-  m_Name: BackStep
+  m_Name: Front Stab
   m_EditorClassIdentifier: Assembly-CSharp::CombatMove
-  moveName: Backstep
-  minRange: 0
-  maxRange: 4
+  moveName: Front Stab
+  minRange: 1
+  maxRange: 5
   baseWeight: 60
-  animTrigger: isBackStepping
-  cooldown: 10
+  animTrigger: isBlitzAttack2
+  cooldown: 7
