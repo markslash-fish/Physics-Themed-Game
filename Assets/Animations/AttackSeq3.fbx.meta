@@ -93,21 +93,14 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.20098042
-        functionName: DealLightDamage
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.22119822
+      - time: 0.2133242
         functionName: PlayImpactRight
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.25345626
+      - time: 0.24820691
         functionName: DisableLeftTrail
         data: 
         objectReferenceParameter: {instanceID: 0}
@@ -115,17 +108,10 @@ ModelImporter:
         intParameter: 0
         messageOptions: 0
       - time: 0.32048064
-        functionName: Combo3Move
+        functionName: TriggerRightHandDamage
         data: 
         objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.68123406
-        functionName: DealLightDamage
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
+        floatParameter: 0.3
         intParameter: 0
         messageOptions: 0
       - time: 0.7327189
@@ -149,22 +135,22 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.9359127
+      - time: 0.9107612
+        functionName: ResetState
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.93328804
         functionName: ResetCombo
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 1
+      - time: 0.9895013
         functionName: EnableMove
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 1
-        functionName: ResetState
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0

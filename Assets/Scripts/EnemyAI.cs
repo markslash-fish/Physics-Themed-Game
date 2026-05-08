@@ -186,8 +186,8 @@ public class EnemyAI : NetworkBehaviour, IDamageable
     public void TakeDamage(int damage, Vector3 hitDir)
     {
         if (!IsServer) return;
-        int healthDamage = (damage * damage) / damage + enemyDefense;
-        int staminaDamage = damage/2;
+        int healthDamage = (damage * damage) / (damage + enemyDefense);
+        int staminaDamage = damage/3;
         enemyCurrentHealth.Value-= healthDamage;
         enemyCurrentStamina.Value -= staminaDamage;
         if (enemyCurrentHealth.Value <= 0) stateHandler.CurrentState = EnemyStateHandler.EnemyState.OnDeath;
@@ -226,7 +226,7 @@ public class EnemyAI : NetworkBehaviour, IDamageable
             yield return null;
         }
         enemyAttackStarted = true;
-        float randomInterval = Random.Range(3f, 4f);
+        float randomInterval = Random.Range(2f, 3f);
         yield return new WaitForSeconds(randomInterval);
         stateHandler.CurrentState = EnemyStateHandler.EnemyState.IsAttacking;
         enemyAttackStarted = false;

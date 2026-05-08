@@ -1,5 +1,6 @@
 using Unity.AppUI.UI;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
@@ -24,8 +25,12 @@ public class NetworkUIManager : MonoBehaviour
     }
     public void HostButtonOnClick()
     {
+      
+
+
         NetworkManager.Singleton.StartHost();
         NetworkManager.Singleton.SceneManager.LoadScene("Main Game", UnityEngine.SceneManagement.LoadSceneMode.Single);
+
            
     }
     public void ClientButtonOnClick()

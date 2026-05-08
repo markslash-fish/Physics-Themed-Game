@@ -4,88 +4,89 @@ using UnityEngine;
 
 public class PlayerCamLockOn : NetworkBehaviour
 {
-    public Transform currentTarget;
-    public PlayerInputReader inputReader;
-    public CinemachineCamera playerLockOnCam;
-    public CinemachineCamera playerThirdPersonCam;
-    [Header("Cam Lock On")]
-    public float camDetectionRange;
-    public LayerMask targetLayer;
-    Vector3 detectionOffset;
-    public override void OnNetworkSpawn()
-    {
-        inputReader.onLockOn += ToggleLockOn;
-    }
-    private void Awake()
-    {
-    
-    }
-    // Update is called once per frame
+    [Header("References")]
+    public CinemachineTargetGroup targetGroup;
+    public Animator cameraStateAnimator; // To swap between 3rd Person & LockOn
+  
+
+    [Header("Settings")]
+    public float detectionRadius = 15f;
+    public LayerMask enemyLayer;
+
+    public Transform currentEnemy;
+
     void Update()
     {
-        
+
+        if (!IsOwner || currentEnemy == null) return;
+
+        float dist = Vector3.Distance(transform.position, currentEnemy.position);
+        if (dist > detectionRadius + 2f) // Buffer of 2m to prevent flickering
+        {
+            ClearLockOn();
+        }
+
+    }
+    public override void OnNetworkSpawn()
+    {
+        if (!IsOwner) return;
+
+    }
+    public override void OnNetworkDespawn()
+    {
+        if (!IsOwner) return;
+      
     }
     public void ToggleLockOn()
     {
-        // If already locked, clear it (Toggle behavior)
-        if (playerLockOnCam.Priority > playerThirdPersonCam.Priority)
+      
+        if (currentEnemy != null)
         {
             ClearLockOn();
             return;
         }
 
-        Vector3 spherePos = transform.TransformPoint(detectionOffset);
-        Collider[] nearbyEnemies = Physics.OverlapSphere(spherePos, camDetectionRange, targetLayer);
+        AttemptLockOn();
+        Debug.Log("Locked");
+    }
 
+    void AttemptLockOn()
+    {
+        Collider[] enemies = Physics.OverlapSphere(transform.position, detectionRadius, enemyLayer);
+        float closestDist = Mathf.Infinity;
         Transform bestTarget = null;
-        float closestToCenter = -1f; // Dot product range is -1 to 1
 
-        foreach (var collider in nearbyEnemies)
+        if (enemies.Length == 0) return; 
+
+        foreach (var col in enemies)
         {
-            Vector3 directionToEnemy = (collider.transform.position - transform.position).normalized;
-
-            // 1. Check if the enemy is in front of us
-            float dot = Vector3.Dot(transform.forward, directionToEnemy);
-
-            // 2. Line of Sight Check (Don't lock through walls!)
-            if (dot > 0.5f) // Roughly a 60-degree cone
+            float dist = Vector3.Distance(transform.position, col.transform.position);
+            if (dist < closestDist)
             {
-                if (Physics.Linecast(transform.position + Vector3.up, collider.transform.position + Vector3.up, out RaycastHit hit))
-                {
-                    if (hit.transform != collider.transform) continue; // Something is in the way
-                }
-
-                // 3. Keep track of the enemy closest to the center of our gaze
-                if (dot > closestToCenter)
-                {
-                    closestToCenter = dot;
-                    bestTarget = collider.transform;
-                }
+                closestDist = dist;
+                bestTarget = col.transform;
             }
         }
 
         if (bestTarget != null)
         {
-            ActivateLockOn(bestTarget);
+            currentEnemy = bestTarget;
+            targetGroup.AddMember(currentEnemy, 1f, 2f);
+
+         
+            cameraStateAnimator.SetBool("IsLockedOn", true);
+
+          
         }
     }
-    private void ActivateLockOn(Transform target)
-    {
-        playerLockOnCam.Target.LookAtTarget = target;
-        playerLockOnCam.Priority = 100;
-        playerThirdPersonCam.Priority = 90;
-    }
 
-    private void ClearLockOn()
+    public void ClearLockOn()
     {
-        playerLockOnCam.Priority = 90;
-        playerThirdPersonCam.Priority = 100;
-        playerLockOnCam.Target.TrackingTarget = null;
-    }
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.blue;
-        Vector3 spherePos = transform.TransformPoint(detectionOffset);
-        Gizmos.DrawWireSphere(spherePos, camDetectionRange);
+        if (currentEnemy != null)
+        {
+            targetGroup.RemoveMember(currentEnemy);
+            currentEnemy = null;
+        }
+        cameraStateAnimator.SetBool("IsLockedOn", false);
     }
 }

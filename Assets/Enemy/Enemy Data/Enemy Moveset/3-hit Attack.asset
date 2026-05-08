@@ -17,4 +17,4 @@ MonoBehaviour:
   maxRange: 7
   baseWeight: 45
   animTrigger: isBlitzAttack1
-  cooldown: 7
+  cooldown: 10

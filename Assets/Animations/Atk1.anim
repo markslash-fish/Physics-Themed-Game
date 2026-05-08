@@ -33451,10 +33451,10 @@ AnimationClip:
     intParameter: 0
     messageOptions: 0
   - time: 0.8333333
-    functionName: ApplyForce
+    functionName: TriggerLeftHandDamage
     data: 
-    objectReferenceParameter: {fileID: 0}
-    floatParameter: 90
+    objectReferenceParameter: {fileID: 6352987617116327525, guid: 1d6a352702ad38445b3c31f0ed9d56dc, type: 3}
+    floatParameter: 0.3
     intParameter: 0
     messageOptions: 0
   - time: 0.864119
@@ -33464,11 +33464,11 @@ AnimationClip:
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.90215856
-    functionName: TriggerLeftHandDamage
+  - time: 0.93333334
+    functionName: ResetState
     data: 
-    objectReferenceParameter: {fileID: 6352987617116327525, guid: 1d6a352702ad38445b3c31f0ed9d56dc, type: 3}
-    floatParameter: 0.3
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 0.93333334
@@ -33501,13 +33501,6 @@ AnimationClip:
     messageOptions: 0
   - time: 1.0129747
     functionName: EnableMove
-    data: 
-    objectReferenceParameter: {fileID: 0}
-    floatParameter: 0
-    intParameter: 0
-    messageOptions: 0
-  - time: 1.1
-    functionName: ResetState
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0

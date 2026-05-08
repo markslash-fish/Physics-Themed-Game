@@ -101,13 +101,15 @@ public class PlayerAnimationController : NetworkBehaviour
         if (player.playerState == Player.PlayerState.IsBlocking)
         {
             anim.SetBool("Block", true);
+            anim.SetFloat("isSprinting", 0.5f);
         }
       
 
     }
     void StopBlock()
     {
-            anim.SetBool("Block", false);
+        anim.SetFloat("isSprinting", 0.8f);
+        anim.SetBool("Block", false);
             player.playerState = Player.PlayerState.None;
     }
 
@@ -155,7 +157,7 @@ public class PlayerAnimationController : NetworkBehaviour
     }
     void PlayHit()
     {
- 
+            player.playerState = Player.PlayerState.IsHurt;
             anim.ResetControllerState();
             anim.SetTrigger("Hit");
         
