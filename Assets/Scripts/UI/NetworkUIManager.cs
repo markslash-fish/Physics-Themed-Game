@@ -43,7 +43,8 @@ public class NetworkUIManager : MonoBehaviour
 
         NetworkManager.Singleton.StartHost();
 
-        portText.SetText("Port: " + lobbyPort.ToString());
+        portText.SetText($"Port:  {lobbyPort}");
+
 
     }
   
@@ -73,5 +74,16 @@ public class NetworkUIManager : MonoBehaviour
 
    
         NetworkManager.Singleton.StartClient();
+    }
+    public void CloseHost()
+    {
+        if (NetworkManager.Singleton != null)
+        {
+            // 2. Shut down the network (works for Host, Client, or Server)
+            NetworkManager.Singleton.Shutdown();
+
+            // 3. Optional: Clear local references if needed
+            Debug.Log("Network Shutdown successful.");
+        }
     }
 }

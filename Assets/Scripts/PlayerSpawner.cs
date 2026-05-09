@@ -40,4 +40,6 @@ public class PlayerSpawner : NetworkBehaviour
         // This replaces the "Player Prefab" slot in NetworkManager
         player.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
     }
+
+
 }
