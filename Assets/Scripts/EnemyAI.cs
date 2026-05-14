@@ -108,7 +108,9 @@ public class EnemyAI : NetworkBehaviour, IDamageable
         if (!IsServer) return;
         if (newState == EnemyStateHandler.EnemyState.OnDeath)
         {
-            GetComponent<NetworkObject>().Despawn();
+            StartCoroutine(PlayDeath());
+            navMeshAgent.isStopped = true;
+            navMeshAgent.updatePosition = false;
         }
         else if (newState == EnemyStateHandler.EnemyState.IsAttacking)
         {
@@ -230,6 +232,11 @@ public class EnemyAI : NetworkBehaviour, IDamageable
         yield return new WaitForSeconds(randomInterval);
         stateHandler.CurrentState = EnemyStateHandler.EnemyState.IsAttacking;
         enemyAttackStarted = false;
+    }
+    private IEnumerator PlayDeath()
+    {
+        yield return new WaitForSeconds(0.3f);
+        GetComponent<NetworkObject>().Despawn();
     }
 
    

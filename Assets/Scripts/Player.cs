@@ -48,6 +48,8 @@ float ghostTimer = 0f;
     public bool isGrounded;
     public bool isRunning;
 
+    public bool HasReadied { get; private set; } = false;
+
     Animator anim;
     Rigidbody rb;
 
@@ -77,8 +79,9 @@ float ghostTimer = 0f;
     [SerializeField] public string skillTrigger;
     [SerializeField] public int potionCount;
     public CinemachineStateDrivenCamera stateCam;
-   
-  
+
+    public NetworkVariable<bool> IsReadySynced = new NetworkVariable<bool>(false,
+         NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     public event Action onHurt;
 
@@ -90,7 +93,8 @@ float ghostTimer = 0f;
         currentWalkSpeed = 2f;
         runSpeed = 5.8f;
         potionCount = 3;
-        if(IsOwner)
+      
+        if (IsOwner)
         {
             stateCam.Priority = 100;
             gameObject.tag = "Player";
@@ -583,12 +587,14 @@ if (isDodging)
         anim.applyRootMotion = true;
         playerState = PlayerState.None;
     }
+    [Rpc(SendTo.Server)]
+    public void SetReadyRpc()
+    {
+        IsReadySynced.Value = true;
+        GameManager.Instance.SetPlayerReadyRpc(true);
+    }
 
-// =========================
-// MULTIPLAYER AFTER IMAGE
-// =========================
-
-[ServerRpc]
+    [ServerRpc]
 void SpawnGhostServerRpc(Vector3 pos, Quaternion rot)
 {
     SpawnGhostClientRpc(pos, rot);
