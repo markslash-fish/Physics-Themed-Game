@@ -6,6 +6,12 @@ public class StoneGateScript : MonoBehaviour
     [SerializeField] Animator animator;
     [SerializeField] GameObject floatingButtonUI = null;
     [SerializeField] GameObject confirmationWindow = null;
+
+    [Header("Audio Settings")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip openSFX;
+    [SerializeField] private AudioClip closeSFX;
+
     bool isInTrigger;
     void Start()
     {
@@ -49,6 +55,7 @@ public class StoneGateScript : MonoBehaviour
     public void OpenGate()
     {
         animator.SetBool("IsOpen", true);
+        PlaySound(openSFX);
     }
     public void CloseGate()
     {
@@ -74,5 +81,13 @@ public class StoneGateScript : MonoBehaviour
 
         // We set this to false so the Update loop doesn't try to open the window again
         isInTrigger = false;
+    }
+    private void PlaySound(AudioClip clip)
+    {
+        if (audioSource != null && clip != null)
+        {
+            // PlayOneShot para hindi maputol ang tunog kung magkasunod na tinawag
+            audioSource.PlayOneShot(clip); 
+        }
     }
 }

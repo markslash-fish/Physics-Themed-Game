@@ -1440,10 +1440,10 @@ GameObject:
   m_Component:
   - component: {fileID: 8882224511231483780}
   - component: {fileID: 4986775403615611231}
+  - component: {fileID: 1690452885795680709}
   - component: {fileID: 2357532188560727269}
   - component: {fileID: 346072902704696751}
   - component: {fileID: 3253946695245641523}
-  - component: {fileID: 1690452885795680709}
   - component: {fileID: 1774209350287719310}
   - component: {fileID: 4274963214596168274}
   - component: {fileID: 4300942190930413521}
@@ -1508,6 +1508,31 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1690452885795680709
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4336909444125087712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 3363441167
+  InScenePlacedSourceGlobalObjectIdHash: 568711568
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &2357532188560727269
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1520,6 +1545,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 672847772a1938e4e8f6960dcb93fe59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerVfx
+  ShowTopMostFoldoutHeaderGroup: 1
   chargeVFX: {fileID: 8011998094573082391, guid: 6dda45fbc7f7e9e43b34acbb493133e9, type: 3}
   heavyBurstVFX: {fileID: 7932645971135791481, guid: 5bd9989ac09c9c44db7b1c809ed3be81, type: 3}
   impactVFX: {fileID: 2196197084933303326, guid: 8ff6649ae286c0040af812e58c8604ed, type: 3}
@@ -1590,31 +1616,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!114 &1690452885795680709
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4336909444125087712}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 3363441167
-  InScenePlacedSourceGlobalObjectIdHash: 568711568
-  DeferredDespawnTick: 0
-  Ownership: 1
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 0
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
-  SyncOwnerTransformWhenParented: 1
-  AllowOwnerToParent: 0
 --- !u!114 &1774209350287719310
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1732,15 +1733,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
   ShowTopMostFoldoutHeaderGroup: 1
+  ghostPrefab: {fileID: 0}
+  ghostSpawnDelay: 0.05
   playerState: 0
   playerInputReader: {fileID: 1774209350287719310}
+  camLock: {fileID: 0}
   cameraTransform: {fileID: 6941417565701292703}
   groundCheck: {fileID: 5705174814418102409}
   dodgeForce: 15
   isBlocking: 0
   isDodging: 0
   jumpHeight: 2
-  walkSpeed: 8
+  baseWalkSpeed: 0
+  currentWalkSpeed: 0
   runSpeed: 10
   gravity: -20
   groundMask:
@@ -1776,8 +1781,12 @@ MonoBehaviour:
   playerDamage: 0
   skillTrigger: 
   potionCount: 0
-  playerThirdPersonCam: {fileID: 0}
-  playerLockOnCam: {fileID: 0}
+  stateCam: {fileID: 0}
+  IsReadySynced:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
 --- !u!114 &4300942190930413521
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1928,6 +1937,10 @@ MonoBehaviour:
       ParameterType: 9
     - name: Blend
       NameHash: 1784438316
+      Synchronize: 1
+      ParameterType: 1
+    - name: isSprinting
+      NameHash: 1125312739
       Synchronize: 1
       ParameterType: 1
   AnimatorParametersExpanded: 0

@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using static Player;
 using Random = UnityEngine.Random;
+using UnityEngine.UI;
 
 public class EnemyAI : NetworkBehaviour, IDamageable
 {
@@ -16,6 +17,12 @@ public class EnemyAI : NetworkBehaviour, IDamageable
     EnemyAttackController attackController;
     EnemyStateHandler stateHandler;
     EnemyAnimationController animationController;
+
+    [Header("EnemyHPBar")]
+    [SerializeField] private Image hpBar;
+    [SerializeField] private Image damageBar;  
+    private Coroutine damageRoutine;
+    
    
 
     [Header("EnemyStats")]
@@ -62,6 +69,8 @@ public class EnemyAI : NetworkBehaviour, IDamageable
     }
     public override void OnNetworkSpawn()
     {
+      
+
         enemyMaxHealth = guardianData.enemyHealth;
         enemyMaxStamina = guardianData.enemyStamina;
         enemyCurrentHealth.Value = enemyMaxHealth;
@@ -82,7 +91,7 @@ public class EnemyAI : NetworkBehaviour, IDamageable
     private void Start()
     {
         navMeshAgent.updateRotation = false;
-        
+        hpBar.transform.parent.gameObject.SetActive(false);
     }
     public override void OnNetworkDespawn()
     {
@@ -195,11 +204,13 @@ public class EnemyAI : NetworkBehaviour, IDamageable
         strafeDirection *= -1;
 
     }
+
+    //TakeDamage 
     public void TakeDamage(int damage, Vector3 hitDir)
     {
-
-        if (!IsServer || stateHandler.CurrentState == EnemyStateHandler.EnemyState.OnDeath) return;
-
+        if (!IsServer) return;
+        ShowHPBarClientRpc();
+        
         int healthDamage = (damage * damage) / (damage + enemyDefense);
         enemyCurrentHealth.Value -= healthDamage;
 
@@ -221,12 +232,45 @@ public class EnemyAI : NetworkBehaviour, IDamageable
         int staminaDamage = damage / 3;
         enemyCurrentStamina.Value -= staminaDamage;
 
-        if (enemyCurrentStamina.Value <= 0)
-        {
-            enemyCurrentStamina.Value = 0;
-            stateHandler.CurrentState = EnemyStateHandler.EnemyState.IsExhausted;
-        }
+        UpdateHPBarClientRpc(enemyCurrentHealth.Value);    
+
+        if (enemyCurrentHealth.Value <= 0) stateHandler.CurrentState = EnemyStateHandler.EnemyState.OnDeath;
+        if (enemyCurrentStamina.Value <= 0) stateHandler.CurrentState = EnemyStateHandler.EnemyState.IsExhausted;
     }
+
+
+    
+    //HPBarFuntion
+    [ClientRpc]
+    void UpdateHPBarClientRpc(int currentHealth)
+    {
+        hpBar.fillAmount = (float)currentHealth / enemyMaxHealth;
+
+        StartCoroutine(SmoothDamageBar((float)currentHealth / enemyMaxHealth));
+        
+    }   
+
+IEnumerator SmoothDamageBar(float target)
+{
+    yield return new WaitForSeconds(0.4f);
+
+    while (damageBar.fillAmount > target)
+    {
+        damageBar.fillAmount =
+            Mathf.Lerp(damageBar.fillAmount, target, Time.deltaTime * 3f);
+
+        yield return null;
+    }
+
+    damageBar.fillAmount = target;
+}
+[ClientRpc]
+void ShowHPBarClientRpc()
+{
+    hpBar.transform.parent.gameObject.SetActive(true);
+}
+    //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
     void CalculateDistancefromPlayer()
     {
         dirToPlayer = (targetPlayer.transform.position - transform.position).normalized;

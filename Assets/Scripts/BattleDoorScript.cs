@@ -7,9 +7,12 @@ public class BattleDoorScript : MonoBehaviour
      public void OpenBattleGate()
     {
         animator.SetBool("IsOpen", true);
+       
     }
     public void CloseBattleGate()
     {
         animator.SetBool("IsOpen", false);
+        
     }
+
 }

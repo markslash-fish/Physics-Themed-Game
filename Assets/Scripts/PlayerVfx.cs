@@ -1,362 +1,362 @@
-using UnityEngine;
-using Unity.Netcode;
-using System.Collections;
+    using UnityEngine;
+    using Unity.Netcode;
+    using System.Collections;
 
-public class PlayerVfx : NetworkBehaviour
-{
-    [Header("AttackVFX")]
-    GameObject currentCharge;
-    public GameObject chargeVFX;
-    public GameObject heavyBurstVFX;
-    public GameObject impactVFX;
-    public Transform handPoint;
-    public Transform rightHandPoint;
-
-    public GameObject leftTrail;
-    public GameObject rightTrail;
-
-    public Transform leftPoint;
-    public Transform rightPoint;
-
-    public GameObject leftSwingVFX;
-    public GameObject rightSwingVFX;
-
-    [Header("JumpVFX")]
-    public GameObject jumpVFX;
-    public GameObject jumpLandVFX;
-    public Transform jumpPoint;
-    public GameObject jumpTrail;
-
-    [Header("WalkVFX")]
-    public GameObject walkVFX;
-    public Transform leftFootPoint;
-    public Transform rightFootPoint;
-
-    [Header("HealVFX")]
-    public GameObject healGlowVFX;
-    public GameObject healVFX;
-    public Transform healVfxPoint;
-
-    public Animator animator;
-
-    GameObject currentGlow;
-
-    void Update()
+    public class PlayerVfx : NetworkBehaviour
     {
-        if (!IsOwner) return;
+        [Header("AttackVFX")]
+        GameObject currentCharge;
+        public GameObject chargeVFX;
+        public GameObject heavyBurstVFX;
+        public GameObject impactVFX;
+        public Transform handPoint;
+        public Transform rightHandPoint;
 
-        if (Input.GetKeyDown(KeyCode.J))
-            StartCoroutine(HealRoutine());
-    }
+        public GameObject leftTrail;
+        public GameObject rightTrail;
 
-    IEnumerator HealRoutine()
-    {
-        animator.SetTrigger("Heal");
+        public Transform leftPoint;
+        public Transform rightPoint;
 
-        yield return new WaitForSeconds(0.5f);
+        public GameObject leftSwingVFX;
+        public GameObject rightSwingVFX;
 
-        StartHealGlowServerRpc();
+        [Header("JumpVFX")]
+        public GameObject jumpVFX;
+        public GameObject jumpLandVFX;
+        public Transform jumpPoint;
+        public GameObject jumpTrail;
 
-        yield return new WaitForSeconds(1f);
+        [Header("WalkVFX")]
+        public GameObject walkVFX;
+        public Transform leftFootPoint;
+        public Transform rightFootPoint;
 
-        PlayHealVFXServerRpc();
+        [Header("HealVFX")]
+        public GameObject healGlowVFX;
+        public GameObject healVFX;
+        public Transform healVfxPoint;
 
-        yield return new WaitForSeconds(5f);
-    }
+        public Animator animator;
 
-    // =========================
-    // HEAL
-    // =========================
+        GameObject currentGlow;
 
-    [ServerRpc]
-    void StartHealGlowServerRpc()
-    {
-        StartHealGlowClientRpc();
-    }
+        void Update()
+            {
+                if (!IsOwner) return;
 
-    [ClientRpc]
-    void StartHealGlowClientRpc()
-    {
-        currentGlow = Instantiate(healGlowVFX, healVfxPoint.position, Quaternion.identity);
-        currentGlow.transform.SetParent(healVfxPoint);
-    }
+                if (Input.GetKeyDown(KeyCode.J))
+                    StartCoroutine(HealRoutine());
+            }
 
-    [ServerRpc]
-    void PlayHealVFXServerRpc()
-    {
-        PlayHealVFXClientRpc();
-    }
+            IEnumerator HealRoutine()
+            {
+                animator.SetTrigger("Heal");
 
-    [ClientRpc]
-    void PlayHealVFXClientRpc()
-    {
-        GameObject vfx = Instantiate(healVFX, healVfxPoint.position, Quaternion.identity);
-        vfx.transform.SetParent(healVfxPoint);
+                yield return new WaitForSeconds(0.5f);
 
-        Destroy(vfx, 2f);
+                StartHealGlowServerRpc();
 
-        if (currentGlow != null)
-            Destroy(currentGlow);
-    }
-    public void StartHealGlow()
-{
-    if (!IsOwner) return;
-    StartHealGlowServerRpc();
-}
+                yield return new WaitForSeconds(1f);
 
-public void PlayHealVFX()
-{
-    if (!IsOwner) return;
-    PlayHealVFXServerRpc();
-}
+                PlayHealVFXServerRpc();
 
-    // =========================
-    // CHARGE + HEAVY
-    // =========================
+                yield return new WaitForSeconds(5f);
+            }
 
-    [ServerRpc]
-    public void StartChargeServerRpc()
-    {
-        StartChargeClientRpc();
-    }
+            // =========================
+            // HEAL
+            // =========================
 
-    [ClientRpc]
-    void StartChargeClientRpc()
-    {
-        if (currentCharge != null)
-            Destroy(currentCharge);
+            [ServerRpc]
+            void StartHealGlowServerRpc()
+            {
+                StartHealGlowClientRpc();
+            }
 
-        currentCharge = Instantiate(chargeVFX, handPoint.position, Quaternion.identity);
-        currentCharge.transform.SetParent(handPoint);
-        currentCharge.transform.localPosition = Vector3.zero;
-        currentCharge.transform.localRotation = Quaternion.identity;
-        currentCharge.transform.localScale = Vector3.one;
-    }
+            [ClientRpc]
+            void StartHealGlowClientRpc()
+            {
+                currentGlow = Instantiate(healGlowVFX, healVfxPoint.position, Quaternion.identity);
+                currentGlow.transform.SetParent(healVfxPoint);
+            }
 
-    [ServerRpc]
-    public void ReleaseHeavyServerRpc(Vector3 pos, Vector3 forward)
-    {
-        ReleaseHeavyClientRpc(pos, forward);
-    }
+            [ServerRpc]
+            void PlayHealVFXServerRpc()
+            {
+                PlayHealVFXClientRpc();
+            }
 
-    [ClientRpc]
-    void ReleaseHeavyClientRpc(Vector3 pos, Vector3 forward)
-    {
-        if (currentCharge != null)
-            Destroy(currentCharge);
+            [ClientRpc]
+            void PlayHealVFXClientRpc()
+            {
+                GameObject vfx = Instantiate(healVFX, healVfxPoint.position, Quaternion.identity);
+                vfx.transform.SetParent(healVfxPoint);
 
-        GameObject burst = Instantiate(heavyBurstVFX, pos, Quaternion.LookRotation(forward));
-        Destroy(burst, 1f);
-    }
-    public void ReleaseHeavy()
-{
-    if (!IsOwner) return;
+                Destroy(vfx, 2f);
 
-    Vector3 pos = handPoint.position + transform.forward * 0.6f + Vector3.up * 0.2f;
-
-    ReleaseHeavyServerRpc(pos, transform.forward);
-}
-
-    // =========================
-    // TRAILS
-    // =========================
-
-    [ServerRpc]
-    public void SetTrailServerRpc(bool left, bool state)
-    {
-        SetTrailClientRpc(left, state);
-    }
-
-    [ClientRpc]
-    void SetTrailClientRpc(bool left, bool state)
-    {
-        if (left) leftTrail.SetActive(state);
-        else rightTrail.SetActive(state);
-    }
-    public void EnableLeftTrail()
-{
-    if (!IsOwner) return;
-    SetTrailServerRpc(true, true);
-}
-
-public void DisableLeftTrail()
-{
-    if (!IsOwner) return;
-    SetTrailServerRpc(true, false);
-}
-
-public void EnableRightTrail()
-{
-    if (!IsOwner) return;
-    SetTrailServerRpc(false, true);
-}
-
-public void DisableRightTrail()
-{
-    if (!IsOwner) return;
-    SetTrailServerRpc(false, false);
-}
-
-    // =========================
-    // SWING
-    // =========================
-
-    [ServerRpc]
-    public void PlaySwingServerRpc(bool left)
-    {
-        PlaySwingClientRpc(left);
-    }
-
-    [ClientRpc]
-    void PlaySwingClientRpc(bool left)
-    {
-        if (left)
+                if (currentGlow != null)
+                    Destroy(currentGlow);
+            }
+            public void StartHealGlow()
         {
-            leftTrail.SetActive(true);
-            GameObject vfx = Instantiate(leftSwingVFX, leftPoint.position, Quaternion.identity);
-            vfx.transform.SetParent(leftPoint);
-            Destroy(vfx, 1f);
+            if (!IsOwner) return;
+            StartHealGlowServerRpc();
         }
-        else
+
+        public void PlayHealVFX()
         {
-            rightTrail.SetActive(true);
-            GameObject vfx = Instantiate(rightSwingVFX, rightPoint.position, Quaternion.identity);
-            vfx.transform.SetParent(rightPoint);
-            Destroy(vfx, 1f);
+            if (!IsOwner) return;
+            PlayHealVFXServerRpc();
+        }
+
+            // =========================
+            // CHARGE + HEAVY
+            // =========================
+
+            [ServerRpc]
+            public void StartChargeServerRpc()
+            {
+                StartChargeClientRpc();
+            }
+
+            [ClientRpc]
+            void StartChargeClientRpc()
+            {
+                if (currentCharge != null)
+                    Destroy(currentCharge);
+
+                currentCharge = Instantiate(chargeVFX, handPoint.position, Quaternion.identity);
+                currentCharge.transform.SetParent(handPoint);
+                currentCharge.transform.localPosition = Vector3.zero;
+                currentCharge.transform.localRotation = Quaternion.identity;
+                currentCharge.transform.localScale = Vector3.one;
+            }
+
+            [ServerRpc]
+            public void ReleaseHeavyServerRpc(Vector3 pos, Vector3 forward)
+            {
+                ReleaseHeavyClientRpc(pos, forward);
+            }
+
+            [ClientRpc]
+            void ReleaseHeavyClientRpc(Vector3 pos, Vector3 forward)
+            {
+                if (currentCharge != null)
+                    Destroy(currentCharge);
+
+                GameObject burst = Instantiate(heavyBurstVFX, pos, Quaternion.LookRotation(forward));
+                Destroy(burst, 1f);
+            }
+            public void ReleaseHeavy()
+        {
+            if (!IsOwner) return;
+
+            Vector3 pos = handPoint.position + transform.forward * 0.6f + Vector3.up * 0.2f;
+
+            ReleaseHeavyServerRpc(pos, transform.forward);
+        }
+
+            // =========================
+            // TRAILS
+            // =========================
+
+            [ServerRpc]
+            public void SetTrailServerRpc(bool left, bool state)
+            {
+                SetTrailClientRpc(left, state);
+            }
+
+            [ClientRpc]
+            void SetTrailClientRpc(bool left, bool state)
+            {
+                if (left) leftTrail.SetActive(state);
+                else rightTrail.SetActive(state);
+            }
+            public void EnableLeftTrail()
+        {
+            if (!IsOwner) return;
+            SetTrailServerRpc(true, true);
+        }
+
+        public void DisableLeftTrail()
+        {
+            if (!IsOwner) return;
+            SetTrailServerRpc(true, false);
+        }
+
+        public void EnableRightTrail()
+        {
+            if (!IsOwner) return;
+            SetTrailServerRpc(false, true);
+        }
+
+        public void DisableRightTrail()
+        {
+            if (!IsOwner) return;
+            SetTrailServerRpc(false, false);
+        }
+
+            // =========================
+            // SWING
+            // =========================
+
+            [ServerRpc]
+            public void PlaySwingServerRpc(bool left)
+            {
+                PlaySwingClientRpc(left);
+            }
+
+            [ClientRpc]
+            void PlaySwingClientRpc(bool left)
+            {
+                if (left)
+                {
+                    leftTrail.SetActive(true);
+                    GameObject vfx = Instantiate(leftSwingVFX, leftPoint.position, Quaternion.identity);
+                    vfx.transform.SetParent(leftPoint);
+                    Destroy(vfx, 1f);
+                }
+                else
+                {
+                    rightTrail.SetActive(true);
+                    GameObject vfx = Instantiate(rightSwingVFX, rightPoint.position, Quaternion.identity);
+                    vfx.transform.SetParent(rightPoint);
+                    Destroy(vfx, 1f);
+                }
+            }
+
+            public void PlayLeftSwing()
+        {
+            if (!IsOwner) return;
+            PlaySwingServerRpc(true);
+        }
+
+        public void PlayRightSwing()
+        {
+            if (!IsOwner) return;
+            PlaySwingServerRpc(false);
+        }
+
+            // =========================
+            // BASIC attack IMPACT
+            // =========================
+            public void PlayImpactLeft()
+        {
+            if (!IsOwner) return;
+
+            Vector3 pos = handPoint.position + transform.forward * 0.6f;
+
+            PlayImpactServerRpc(pos, transform.forward);
+        }
+
+        public void PlayImpactRight()
+        {
+            if (!IsOwner) return;
+
+            Vector3 pos = rightHandPoint.position + transform.forward * 0.6f;
+
+            PlayImpactServerRpc(pos, transform.forward);
+        }
+
+            [ServerRpc]
+            public void PlayImpactServerRpc(Vector3 pos, Vector3 forward)
+            {
+                PlayImpactClientRpc(pos, forward);
+            }
+
+            [ClientRpc]
+            void PlayImpactClientRpc(Vector3 pos, Vector3 forward)
+            {
+                GameObject vfx = Instantiate(impactVFX, pos, Quaternion.LookRotation(forward));
+                Destroy(vfx, 1f);
+            }
+
+            // =========================
+            // WALK
+            // =========================
+
+            [ServerRpc]
+            public void PlayFootstepServerRpc(bool left)
+            {
+                PlayFootstepClientRpc(left);
+            }
+
+            [ClientRpc]
+            void PlayFootstepClientRpc(bool left)
+            {
+                Transform point = left ? leftFootPoint : rightFootPoint;
+
+                GameObject vfx = Instantiate(walkVFX, point.position, Quaternion.identity);
+                Destroy(vfx, 1f);
+            }
+
+            // =========================
+            // JUMP
+            // =========================
+
+            [ServerRpc]
+            public void PlayJumpServerRpc()
+            {
+                PlayJumpClientRpc();
+            }
+
+            [ClientRpc]
+            void PlayJumpClientRpc()
+            {
+                GameObject vfx = Instantiate(jumpVFX, jumpPoint.position, Quaternion.identity);
+                Destroy(vfx, 1f);
+            }
+
+            [ServerRpc]
+            public void PlayLandServerRpc()
+            {
+                PlayLandClientRpc();
+            }
+
+            [ClientRpc]
+            void PlayLandClientRpc()
+            {
+                GameObject vfx = Instantiate(jumpLandVFX, jumpPoint.position, Quaternion.identity);
+                Destroy(vfx, 1f);
+            }
+
+            public void PlayJumpVFX()
+        {
+            if (!IsOwner) return;
+            PlayJumpServerRpc();
+        }
+
+        public void PlayLandVFX()
+        {
+            if (!IsOwner) return;
+            PlayLandServerRpc();
+        }
+
+            // =========================
+            // JUMP TRAIL
+            // =========================
+
+            [ServerRpc]
+            public void SetJumpTrailServerRpc(bool state)
+            {
+                SetJumpTrailClientRpc(state);
+            }
+
+            [ClientRpc]
+            void SetJumpTrailClientRpc(bool state)
+            {
+                jumpTrail.SetActive(state);
+            }
+            public void EJumpTrail()
+        {
+            if (!IsOwner) return;
+            SetJumpTrailServerRpc(true);
+        }
+
+        public void DisJumpTrail()
+        {
+            if (!IsOwner) return;
+            SetJumpTrailServerRpc(false);
         }
     }
-
-    public void PlayLeftSwing()
-{
-    if (!IsOwner) return;
-    PlaySwingServerRpc(true);
-}
-
-public void PlayRightSwing()
-{
-    if (!IsOwner) return;
-    PlaySwingServerRpc(false);
-}
-
-    // =========================
-    // BASIC attack IMPACT
-    // =========================
-    public void PlayImpactLeft()
-{
-    if (!IsOwner) return;
-
-    Vector3 pos = handPoint.position + transform.forward * 0.6f;
-
-    PlayImpactServerRpc(pos, transform.forward);
-}
-
-public void PlayImpactRight()
-{
-    if (!IsOwner) return;
-
-    Vector3 pos = rightHandPoint.position + transform.forward * 0.6f;
-
-    PlayImpactServerRpc(pos, transform.forward);
-}
-
-    [ServerRpc]
-    public void PlayImpactServerRpc(Vector3 pos, Vector3 forward)
-    {
-        PlayImpactClientRpc(pos, forward);
-    }
-
-    [ClientRpc]
-    void PlayImpactClientRpc(Vector3 pos, Vector3 forward)
-    {
-        GameObject vfx = Instantiate(impactVFX, pos, Quaternion.LookRotation(forward));
-        Destroy(vfx, 1f);
-    }
-
-    // =========================
-    // WALK
-    // =========================
-
-    [ServerRpc]
-    public void PlayFootstepServerRpc(bool left)
-    {
-        PlayFootstepClientRpc(left);
-    }
-
-    [ClientRpc]
-    void PlayFootstepClientRpc(bool left)
-    {
-        Transform point = left ? leftFootPoint : rightFootPoint;
-
-        GameObject vfx = Instantiate(walkVFX, point.position, Quaternion.identity);
-        Destroy(vfx, 1f);
-    }
-
-    // =========================
-    // JUMP
-    // =========================
-
-    [ServerRpc]
-    public void PlayJumpServerRpc()
-    {
-        PlayJumpClientRpc();
-    }
-
-    [ClientRpc]
-    void PlayJumpClientRpc()
-    {
-        GameObject vfx = Instantiate(jumpVFX, jumpPoint.position, Quaternion.identity);
-        Destroy(vfx, 1f);
-    }
-
-    [ServerRpc]
-    public void PlayLandServerRpc()
-    {
-        PlayLandClientRpc();
-    }
-
-    [ClientRpc]
-    void PlayLandClientRpc()
-    {
-        GameObject vfx = Instantiate(jumpLandVFX, jumpPoint.position, Quaternion.identity);
-        Destroy(vfx, 1f);
-    }
-
-    public void PlayJumpVFX()
-{
-    if (!IsOwner) return;
-    PlayJumpServerRpc();
-}
-
-public void PlayLandVFX()
-{
-    if (!IsOwner) return;
-    PlayLandServerRpc();
-}
-
-    // =========================
-    // JUMP TRAIL
-    // =========================
-
-    [ServerRpc]
-    public void SetJumpTrailServerRpc(bool state)
-    {
-        SetJumpTrailClientRpc(state);
-    }
-
-    [ClientRpc]
-    void SetJumpTrailClientRpc(bool state)
-    {
-        jumpTrail.SetActive(state);
-    }
-    public void EJumpTrail()
-{
-    if (!IsOwner) return;
-    SetJumpTrailServerRpc(true);
-}
-
-public void DisJumpTrail()
-{
-    if (!IsOwner) return;
-    SetJumpTrailServerRpc(false);
-}
-}
