@@ -7,10 +7,6 @@ public class EnemyAnimationController : NetworkBehaviour
     EnemyStateHandler stateHandler;
     EnemyAI enemyAI;
 
-
-    private bool isStrafingRight;
-    private bool isStrafing;
-    private bool isIdle;
     void Start()
     {
         animator = GetComponent<Animator>();
@@ -27,18 +23,26 @@ public class EnemyAnimationController : NetworkBehaviour
     }
     public void PlayStrafe()
     {
-        isStrafing = stateHandler.enemyState.Value == EnemyStateHandler.EnemyState.IsStrafing;
+       bool isStrafing = stateHandler.enemyState.Value == EnemyStateHandler.EnemyState.IsStrafing;
         animator.SetBool("isStrafing", isStrafing);
     }
     public void PlayIdle()
     {
-        isIdle = stateHandler.enemyState.Value == EnemyStateHandler.EnemyState.Idle;
+       bool isIdle = stateHandler.enemyState.Value == EnemyStateHandler.EnemyState.Idle;
         animator.SetBool("isIdle", isIdle);
     }
     public void MirrorStrafe()
     {
-        isStrafingRight = enemyAI.strafeDirection == -1;
+      bool  isStrafingRight = enemyAI.strafeDirection == -1;
         animator.SetBool("isStrafingRight", isStrafingRight);
      
+    }
+    public void PlayExhaust()
+    {
+    animator.SetBool("isExhausted", true);     
+    }
+    public void RecoverExhaust()
+    {
+        animator.SetBool("isExhausted", false);
     }
 }

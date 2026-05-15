@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using NUnit.Framework;
+using Unity.Netcode;
 using UnityEngine;
 
-public class BattleRoomScript : MonoBehaviour
+public class BattleRoomScript : NetworkBehaviour
 {
     public GameObject backGate, frontGate;
     public List<GameObject> enemiesActive = new List<GameObject>();
@@ -15,10 +16,12 @@ public class BattleRoomScript : MonoBehaviour
 
     void Update()
     {
+        enemiesActive.RemoveAll(enemy => enemy == null);
         if (enemiesActive.Count == 0)
         {
+            var gateOpen = frontGate.GetComponent<BattleDoorScript>();
             frontGate.GetComponent<BattleDoorScript>().OpenBattleGate();
-
+            gateOpen.OpenBattleGate();
         }
     }
     private void OnTriggerStay(Collider other)
@@ -39,6 +42,8 @@ public class BattleRoomScript : MonoBehaviour
             playersActive.Add(other.gameObject);
             if (playersActive.Count == 2)
             {
+                var gateClose = frontGate.GetComponent<BattleDoorScript>();
+                gateClose.CloseBattleGate();
                 backGate.GetComponent<BattleDoorScript>().CloseBattleGate();
             }
 
@@ -51,7 +56,9 @@ public class BattleRoomScript : MonoBehaviour
             playersActive.Remove(other.gameObject);
             if (playersActive.Count == 0)
             {
-                frontGate.GetComponent<BattleDoorScript>().CloseBattleGate();
+                
+               var gateClose = frontGate.GetComponent<BattleDoorScript>();
+                gateClose.CloseBattleGate();
             }
 
         }

@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
+using static Player;
 using Random = UnityEngine.Random;
 
 public class EnemyAI : NetworkBehaviour, IDamageable
@@ -121,18 +122,26 @@ public class EnemyAI : NetworkBehaviour, IDamageable
             attackController.ChooseAction();
      
         }
-        else if(newState == EnemyStateHandler.EnemyState.IsStrafing)
+        else if (newState == EnemyStateHandler.EnemyState.IsStrafing)
         {
+          
+            StopCoroutine(AttackRoutine());
             StartCoroutine(AttackRoutine());
+
             navMeshAgent.isStopped = false;
             navMeshAgent.nextPosition = transform.position;
             navMeshAgent.updatePosition = true;
-          
-            
         }
         else if(newState == EnemyStateHandler.EnemyState.Idle)
         {
             animationController.PlayIdle();
+            navMeshAgent.isStopped = true;
+            navMeshAgent.updatePosition = false;
+        }
+        else if(newState == EnemyStateHandler.EnemyState.IsExhausted)
+        {
+          
+            animationController.PlayExhaust();
             navMeshAgent.isStopped = true;
             navMeshAgent.updatePosition = false;
         }
@@ -156,6 +165,7 @@ public class EnemyAI : NetworkBehaviour, IDamageable
     {
         if (other.CompareTag("Player"))
         {
+            if (stateHandler.CurrentState == EnemyStateHandler.EnemyState.IsExhausted) return;
             SetTarget();
             stateHandler.CurrentState = EnemyStateHandler.EnemyState.IsStrafing;
             
@@ -187,13 +197,35 @@ public class EnemyAI : NetworkBehaviour, IDamageable
     }
     public void TakeDamage(int damage, Vector3 hitDir)
     {
-        if (!IsServer) return;
+
+        if (!IsServer || stateHandler.CurrentState == EnemyStateHandler.EnemyState.OnDeath) return;
+
         int healthDamage = (damage * damage) / (damage + enemyDefense);
-        int staminaDamage = damage/3;
-        enemyCurrentHealth.Value-= healthDamage;
+        enemyCurrentHealth.Value -= healthDamage;
+
+    
+        if (enemyCurrentHealth.Value <= 0)
+        {
+            stateHandler.CurrentState = EnemyStateHandler.EnemyState.OnDeath;
+            return;
+        }
+
+
+        if (stateHandler.CurrentState == EnemyStateHandler.EnemyState.IsExhausted)
+        {
+            Debug.Log("Enemy hit while exhausted - taking damage but staying in state");
+            return;
+        }
+
+
+        int staminaDamage = damage / 3;
         enemyCurrentStamina.Value -= staminaDamage;
-        if (enemyCurrentHealth.Value <= 0) stateHandler.CurrentState = EnemyStateHandler.EnemyState.OnDeath;
-        if (enemyCurrentStamina.Value <= 0) stateHandler.CurrentState = EnemyStateHandler.EnemyState.IsExhausted;
+
+        if (enemyCurrentStamina.Value <= 0)
+        {
+            enemyCurrentStamina.Value = 0;
+            stateHandler.CurrentState = EnemyStateHandler.EnemyState.IsExhausted;
+        }
     }
     void CalculateDistancefromPlayer()
     {
@@ -214,6 +246,13 @@ public class EnemyAI : NetworkBehaviour, IDamageable
         Quaternion enemyLookrotation = Quaternion.LookRotation(dirToPlayer);
         transform.rotation = Quaternion.Slerp(transform.rotation, enemyLookrotation, Time.deltaTime * 5f);
     }
+    void ResetEnemyExhaustState()
+    {
+        enemyCurrentStamina.Value = enemyMaxStamina;
+        animationController.RecoverExhaust();
+        stateHandler.CurrentState = EnemyStateHandler.EnemyState.IsStrafing;
+        
+    }
   
     private void OnDrawGizmos()
     {
@@ -223,14 +262,21 @@ public class EnemyAI : NetworkBehaviour, IDamageable
     }
     private IEnumerator AttackRoutine()
     {
-        while(attackController.isBusy)
+        while(attackController.isBusy || stateHandler.isBusy )
         {
             yield return null;
         }
         enemyAttackStarted = true;
+        if (stateHandler.CurrentState != EnemyStateHandler.EnemyState.IsStrafing)
+            yield break;
+
         float randomInterval = Random.Range(2f, 3f);
         yield return new WaitForSeconds(randomInterval);
-        stateHandler.CurrentState = EnemyStateHandler.EnemyState.IsAttacking;
+        if (stateHandler.CurrentState == EnemyStateHandler.EnemyState.IsStrafing)
+        {
+            stateHandler.CurrentState = EnemyStateHandler.EnemyState.IsAttacking;
+        }
+       
         enemyAttackStarted = false;
     }
     private IEnumerator PlayDeath()

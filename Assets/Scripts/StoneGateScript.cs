@@ -7,7 +7,6 @@ public class StoneGateScript : MonoBehaviour
     [SerializeField] GameObject floatingButtonUI = null;
     [SerializeField] GameObject confirmationWindow = null;
     bool isInTrigger;
-    public bool isReady;
     void Start()
     {
        
