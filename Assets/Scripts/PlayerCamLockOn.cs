@@ -16,35 +16,16 @@ public class PlayerCamLockOn : NetworkBehaviour
 
     void Update()
     {
+        if(currentEnemy == null)
+        {
+            cameraStateAnimator.SetBool("IsLockedOn", false);
+        }
+
         if (!IsOwner) return;
 
         // Logic: If we have a reference, we MUST validate it
         if (currentEnemy != null)
         {
-            bool isEnemyGone = false;
-
-            // Check if the reference itself became null/destroyed
-            if (currentEnemy == null)
-            {
-                isEnemyGone = true;
-            }
-            else
-            {
-                // Check if the object is disabled or about to be destroyed
-                if (!currentEnemy.gameObject.activeInHierarchy)
-                {
-                    isEnemyGone = true;
-                }
-            }
-
-            if (isEnemyGone)
-            {
-                Debug.Log("Enemy lost or despawned. Resetting camera.");
-                ClearLockOn();
-                return;
-            }
-
-            // Standard Distance Check
             float dist = Vector3.Distance(transform.position, currentEnemy.position);
             if (dist > detectionRadius + 2f)
             {
@@ -58,6 +39,7 @@ public class PlayerCamLockOn : NetworkBehaviour
         if (currentEnemy != null)
         {
             ClearLockOn();
+            currentEnemy = null;
             return;
         }
 
@@ -99,8 +81,6 @@ public class PlayerCamLockOn : NetworkBehaviour
         if (cameraStateAnimator != null)
         {
             cameraStateAnimator.SetBool("IsLockedOn", false);
-            // Force the animator to update this frame
-            cameraStateAnimator.Update(0);
         }
 
         if (currentEnemy != null)
@@ -108,7 +88,7 @@ public class PlayerCamLockOn : NetworkBehaviour
             targetGroup.RemoveMember(currentEnemy);
             currentEnemy = null;
         }
-
         Debug.Log("Lock On Cleared.");
+
     }
 }

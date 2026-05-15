@@ -1,6 +1,7 @@
 using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using static Player;
 
 public class PlayerAnimationController : NetworkBehaviour
 {  
@@ -157,8 +158,9 @@ public class PlayerAnimationController : NetworkBehaviour
     }
     void PlayHit()
     {
-            player.playerState = Player.PlayerState.IsHurt;
-            anim.ResetControllerState();
+        if (player.isBlocking && player.playerState == Player.PlayerState.IsBlocking) return;
+        player.playerState = Player.PlayerState.IsHurt;
+        anim.ResetControllerState();
             anim.SetTrigger("Hit");
         
            

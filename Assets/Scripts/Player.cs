@@ -6,14 +6,14 @@ using UnityEngine;
 public class Player : NetworkBehaviour, IDamageable
 {
     [Header("After Image")]
-public GameObject ghostPrefab;
-public float ghostSpawnDelay = 0.05f;
-float ghostTimer = 0f;
-    
-    public enum PlayerState { None, IsJumping, IsDodging, IsAttacking, IsBlocking, IsHealing, IsHurt }
+    public GameObject ghostPrefab;
+    public float ghostSpawnDelay = 0.05f;
+    float ghostTimer = 0f;
+
+    public enum PlayerState { None, IsJumping, IsDodging, IsAttacking, IsBlocking, IsHealing, IsHurt, IsExhausted, IsDead }
     public PlayerState playerState;
 
-  public bool isBusy => playerState != PlayerState.None;
+    public bool isBusy => playerState != PlayerState.None;
 
     [Header("References")]
     [SerializeField] PlayerInputReader playerInputReader;
@@ -24,7 +24,7 @@ float ghostTimer = 0f;
     [Header("Dodge")]
     [SerializeField] float dodgeForce = 12f;
 
-    public  bool isBlocking = false;
+    public bool isBlocking = false;
     public bool isDodging = false;
 
 
@@ -35,7 +35,7 @@ float ghostTimer = 0f;
     [SerializeField] private float runSpeed;
     [SerializeField] float gravity = -20f;
     float verticalVelocity;
-  
+
 
     [Header("Ground Check")]
     public LayerMask groundMask;
@@ -63,7 +63,7 @@ float ghostTimer = 0f;
     public float comboTimer = 0f;
     public float comboResetTime = 1f;
 
-   public bool isHeavyAttacking = false;
+    public bool isHeavyAttacking = false;
 
     [Header("Stats")]
     public NetworkVariable<int> playerBaseCurrentHealth = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -93,7 +93,7 @@ float ghostTimer = 0f;
         currentWalkSpeed = 2f;
         runSpeed = 5.8f;
         potionCount = 3;
-      
+
         if (IsOwner)
         {
             stateCam.Priority = 100;
@@ -102,7 +102,7 @@ float ghostTimer = 0f;
         else
         {
             stateCam.Priority = 0;
-          
+
 
         }
         playerBaseCurrentHealth.OnValueChanged += (oldVal, newVal) => {
@@ -117,7 +117,7 @@ float ghostTimer = 0f;
         playerBaseCurrentStamina.Value = playerBaseMaxStamina;
         playerBaseMinAP = 10;
         playerBaseMaxAP = 12;
-        playerBaseDefense = 50;
+        playerBaseDefense = 10;
         playerBaseSense = 0.25f;
 
         playerInputReader.onBlockStarted += StartBlock;
@@ -144,7 +144,7 @@ float ghostTimer = 0f;
         playerInputReader.onMove -= PlayerMove;
         playerInputReader.jumpStarted -= PlayerJump;
         playerInputReader.onHeal -= PlayerHeal;
-       
+
         playerInputReader.onLightAttackStarted -= PlayerLightAttack;
         playerInputReader.onHeavyAttackStarted -= PlayerHeavyAttack;
     }
@@ -164,22 +164,22 @@ float ghostTimer = 0f;
             CalculateMovement();
             HandleComboReset();
 
-if (!IsOwner) return;
+            if (!IsOwner) return;
 
-if (isDodging)
-{
-    ghostTimer += Time.deltaTime;
+            if (isDodging)
+            {
+                ghostTimer += Time.deltaTime;
 
-    if (ghostTimer >= ghostSpawnDelay)
-    {
-        SpawnGhostServerRpc(transform.position, transform.rotation);
-        ghostTimer = 0f;
-    }
-}
+                if (ghostTimer >= ghostSpawnDelay)
+                {
+                    SpawnGhostServerRpc(transform.position, transform.rotation);
+                    ghostTimer = 0f;
+                }
+            }
 
         }
 
-        if(playerState == PlayerState.IsJumping)
+        if (playerState == PlayerState.IsJumping)
         {
             playerInputReader.sprintAction.Disable();
             playerInputReader.jumpAction.Disable();
@@ -243,7 +243,11 @@ if (isDodging)
             playerInputReader.blockAction.Disable();
 
         }
-        else 
+        else if(playerState == PlayerState.IsDead)
+        {
+            PlayerOnDeath();
+        }
+        else
         {
             playerInputReader.sprintAction.Enable();
             playerInputReader.jumpAction.Enable();
@@ -266,30 +270,30 @@ if (isDodging)
 
         if (!canMove && isBusy) return;
 
-      
+
 
         if (move != Vector3.zero)
-            {
-                Quaternion rot = Quaternion.LookRotation(move);
-                transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * 10f);
-            }
+        {
+            Quaternion rot = Quaternion.LookRotation(move);
+            transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * 10f);
+        }
 
-            float currentSpeed = isRunning ? runSpeed : baseWalkSpeed;
+        float currentSpeed = isRunning ? runSpeed : baseWalkSpeed;
 
-            if (isGrounded && verticalVelocity < 0)
-            {
-                verticalVelocity = -2f;
-            }
+        if (isGrounded && verticalVelocity < 0)
+        {
+            verticalVelocity = -2f;
+        }
 
-            verticalVelocity += gravity * Time.deltaTime;
+        verticalVelocity += gravity * Time.deltaTime;
 
-            Vector3 velocity = isBlocking? move * currentWalkSpeed : move * currentSpeed;
-            velocity.y = verticalVelocity;
+        Vector3 velocity = isBlocking ? move * currentWalkSpeed : move * currentSpeed;
+        velocity.y = verticalVelocity;
 
-      
+
         rb.MovePosition(rb.position + velocity * Time.deltaTime);
-        
-      
+
+
     }
 
     // ======================
@@ -302,7 +306,7 @@ if (isDodging)
 
     void CalculateMovement()
     {
-     
+
         float x = movement.x;
         float z = movement.y;
 
@@ -337,7 +341,7 @@ if (isDodging)
         }
 
         float currentSpeed = isRunning ? runSpeed : baseWalkSpeed;
-        
+
 
         if (isGrounded && verticalVelocity < 0)
         {
@@ -346,7 +350,7 @@ if (isDodging)
 
         verticalVelocity += gravity * Time.deltaTime;
 
-        Vector3 velocity = isBlocking? move * currentSpeed : move * currentWalkSpeed;
+        Vector3 velocity = isBlocking ? move * currentSpeed : move * currentWalkSpeed;
         velocity.y = verticalVelocity;
 
 
@@ -361,22 +365,22 @@ if (isDodging)
     {
         if (isBusy) return;
 
-       
+
         if (isGrounded)
-            {
-             playerState = PlayerState.IsJumping;
-             verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
-            
-            }
-        
-       
+        {
+            playerState = PlayerState.IsJumping;
+            verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
+
+        }
+
+
     }
 
     void SetSprint(bool value)
     {
         value = true;
         isRunning = value;
-   
+
     }
     void EndSprint(bool value)
     {
@@ -392,7 +396,7 @@ if (isDodging)
         if (isBusy && playerBaseCurrentHealth.Value == playerBaseMaxHealth || potionCount == 0) return;
         playerState = PlayerState.IsHealing;
     }
-    
+
 
     // ======================
     // LIGHT ATTACK COMBO
@@ -410,19 +414,19 @@ if (isDodging)
         if (comboStep == 0)
         {
             comboStep = 1;
-           
+
         }
         else if (comboStep == 1 && canCombo)
         {
             comboStep = 2;
             canCombo = false;
-            
+
         }
         else if (comboStep == 2 && canCombo)
         {
             comboStep = 3;
             canCombo = false;
-            
+
         }
     }
 
@@ -454,7 +458,7 @@ if (isDodging)
             if (comboTimer >= comboResetTime)
             {
                 ResetCombo();
-              
+
             }
         }
     }
@@ -477,7 +481,7 @@ if (isDodging)
     {
         playerState = PlayerState.None;
         isHeavyAttacking = false;
-       
+
 
     }
 
@@ -490,7 +494,7 @@ if (isDodging)
     {
         canMove = true;
     }
-   
+
 
 
 
@@ -512,8 +516,8 @@ if (isDodging)
 
         rb.AddForce(dodgeDir * dodgeForce, ForceMode.Impulse);
 
-       
-       
+
+
     }
 
     void StartBlock()
@@ -522,29 +526,51 @@ if (isDodging)
         if (isBlocking) return;
         playerState = PlayerState.IsBlocking;
         isBlocking = true;
-      
+
     }
 
     void StopBlock()
     {
+        Debug.Log("Blocking Stopped");
         playerState = PlayerState.None;
         isBlocking = false;
     }
-
+    void PlayerOnDeath()
+    {
+        playerState = PlayerState.IsDead;
+        GameManager.Instance.NotifyPlayerDeathRpc();
+        GetComponent<NetworkObject>().Despawn();
+    }
     public void TakeDamage(int damage, Vector3 hitDir)
     {
         if (isDodging) return;
+       
         int healthDamage = (damage * damage) / (damage + playerBaseDefense);
-        float staminaDamage = (healthDamage / 4);
+        int staminaDamage = (healthDamage * (3/2));
         float knockbackForce = (damage <20)? 8f: 12f;
-        playerBaseCurrentHealth.Value -= healthDamage;
-        playerState = Player.PlayerState.IsHurt;
-
-     
         ApplyKnockbackClientRpc(knockbackForce, hitDir);
+        if (playerState == PlayerState.IsBlocking && isBlocking)
+        {
+
+            playerBaseCurrentStamina.Value -= staminaDamage;
+            return;
+
+        }
+        playerBaseCurrentHealth.Value -= healthDamage;
+
+
+
+       
         if (playerBaseCurrentHealth.Value <= 0)
         {
-            GetComponent<NetworkObject>().Despawn();
+            playerBaseCurrentHealth.Value = 0;
+            PlayerOnDeath();
+        }
+        else if(playerBaseCurrentStamina.Value <= 0)
+        {
+            playerBaseCurrentStamina.Value = 0;
+            playerState = PlayerState.IsExhausted;
+
         }
       
        
@@ -560,14 +586,14 @@ if (isDodging)
 
     public void ApplyPlayerKnockback(float knockbackForce, Vector3 hitDir)
     {
-        playerState = PlayerState.IsHurt; // Ensure state is set for everyone
+      
         anim.applyRootMotion = false;
 
-        // CRITICAL: Clear current velocity so the knockback isn't fighting old movement
+       
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
 
-        // Apply the force
+     
         rb.AddForce(hitDir * knockbackForce, ForceMode.Impulse);
 
         Debug.Log("Knockback Applied");
@@ -586,6 +612,7 @@ if (isDodging)
     {
         anim.applyRootMotion = true;
         playerState = PlayerState.None;
+        Debug.Log("Nonee");
     }
     [Rpc(SendTo.Server)]
     public void SetReadyRpc()

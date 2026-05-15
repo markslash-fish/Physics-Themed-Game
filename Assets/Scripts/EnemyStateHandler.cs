@@ -3,6 +3,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
 using static EnemyAI;
+using static Player;
 
 public class EnemyStateHandler : NetworkBehaviour
 {
@@ -12,7 +13,7 @@ public class EnemyStateHandler : NetworkBehaviour
     [SerializeField] private NavMeshAgent navMeshAgent;
     [SerializeField] private EnemyAnimationController animationController;
 
-
+    public bool isBusy => CurrentState != EnemyState.IsStrafing;
     public event Action onIdle;
     public event Action onStrafe;
     public event Action onAttack;

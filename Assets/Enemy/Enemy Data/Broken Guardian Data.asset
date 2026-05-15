@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: Broken Guardian Data
   m_EditorClassIdentifier: Assembly-CSharp::GuardianDataManager
   poise: 2
-  enemyName: Broken Guardian
+  enemyName: Blitz Guardian
   enemyHealth: 180
-  enemyStamina: 100
+  enemyStamina: 158
   enemyDefense: 25
-  enemySpeed: 1.5
-  enemyMinAttackPower: 9
-  enemyMaxAttackPower: 17
+  enemySpeed: 1.4
+  enemyMinAttackPower: 19
+  enemyMaxAttackPower: 24
   enemyID: 22601
   enemyKey: guardian-broken
