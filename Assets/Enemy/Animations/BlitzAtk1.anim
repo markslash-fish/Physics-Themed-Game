@@ -86305,6 +86305,20 @@ AnimationClip:
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
+  - time: 0.7
+    functionName: PlaySlashL
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 0.73333335
+    functionName: BRAttackSFX
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
   - time: 0.73333335
     functionName: TriggerRightHandDamage
     data: 
@@ -86317,6 +86331,20 @@ AnimationClip:
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0.35
+    intParameter: 0
+    messageOptions: 0
+  - time: 1.5
+    functionName: PlaySlashL
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 1.5333333
+    functionName: BRAttackSFX
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 1.6
@@ -86333,15 +86361,29 @@ AnimationClip:
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
+  - time: 2.2666667
+    functionName: PlayCross
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 2.3333333
+    functionName: CrossAttackSFX
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
   - time: 2.5333333
-    functionName: TriggerRightHandDamage
+    functionName: TriggerLeftHandDamage
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0.35
     intParameter: 0
     messageOptions: 0
   - time: 2.5333333
-    functionName: TriggerLeftHandDamage
+    functionName: TriggerRightHandDamage
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0.35

@@ -7,20 +7,25 @@ public class AnimationRouter : MonoBehaviour
 
     public void TriggerLeftHandDamage(float duration)
     {
-        if (leftHand != null) leftHand.StartDamageWindow(duration);
+        if (leftHand != null)
+            leftHand.StartDamageWindow(duration);
     }
 
     public void TriggerRightHandDamage(float duration)
     {
-        if (rightHand != null) rightHand.StartDamageWindow(duration);
+        if (rightHand != null)
+            rightHand.StartDamageWindow(duration);
     }
-  public void clearLeftIgnoreList()
+
+    public void clearLeftIgnoreList()
     {
-        leftHand.ResetIgnoredList();
+        if (leftHand != null)
+            leftHand.ResetIgnoredList();
     }
+
     public void clearRightIgnoreList()
     {
-        rightHand.ResetIgnoredList();
+        if (rightHand != null)
+            rightHand.ResetIgnoredList();
     }
 }
-

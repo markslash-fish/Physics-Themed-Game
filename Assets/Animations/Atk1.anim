@@ -33457,6 +33457,13 @@ AnimationClip:
     floatParameter: 0.3
     intParameter: 0
     messageOptions: 0
+  - time: 0.8333333
+    functionName: LAttackSFX
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
   - time: 0.864119
     functionName: EnableNextCombo
     data: 
@@ -33465,14 +33472,14 @@ AnimationClip:
     intParameter: 0
     messageOptions: 0
   - time: 0.93333334
-    functionName: ResetState
+    functionName: DisableRightTrail
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 0.93333334
-    functionName: DisableRightTrail
+    functionName: ResetState
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
@@ -33486,20 +33493,13 @@ AnimationClip:
     intParameter: 0
     messageOptions: 0
   - time: 1
-    functionName: StopLeftSwing
-    data: 
-    objectReferenceParameter: {fileID: 0}
-    floatParameter: 0
-    intParameter: 0
-    messageOptions: 0
-  - time: 1
     functionName: PlayImpactLeft
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 1.0129747
+  - time: 1.0333333
     functionName: EnableMove
     data: 
     objectReferenceParameter: {fileID: 0}
