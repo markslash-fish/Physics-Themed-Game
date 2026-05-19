@@ -69,14 +69,14 @@ public class EnemyAttackHitboxScript : NetworkBehaviour
             timer += Time.deltaTime;
             yield return null;
         }
-        attackRoutine = null;
+        
     }
     public void DealDamage()
     {
         if (!IsServer) return;
 
         Vector3 spherePos = transform.TransformPoint(attackPointOffset);
-        Collider[] hitEntities = Physics.OverlapSphere(spherePos, attackRange, targetMask);
+        Collider[] hitEntities = Physics.OverlapSphere(spherePos, attackRange, targetMask, QueryTriggerInteraction.Ignore);
           
 
 
@@ -89,11 +89,8 @@ public class EnemyAttackHitboxScript : NetworkBehaviour
                     int damage = (hitBoxType == "Player") ? player.playerDamage : enemyAI.enemyDamage;
                     Vector3 hitDir = (entity.transform.position - transform.parent.position).normalized;
                     hitDir.y = 0.15f;
-            DamageServerRpc(
-                entity.GetComponent<NetworkObject>().NetworkObjectId,
-                damage,
-                hitDir
-            );
+
+                        damageable.TakeDamage(damage, hitDir);
                         ignoredColliders.Add(entity);
 
                     Debug.Log("AAAAAAAAAAAAA");
@@ -117,20 +114,10 @@ public class EnemyAttackHitboxScript : NetworkBehaviour
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, attackRange);
     }
-public void ResetHitbox()
-{
+ public void ResetHitbox()
+ {
     ignoredColliders.Clear();
-}
-[ServerRpc(RequireOwnership = false)]
-void DamageServerRpc(ulong targetId, int damage, Vector3 hitDir)
-{
-    if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetId, out NetworkObject obj))
-    {
-        if (obj.TryGetComponent(out IDamageable damageable))
-        {
-            damageable.TakeDamage(damage, hitDir);
-        }
-    }
-}
+ }
+
 
 }

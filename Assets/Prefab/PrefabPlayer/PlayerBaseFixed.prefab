@@ -579,7 +579,7 @@ MonoBehaviour:
   enemyAI: {fileID: 0}
   player: {fileID: 2873737067603535493}
   attackPointOffset: {x: 0, y: 0, z: 0}
-  attackRange: 2
+  attackRange: 2.1
   targetTag: 
   hitBoxType: Player
   targetMask:
@@ -720,7 +720,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &7542455642855753517
 Transform:
   m_ObjectHideFlags: 0
@@ -2280,7 +2280,7 @@ MonoBehaviour:
   enemyAI: {fileID: 0}
   player: {fileID: 2873737067603535493}
   attackPointOffset: {x: 0, y: 0, z: 0}
-  attackRange: 2
+  attackRange: 2.1
   targetTag: 
   hitBoxType: Player
   targetMask:
@@ -3075,8 +3075,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6167484466743613674}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.017468097, y: -0.48596263, z: 0.0097154025, w: 0.873751}
-  m_LocalPosition: {x: 1.1799452, y: 0.805556, z: -0.73262745}
+  m_LocalRotation: {x: 0.08492751, y: 0.17324728, z: -0.014996973, w: 0.9810952}
+  m_LocalPosition: {x: -0.6037217, y: 1.0574828, z: -1.6561254}
   m_LocalScale: {x: 0.5555556, y: 0.55555564, z: 0.55555564}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3159,7 +3159,7 @@ MonoBehaviour:
     SplineCurvature: 0.5
   RecenteringTarget: 2
   HorizontalAxis:
-    Value: -58.163887
+    Value: 20.028746
     Center: 0
     Range: {x: -180, y: 180}
     Wrap: 1
@@ -3169,7 +3169,7 @@ MonoBehaviour:
       Time: 2
     Restrictions: 0
   VerticalAxis:
-    Value: -10
+    Value: -1.4530278
     Center: 17.5
     Range: {x: -10, y: 45}
     Wrap: 0
@@ -3521,7 +3521,7 @@ MonoBehaviour:
   camLock: {fileID: 723914422489816658}
   cameraTransform: {fileID: 1017288822997136610}
   groundCheck: {fileID: 2819344902670104981}
-  dodgeForce: 16
+  dodgeForce: 14
   isBlocking: 0
   isDodging: 0
   jumpHeight: 2
@@ -3561,8 +3561,10 @@ MonoBehaviour:
   playerBaseSense: 0
   playerDamage: 0
   skillTrigger: 
-  potionCount: 0
+  currentPotionCount: 0
+  maxPotionCount: 0
   stateCam: {fileID: 4650176941812897797}
+  playerHUD: {fileID: 6103312202448696634}
   IsReadySynced:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -3587,7 +3589,7 @@ MonoBehaviour:
   isMoving: 0
   potionObject: {fileID: 5276104369471452875}
   emptyPotionObject: {fileID: 510181105399325352, guid: 1343b194a616ab9419b399bc4feff8ae, type: 3}
-  throwForce: 20
+  throwForce: 7
 --- !u!114 &3346526419801248037
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3830,6 +3832,10 @@ MonoBehaviour:
       NameHash: 1125312739
       Synchronize: 1
       ParameterType: 1
+    - name: isDead
+      NameHash: 1276664872
+      Synchronize: 1
+      ParameterType: 9
   AnimatorParametersExpanded: 0
 --- !u!114 &7412974830409730787
 MonoBehaviour:

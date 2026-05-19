@@ -10,7 +10,6 @@ public class PlayerAnimationController : NetworkBehaviour
     [SerializeField] private Player player;
     [SerializeField] private PlayerInputReader inputReader;
 
-    public bool isMoving;
     public GameObject potionObject;
 
     public GameObject emptyPotionObject;
@@ -29,7 +28,7 @@ public class PlayerAnimationController : NetworkBehaviour
         inputReader.onDodgeStarted += PlayDodge;
         inputReader.onHeal += PlayHeal;
         player.onHurt += PlayHit;
-
+        player.onDeath += PlayDeath;
     }
     public override void OnNetworkDespawn()
     {
@@ -43,6 +42,7 @@ public class PlayerAnimationController : NetworkBehaviour
         inputReader.onDodgeStarted -= PlayDodge;
         inputReader.onHeal -= PlayHeal;
         player.onHurt -= PlayHit;
+        player.onDeath -= PlayDeath;
     }
     private void Awake()
     {
@@ -159,11 +159,16 @@ public class PlayerAnimationController : NetworkBehaviour
     void PlayHit()
     {
         if (player.isBlocking && player.playerState == Player.PlayerState.IsBlocking) return;
-        player.playerState = Player.PlayerState.IsHurt;
+
+         player.playerState = Player.PlayerState.IsHurt;
+         anim.ResetControllerState();
+         anim.SetTrigger("Hit");
+    }
+    void PlayExhaust()
+    {
+        player.playerState = Player.PlayerState.IsExhausted;
         anim.ResetControllerState();
-            anim.SetTrigger("Hit");
-        
-           
+        anim.SetTrigger("isExhausted");
     }
     void PlaySprint(bool sprinting)
     {
@@ -179,6 +184,10 @@ public class PlayerAnimationController : NetworkBehaviour
         
             anim.SetFloat("isSprinting", 0.8f);
         
+    }
+    void PlayDeath()
+    {
+        anim.SetTrigger("isDead");
     }
        
     IEnumerator ShowPotionDelay()

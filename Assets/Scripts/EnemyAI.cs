@@ -66,6 +66,9 @@ public class EnemyAI : NetworkBehaviour, IDamageable
         attackController = GetComponent<EnemyAttackController>();
         stateHandler = GetComponent<EnemyStateHandler>();
         animationController = GetComponent<EnemyAnimationController>();
+
+        InvokeRepeating("SwitchStrafeDirection", 3.2f, 4.7f);
+        InvokeRepeating("RandomizeStrafeDistance", 2.5f, 4.2f);
     }
     public override void OnNetworkSpawn()
     {
@@ -84,7 +87,7 @@ public class EnemyAI : NetworkBehaviour, IDamageable
         stateHandler.enemyState.OnValueChanged += OnStateChanged;
         OnStateChanged(stateHandler.enemyState.Value, stateHandler.enemyState.Value);
 
-        InvokeRepeating("SwitchStrafeDirection", 5.2f, 7.7f);
+       
 
 
     }
@@ -111,6 +114,12 @@ public class EnemyAI : NetworkBehaviour, IDamageable
         {
             ResetEnemyRotation();
         }
+        var playerDead = targetPlayer.gameObject.GetComponent<Player>();
+        if (playerDead.playerState == Player.PlayerState.IsDead)
+        {
+            targetPlayer = null;
+            return;
+        }
 
     }
     private void OnStateChanged(EnemyStateHandler.EnemyState oldState, EnemyStateHandler.EnemyState newState)
@@ -133,13 +142,16 @@ public class EnemyAI : NetworkBehaviour, IDamageable
         }
         else if (newState == EnemyStateHandler.EnemyState.IsStrafing)
         {
-          
+           
+
             StopCoroutine(AttackRoutine());
             StartCoroutine(AttackRoutine());
 
             navMeshAgent.isStopped = false;
             navMeshAgent.nextPosition = transform.position;
             navMeshAgent.updatePosition = true;
+
+
         }
         else if(newState == EnemyStateHandler.EnemyState.Idle)
         {
@@ -189,7 +201,8 @@ public class EnemyAI : NetworkBehaviour, IDamageable
         foreach (Collider  player in playersHit)
         {
             Vector3 directionToPlayer = (player.transform.position - transform.position);
-
+            var deadPlayer = player.GetComponent<Player>();
+            if (deadPlayer.playerState == Player.PlayerState.IsDead) return;
             float distance = directionToPlayer.sqrMagnitude;
             if (distance < closestPlayer)
             {
@@ -203,6 +216,11 @@ public class EnemyAI : NetworkBehaviour, IDamageable
     {
         strafeDirection *= -1;
 
+    }
+    void RandomizeStrafeDistance()
+    {
+        int distanceValue = Random.Range(4, 7);
+        strafeDistance = distanceValue;
     }
 
     //TakeDamage 

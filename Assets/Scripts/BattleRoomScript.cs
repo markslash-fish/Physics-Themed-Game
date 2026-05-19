@@ -10,18 +10,32 @@ public class BattleRoomScript : NetworkBehaviour
     public List<GameObject> playersActive = new List<GameObject>();
     void Start()
     {
-
+        backGate.GetComponent<StoneGateScript>().OpenGate();
     }
 
 
     void Update()
     {
         enemiesActive.RemoveAll(enemy => enemy == null);
-        if (enemiesActive.Count == 0)
+        if (enemiesActive.Count == 0 && playersActive.Count != 0)
         {
-            var gateOpen = frontGate.GetComponent<BattleDoorScript>();
-            frontGate.GetComponent<BattleDoorScript>().OpenBattleGate();
-            gateOpen.OpenBattleGate();
+            frontGate.GetComponent<StoneGateScript>().OpenGate();
+       
+
+        }
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player") && !playersActive.Contains(other.gameObject))
+        {
+            playersActive.Add(other.gameObject);
+            if (playersActive.Count == GameManager.Instance.maxPlayers)
+            {
+
+                backGate.GetComponent<StoneGateScript>().CloseGate();
+            }
+          
+
         }
     }
     private void OnTriggerStay(Collider other)
@@ -37,17 +51,7 @@ public class BattleRoomScript : NetworkBehaviour
           
 
         }
-        if (other.CompareTag("Player") && !playersActive.Contains(other.gameObject))
-        {
-            playersActive.Add(other.gameObject);
-            if (playersActive.Count == 2)
-            {
-                var gateClose = frontGate.GetComponent<BattleDoorScript>();
-                gateClose.CloseBattleGate();
-                backGate.GetComponent<BattleDoorScript>().CloseBattleGate();
-            }
-
-        }
+      
     }
     private void OnTriggerExit(Collider other)
     {
@@ -57,9 +61,11 @@ public class BattleRoomScript : NetworkBehaviour
             if (playersActive.Count == 0)
             {
                 
-               var gateClose = frontGate.GetComponent<BattleDoorScript>();
-                gateClose.CloseBattleGate();
+               frontGate.GetComponent<StoneGateScript>().CloseGate();
+                Debug.Log("Front Gate Closed...");
+                this.enabled = false;
             }
+
 
         }
     }

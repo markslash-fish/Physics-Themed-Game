@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Unity.Cinemachine;
 using Unity.Netcode;
 using UnityEngine;
@@ -77,37 +78,49 @@ public class Player : NetworkBehaviour, IDamageable
     [SerializeField] public float playerBaseSense;
     [SerializeField] public int playerDamage;
     [SerializeField] public string skillTrigger;
-    [SerializeField] public int potionCount;
+    [SerializeField] public int currentPotionCount;
+    [SerializeField] public int maxPotionCount;
     public CinemachineStateDrivenCamera stateCam;
+    public GameObject playerHUD;
 
     public NetworkVariable<bool> IsReadySynced = new NetworkVariable<bool>(false,
          NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     public event Action onHurt;
-
+    public event Action onDeath;
+    public Coroutine staminaRegenCoroutine;
 
     public override void OnNetworkSpawn()
     {
+        GameManager.Instance.LockCursor();
         jumpHeight = 2.2f;
         baseWalkSpeed = 4f;
         currentWalkSpeed = 2f;
         runSpeed = 5.8f;
-        potionCount = 3;
+        maxPotionCount = 3;
+        currentPotionCount = maxPotionCount;
 
         if (IsOwner)
         {
             stateCam.Priority = 100;
             gameObject.tag = "Player";
+            playerHUD.SetActive(true);
         }
         else
         {
             stateCam.Priority = 0;
+            playerHUD.SetActive(false);
 
 
         }
         playerBaseCurrentHealth.OnValueChanged += (oldVal, newVal) => {
             if (newVal < oldVal)
             {
+                if(newVal <= 0)
+                {
+                    onDeath?.Invoke();
+                }
+                if (playerState == PlayerState.IsHealing) return;
                 onHurt?.Invoke();
             }
         };
@@ -115,9 +128,9 @@ public class Player : NetworkBehaviour, IDamageable
         playerBaseCurrentHealth.Value = playerBaseMaxHealth;
         playerBaseMaxStamina = 100;
         playerBaseCurrentStamina.Value = playerBaseMaxStamina;
-        playerBaseMinAP = 10;
-        playerBaseMaxAP = 12;
-        playerBaseDefense = 10;
+        playerBaseMinAP = 11;
+        playerBaseMaxAP = 13;
+        playerBaseDefense = 13;
         playerBaseSense = 0.25f;
 
         playerInputReader.onBlockStarted += StartBlock;
@@ -135,7 +148,7 @@ public class Player : NetworkBehaviour, IDamageable
 
     public override void OnNetworkDespawn()
     {
-
+        GameManager.Instance.UnlockCursor();
         playerInputReader.onBlockStarted -= StartBlock;
         playerInputReader.onBlockFinished -= StopBlock;
         playerInputReader.onDodgeStarted -= Dodge;
@@ -243,9 +256,38 @@ public class Player : NetworkBehaviour, IDamageable
             playerInputReader.blockAction.Disable();
 
         }
-        else if(playerState == PlayerState.IsDead)
+        else if(playerState == PlayerState.IsExhausted)
         {
-            PlayerOnDeath();
+            playerInputReader.sprintAction.Disable();
+            playerInputReader.jumpAction.Disable();
+            playerInputReader.lAttackAction.Disable();
+            playerInputReader.hAttackAction.Disable();
+            playerInputReader.dodgeAction.Disable();
+            playerInputReader.blockAction.Disable();
+            playerInputReader.healAction.Disable();
+            playerInputReader.moveAction.Disable();
+        }
+        else if (playerState == PlayerState.IsDead || anim.GetCurrentAnimatorStateInfo(1).IsName("Death"))
+        {
+            playerInputReader.sprintAction.Disable();
+            playerInputReader.jumpAction.Disable();
+            playerInputReader.lAttackAction.Disable();
+            playerInputReader.hAttackAction.Disable();
+            playerInputReader.dodgeAction.Disable();
+            playerInputReader.blockAction.Disable();
+            playerInputReader.healAction.Disable();
+            playerInputReader.moveAction.Disable();
+        }
+        else if (PauseManager.Instance.isPaused() || GameManager.Instance.isInConfirmation())
+        {
+            playerInputReader.sprintAction.Disable();
+            playerInputReader.jumpAction.Disable();
+            playerInputReader.lAttackAction.Disable();
+            playerInputReader.hAttackAction.Disable();
+            playerInputReader.dodgeAction.Disable();
+            playerInputReader.blockAction.Disable();
+            playerInputReader.healAction.Disable();
+            playerInputReader.moveAction.Disable();
         }
         else
         {
@@ -258,9 +300,25 @@ public class Player : NetworkBehaviour, IDamageable
             playerInputReader.healAction.Enable();
             playerInputReader.moveAction.Enable();
         }
-
-
-    }
+        if (playerState != PlayerState.IsAttacking &&
+          playerState != PlayerState.IsDodging &&
+          playerBaseCurrentStamina.Value < playerBaseMaxStamina)
+        {
+            if (staminaRegenCoroutine == null)
+            {
+                staminaRegenCoroutine = StartCoroutine(StaminaRegen());
+            }
+        }
+        else
+        {
+            // Stop regenerating if they attack, dodge, or hit max stamina
+            if (staminaRegenCoroutine != null)
+            {
+                StopCoroutine(staminaRegenCoroutine);
+                staminaRegenCoroutine = null; // Reset the reference safely
+            }
+        }
+}
 
     void FixedUpdate()
     {
@@ -393,7 +451,7 @@ public class Player : NetworkBehaviour, IDamageable
     }
     public void PlayerHeal()
     {
-        if (isBusy && playerBaseCurrentHealth.Value == playerBaseMaxHealth || potionCount == 0) return;
+        if (isBusy && playerBaseCurrentHealth.Value == playerBaseMaxHealth || currentPotionCount == 0) return;
         playerState = PlayerState.IsHealing;
     }
 
@@ -403,31 +461,42 @@ public class Player : NetworkBehaviour, IDamageable
     // ======================
     public void PlayerLightAttack()
     {
-        playerDamage = UnityEngine.Random.Range(playerBaseMinAP, playerBaseMaxAP);
+        int staminaConsumption = 8;
+
+     
         if (isBusy && playerState != PlayerState.IsAttacking) return;
+
+      
+        if (playerState == PlayerState.IsAttacking && !canCombo) return;
+
+      
         if (isHeavyAttacking) return;
+        if (playerBaseCurrentStamina.Value < staminaConsumption) return;
 
+       
+        playerDamage = UnityEngine.Random.Range(playerBaseMinAP, playerBaseMaxAP);
         playerState = PlayerState.IsAttacking;
-
         comboTimer = 0f;
 
+      
         if (comboStep == 0)
         {
             comboStep = 1;
-
+            canCombo = false;
         }
         else if (comboStep == 1 && canCombo)
         {
             comboStep = 2;
             canCombo = false;
-
         }
         else if (comboStep == 2 && canCombo)
         {
             comboStep = 3;
             canCombo = false;
-
         }
+
+      
+        playerBaseCurrentStamina.Value -= staminaConsumption;
     }
 
     // ======================
@@ -436,12 +505,14 @@ public class Player : NetworkBehaviour, IDamageable
     public void PlayerHeavyAttack()
     {
         int baseDamage = UnityEngine.Random.Range(playerBaseMinAP, playerBaseMaxAP);
+        int staminaConsumption = 17;
         playerDamage = baseDamage * 3;
         if (isBusy) return;
+        if (playerBaseCurrentStamina.Value < staminaConsumption) return;
         playerState = PlayerState.IsAttacking;
         if (comboStep != 0) return;
         if (isHeavyAttacking) return;
-
+        playerBaseCurrentStamina.Value -= staminaConsumption;
         isHeavyAttacking = true;
     }
 
@@ -501,7 +572,8 @@ public class Player : NetworkBehaviour, IDamageable
     public void Dodge()
     {
         if (isBusy) return;
-
+        int staminaConsumption = 15;
+        if (playerBaseCurrentStamina.Value < staminaConsumption) return;
         playerState = PlayerState.IsDodging;
         if (!isGrounded) return;
 
@@ -515,6 +587,7 @@ public class Player : NetworkBehaviour, IDamageable
         }
 
         rb.AddForce(dodgeDir * dodgeForce, ForceMode.Impulse);
+        playerBaseCurrentStamina.Value -= staminaConsumption;
 
 
 
@@ -537,34 +610,41 @@ public class Player : NetworkBehaviour, IDamageable
     }
     void PlayerOnDeath()
     {
-        playerState = PlayerState.IsDead;
-        GameManager.Instance.NotifyPlayerDeathRpc();
-        GetComponent<NetworkObject>().Despawn();
+       
+        playerBaseCurrentHealth.Value = 0;
+        Cursor.lockState = CursorLockMode.None;
+       
     }
     public void TakeDamage(int damage, Vector3 hitDir)
     {
-        if (isDodging) return;
+        if (anim.GetCurrentAnimatorStateInfo(1).IsName("Death") || isDodging) return;
+    
        
         int healthDamage = (damage * damage) / (damage + playerBaseDefense);
-        int staminaDamage = (healthDamage * (3/2));
-        float knockbackForce = (damage <20)? 8f: 12f;
+        int staminaDamage = (healthDamage * (5/2));
+        float knockbackForce = (damage <20)? 5f: 7f;
         ApplyKnockbackClientRpc(knockbackForce, hitDir);
         if (playerState == PlayerState.IsBlocking && isBlocking)
         {
-
+            playerBaseCurrentHealth.Value -= healthDamage / 5;
             playerBaseCurrentStamina.Value -= staminaDamage;
             return;
 
         }
+        if(playerState == PlayerState.IsBlocking && isBlocking && playerBaseCurrentStamina.Value <= 0)
+        {
+            playerBaseCurrentStamina.Value = 0;
+            playerState = PlayerState.IsExhausted;
+        }
         playerBaseCurrentHealth.Value -= healthDamage;
 
-
+    
 
        
         if (playerBaseCurrentHealth.Value <= 0)
         {
-            playerBaseCurrentHealth.Value = 0;
             PlayerOnDeath();
+          
         }
         else if(playerBaseCurrentStamina.Value <= 0)
         {
@@ -614,6 +694,26 @@ public class Player : NetworkBehaviour, IDamageable
         playerState = PlayerState.None;
         Debug.Log("Nonee");
     }
+    void DecreasePotionCount()
+    {
+        currentPotionCount--;
+    }
+    void HealPlayer()
+    {
+        int healValue = 45;
+        int damageToHealth = playerBaseMaxHealth - playerBaseCurrentHealth.Value;
+        playerBaseCurrentHealth.Value += healValue;
+        if(healValue > damageToHealth)
+        {
+            playerBaseCurrentHealth.Value = playerBaseMaxHealth;
+        }
+
+    }
+    void SetPlayerDeath()
+    {
+        playerState = PlayerState.IsDead;
+        GameManager.Instance.NotifyPlayerDeathRpc();
+    }
     [Rpc(SendTo.Server)]
     public void SetReadyRpc()
     {
@@ -641,9 +741,19 @@ void SpawnGhostClientRpc(Vector3 pos, Quaternion rot)
         ghostAnim.speed = 0f;
     }
 }
-public void EndDodge()
-{
+ public void EndDodge()
+ {
     isDodging = false;
     ghostTimer = 0f;
-}
-}
+ }
+    private IEnumerator StaminaRegen()
+    {
+
+        while (playerBaseCurrentStamina.Value < playerBaseMaxStamina)
+        {
+            yield return new WaitForSeconds(0.08f);
+            playerBaseCurrentStamina.Value += 1;
+        }
+        staminaRegenCoroutine = null;
+    }
+}   

@@ -7,11 +7,20 @@ public class RestingRoomScript : MonoBehaviour
     public List<GameObject> playersInRoom = new List<GameObject>();
     public GameObject backGate, frontGate;
 
+    private void Start()
+    {
+        backGate.GetComponent<StoneGateScript>().OpenGate();
+        frontGate.GetComponent<StoneGateScript>().OpenGate();
+    }
     public void OnTriggerStay(Collider other)
     {
         if(other.gameObject.CompareTag("Player") && !playersInRoom.Contains(other.gameObject))
         {
             playersInRoom.Add(other.gameObject);
+            if (playersInRoom.Count == GameManager.Instance.maxPlayers)
+            {
+                backGate.GetComponent<StoneGateScript>().CloseGate();
+            }
         }
     }
     public void OnTriggerExit(Collider other)

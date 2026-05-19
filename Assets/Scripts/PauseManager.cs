@@ -9,14 +9,39 @@ public class PauseManager : MonoBehaviour
     {
         
     }
+    public bool isPaused()
+    {
+        return pausePanel != null && pausePanel.activeSelf;
+    }
+    public static PauseManager Instance { get; private set; }
 
-    
+    public void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            Instance = this;
+        }
+    }
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            pausePanel.SetActive(true);
+            if(!isPaused())
+            {
+
+                PauseGame();
+            }
+            else if(isPaused())
+            {
+                UnpauseGame();
+            }
+          
         }
+        
     }
     public void BackToMainMenu()
     {
@@ -31,4 +56,16 @@ public class PauseManager : MonoBehaviour
 
         SceneManager.LoadScene("Map");
     }
+    public void PauseGame()
+    {
+        pausePanel.SetActive(true);
+        Cursor.lockState = CursorLockMode.None;
+    }
+    public void UnpauseGame()
+    {
+        pausePanel.SetActive(false);
+        Cursor.lockState = CursorLockMode.Locked;
+
+    }
+
 }
