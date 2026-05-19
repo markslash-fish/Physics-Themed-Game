@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 21ff5c059d1982e4d842f211a5493c88, type: 3}
-  m_Name: Broken Guardian Data
+  m_Name: Blitz Guardian
   m_EditorClassIdentifier: Assembly-CSharp::GuardianDataManager
   poise: 2
   enemyName: Blitz Guardian
-  enemyHealth: 180
+  enemyHealth: 300
   enemyStamina: 158
-  enemyDefense: 25
-  enemySpeed: 1.4
-  enemyMinAttackPower: 19
-  enemyMaxAttackPower: 24
+  enemyDefense: 35
+  enemySpeed: 2.1
+  enemyMinAttackPower: 15
+  enemyMaxAttackPower: 21
   enemyID: 22601
   enemyKey: guardian-broken

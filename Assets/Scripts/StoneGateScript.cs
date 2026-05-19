@@ -4,34 +4,26 @@ using UnityEngine;
 public class StoneGateScript : MonoBehaviour
 {
     [SerializeField] Animator animator;
-    [SerializeField] GameObject floatingButtonUI = null;
-    [SerializeField] GameObject confirmationWindow = null;
+    public GameObject floatingButtonUI = null;
+
 
     [Header("Audio Settings")]
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip openSFX;
     [SerializeField] private AudioClip closeSFX;
 
-    bool isInTrigger;
+    public bool isInTrigger;
+
     void Start()
     {
        
     }
-
+    public static PauseManager Instance { get; private set; }
 
     void Update()
     {
-        // Find the local player to check their status
-        var localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<Player>();
-
-        // Logic: Only allow E if we are in trigger AND the local player isn't ready
-        if (isInTrigger && localPlayer != null && !localPlayer.IsReadySynced.Value)
-        {
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                confirmationWindow.SetActive(true);
-            }
-        }
+       
+      
     }
 
     private void OnTriggerEnter(Collider other)
@@ -70,17 +62,19 @@ public class StoneGateScript : MonoBehaviour
 
             if (localPlayer != null)
             {
-                // This triggers the NetworkVariable update and the GameManager count
+                
                 localPlayer.SetReadyRpc();
+               
             }
         }
 
-        // 2. Local cleanup (This stops the UI from showing for the person who clicked)
-        confirmationWindow.SetActive(false);
+
+        GameManager.Instance.confirmationWindow.SetActive(false);
         floatingButtonUI.SetActive(false);
 
-        // We set this to false so the Update loop doesn't try to open the window again
+        
         isInTrigger = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
     private void PlaySound(AudioClip clip)
     {

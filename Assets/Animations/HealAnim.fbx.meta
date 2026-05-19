@@ -67,15 +67,22 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.5441176
-        functionName: HealPlayer
+      - time: 0.8272585
+        functionName: PlayHealVFX
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.8272585
-        functionName: PlayHealVFX
+      - time: 0.85499996
+        functionName: DecreasePotionCount
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.8714309
+        functionName: HealPlayer
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0

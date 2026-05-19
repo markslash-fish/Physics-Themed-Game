@@ -61,6 +61,7 @@ public class ItemPickup : NetworkBehaviour
     }
     void OnTriggerEnter(Collider other)
     {
+        if (itemVisual == null) return;
         Debug.Log("Something entered trigger");
         if(other.CompareTag("Player"))
         Debug.Log("PLAYER DETECTED");

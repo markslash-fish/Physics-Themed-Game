@@ -7,10 +7,15 @@ public class GameManager : NetworkBehaviour
     public NetworkVariable<int> PlayersReadyCount = new NetworkVariable<int>(0);
     public NetworkVariable<int> DeadPlayersCount = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
-    [SerializeField] private int maxPlayers;
+    [SerializeField] public int maxPlayers;
     [SerializeField] private GameObject startingGate;
     [SerializeField] private GameObject gameOverUI;
-    
+    public GameObject confirmationWindow = null;
+
+    public bool isInConfirmation()
+    {
+        return confirmationWindow != null && confirmationWindow.activeSelf;
+    }
 
     public static GameManager Instance { get; private set; }
 
@@ -24,6 +29,27 @@ public class GameManager : NetworkBehaviour
         else
         {
             Instance = this;
+        }
+    }
+    private void Update()
+    {
+        var localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<Player>();
+       var gate = startingGate.GetComponent<StoneGateScript>();
+        // Logic: Only allow E if we are in trigger AND the local player isn't ready
+        if (gate.isInTrigger && localPlayer != null && !localPlayer.IsReadySynced.Value)
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+          
+                
+                    confirmationWindow.SetActive(true);
+                    Cursor.lockState = CursorLockMode.None;
+                
+               
+
+
+
+            }
         }
     }
     [Rpc(SendTo.Server)]
@@ -106,4 +132,13 @@ public class GameManager : NetworkBehaviour
         }
         SceneManager.LoadScene("Map");
     }
+    public void LockCursor()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+    public void UnlockCursor()
+    {
+        Cursor.lockState = CursorLockMode.None;
+    }
+
 }

@@ -12,15 +12,16 @@ public class PlayerHealthUIConnector : NetworkBehaviour
     // ✅ Isang OnNetworkSpawn lang — fixed duplicate
     public override void OnNetworkSpawn()
     {
+        
         player = GetComponent<Player>();
-
+        if (!IsOwner) return;
         player.playerBaseCurrentHealth.OnValueChanged += OnHealthChanged;
         player.playerBaseCurrentStamina.OnValueChanged += OnStaminaChanged;
 
-        if (IsOwner)
-        {
+      
+        
             StartCoroutine(InitUIDelay());
-        }
+        
     }
 
     public override void OnNetworkDespawn()
