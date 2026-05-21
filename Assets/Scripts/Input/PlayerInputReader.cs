@@ -213,7 +213,7 @@ public class PlayerInputReader : NetworkBehaviour, InputSystem_Actions.IPlayerAc
 
     public void OnUniqueSkill(InputAction.CallbackContext context)
     {
-        if (onUniqueSkillStarted != null && context.started) onUniqueSkillStarted.Invoke();
+        if (onUniqueSkillStarted != null && context.started) onUniqueSkillStarted?.Invoke();
         else return;
     }
     public void OnSprint(InputAction.CallbackContext context)

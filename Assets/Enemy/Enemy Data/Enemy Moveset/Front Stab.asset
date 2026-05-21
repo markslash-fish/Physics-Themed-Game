@@ -17,4 +17,4 @@ MonoBehaviour:
   maxRange: 5
   baseWeight: 60
   animTrigger: isFrontStab
-  cooldown: 7
+  cooldown: 6.6

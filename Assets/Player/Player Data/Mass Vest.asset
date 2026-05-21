@@ -21,7 +21,13 @@ MonoBehaviour:
   baseDamage: 25
   attackBonus: 6
   defenseBonus: 36
-  healthBonus: 27
+  healthBonus: 30
   staminaBonus: 0
   speedBonus: -2
   senseBonus: 0
+  cooldownReductionBonus: 0
+  heavyAttackBonus: 0
+  uniqueSkillBonus: 0
+  healingBonus: 0
+  damageReductionBonus: 12
+  extraStaminaBonus: 0

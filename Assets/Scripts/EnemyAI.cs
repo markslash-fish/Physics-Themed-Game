@@ -72,12 +72,19 @@ public class EnemyAI : NetworkBehaviour, IDamageable
     }
     public override void OnNetworkSpawn()
     {
-      
-
         enemyMaxHealth = guardianData.enemyHealth;
         enemyMaxStamina = guardianData.enemyStamina;
-        enemyCurrentHealth.Value = enemyMaxHealth;
-        enemyCurrentStamina.Value = enemyMaxStamina;
+
+        // Only set initial values on the server to prevent network race conditions
+        if (IsServer)
+        {
+            enemyCurrentHealth.Value = enemyMaxHealth;
+            enemyCurrentStamina.Value = enemyMaxStamina;
+        }
+
+        // SUBSCRIBE ALL CLIENTS TO HEALTH CHANGES
+        enemyCurrentHealth.OnValueChanged += OnHealthChanged;
+
         enemyDefense = guardianData.enemyDefense;
         enemySpeed = guardianData.enemySpeed;
         enemyMinAP = guardianData.enemyMinAttackPower;
@@ -86,10 +93,6 @@ public class EnemyAI : NetworkBehaviour, IDamageable
 
         stateHandler.enemyState.OnValueChanged += OnStateChanged;
         OnStateChanged(stateHandler.enemyState.Value, stateHandler.enemyState.Value);
-
-       
-
-
     }
     private void Start()
     {
@@ -99,6 +102,15 @@ public class EnemyAI : NetworkBehaviour, IDamageable
     public override void OnNetworkDespawn()
     {
         stateHandler.enemyState.OnValueChanged -= OnStateChanged;
+        enemyCurrentHealth.OnValueChanged -= OnHealthChanged; // CLEAN UP
+    }
+    private void OnHealthChanged(int oldHealth, int newHealth)
+    {
+        // Ensure the HP Bar is visible to the client who just landed a hit
+        ShowHPBar();
+
+        // Update the visual fills on the local screen
+        UpdateHPBar(newHealth);
     }
     void Update()
     {
@@ -197,7 +209,7 @@ public class EnemyAI : NetworkBehaviour, IDamageable
         float closestPlayer = Mathf.Infinity;
 
         Collider[] playersHit = Physics.OverlapSphere(transform.position, sphereRadius, playerLayer);
-
+        ShowHPBar();
         foreach (Collider  player in playersHit)
         {
             Vector3 directionToPlayer = (player.transform.position - transform.position);
@@ -226,19 +238,17 @@ public class EnemyAI : NetworkBehaviour, IDamageable
     //TakeDamage 
     public void TakeDamage(int damage, Vector3 hitDir)
     {
+        // Only the server calculates damage numbers
         if (!IsServer) return;
-        ShowHPBarClientRpc();
-        
+
         int healthDamage = (damage * damage) / (damage + enemyDefense);
         enemyCurrentHealth.Value -= healthDamage;
 
-    
         if (enemyCurrentHealth.Value <= 0)
         {
             stateHandler.CurrentState = EnemyStateHandler.EnemyState.OnDeath;
             return;
         }
-
 
         if (stateHandler.CurrentState == EnemyStateHandler.EnemyState.IsExhausted)
         {
@@ -246,23 +256,30 @@ public class EnemyAI : NetworkBehaviour, IDamageable
             return;
         }
 
-
         int staminaDamage = damage / 3;
         enemyCurrentStamina.Value -= staminaDamage;
 
-        UpdateHPBarClientRpc(enemyCurrentHealth.Value);    
+        // REMOVED: UpdateHPBar() and ShowHPBar() are gone from here!
+        // The OnValueChanged event handler takes care of it safely now.
 
-        if (enemyCurrentHealth.Value <= 0) stateHandler.CurrentState = EnemyStateHandler.EnemyState.OnDeath;
-        if (enemyCurrentStamina.Value <= 0) stateHandler.CurrentState = EnemyStateHandler.EnemyState.IsExhausted;
+        if (enemyCurrentStamina.Value <= 0)
+        {
+            stateHandler.CurrentState = EnemyStateHandler.EnemyState.IsExhausted;
+        }
     }
 
 
-    
+
     //HPBarFuntion
-    [ClientRpc]
-    void UpdateHPBarClientRpc(int currentHealth)
+
+    void UpdateHPBar(int currentHealth)
     {
-        hpBar.fillAmount = (float)currentHealth / enemyMaxHealth;
+      
+        if(hpBar.isActiveAndEnabled)
+        {
+            hpBar.fillAmount = (float)currentHealth / enemyMaxHealth;
+        }
+       
 
         StartCoroutine(SmoothDamageBar((float)currentHealth / enemyMaxHealth));
         
@@ -270,7 +287,8 @@ public class EnemyAI : NetworkBehaviour, IDamageable
 
 IEnumerator SmoothDamageBar(float target)
 {
-    yield return new WaitForSeconds(0.4f);
+       
+    yield return new WaitForSeconds(0.5f);
 
     while (damageBar.fillAmount > target)
     {
@@ -282,8 +300,7 @@ IEnumerator SmoothDamageBar(float target)
 
     damageBar.fillAmount = target;
 }
-[ClientRpc]
-void ShowHPBarClientRpc()
+void ShowHPBar()
 {
     hpBar.transform.parent.gameObject.SetActive(true);
 }
@@ -332,7 +349,7 @@ void ShowHPBarClientRpc()
         if (stateHandler.CurrentState != EnemyStateHandler.EnemyState.IsStrafing)
             yield break;
 
-        float randomInterval = Random.Range(2f, 3f);
+        float randomInterval = Random.Range(1.4f, 2.4f);
         yield return new WaitForSeconds(randomInterval);
         if (stateHandler.CurrentState == EnemyStateHandler.EnemyState.IsStrafing)
         {

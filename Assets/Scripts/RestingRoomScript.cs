@@ -5,7 +5,7 @@ using UnityEngine;
 public class RestingRoomScript : MonoBehaviour
 {
     public List<GameObject> playersInRoom = new List<GameObject>();
-    public GameObject backGate, frontGate;
+    public GameObject backGate = null, frontGate = null;
 
     private void Start()
     {

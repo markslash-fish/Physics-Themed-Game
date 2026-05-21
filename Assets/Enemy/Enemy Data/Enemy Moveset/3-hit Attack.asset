@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: 3-hit Attack
   m_EditorClassIdentifier: Assembly-CSharp::CombatMove
   moveName: 3-Hit Attack
-  minRange: 1
+  minRange: 1.5
   maxRange: 5
   baseWeight: 45
   animTrigger: is3hit
-  cooldown: 3
+  cooldown: 2.7

@@ -44,7 +44,7 @@ public class GameManager : NetworkBehaviour
                 
                     confirmationWindow.SetActive(true);
                     Cursor.lockState = CursorLockMode.None;
-                
+                    
                
 
 

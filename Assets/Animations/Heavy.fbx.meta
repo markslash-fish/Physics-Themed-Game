@@ -92,20 +92,6 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.9483323
-        functionName: EndHeavyAttack
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.99050635
-        functionName: EnableMove
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
       - time: 0.67037034
         functionName: TriggerRightHandDamage
         data: 
@@ -113,15 +99,15 @@ ModelImporter:
         floatParameter: 0.3
         intParameter: 0
         messageOptions: 0
-      - time: 0.3753754
-        functionName: ChargeAttackSFX
+      - time: 0.9099099
+        functionName: HeavyAttackSFX
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0.3
         intParameter: 0
         messageOptions: 0
-      - time: 0.9099099
-        functionName: HeavyAttackSFX
+      - time: 0.98994976
+        functionName: ResetState
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0.3

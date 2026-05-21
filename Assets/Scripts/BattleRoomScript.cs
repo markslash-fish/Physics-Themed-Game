@@ -11,6 +11,7 @@ public class BattleRoomScript : NetworkBehaviour
     void Start()
     {
         backGate.GetComponent<StoneGateScript>().OpenGate();
+        frontGate.GetComponent<StoneGateScript>().OpenGate();
     }
 
 
@@ -33,6 +34,7 @@ public class BattleRoomScript : NetworkBehaviour
             {
 
                 backGate.GetComponent<StoneGateScript>().CloseGate();
+                frontGate.GetComponent<StoneGateScript>().CloseGate();
             }
           
 

@@ -730,7 +730,7 @@ Transform:
   m_GameObject: {fileID: 2002699538466746812}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.2777778, y: 1.1388891, z: -1.1111112}
+  m_LocalPosition: {x: 0.5555556, y: 1.166667, z: -1.1111112}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -792,7 +792,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineThirdPersonFollow
   Damping: {x: 0.1, y: 3, z: 0.3}
-  ShoulderOffset: {x: 0.5, y: 0.3, z: 0}
+  ShoulderOffset: {x: 1, y: 0.35, z: 0}
   VerticalArmLength: 0.4
   CameraSide: 1
   CameraDistance: 2
@@ -847,9 +847,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineGroupFraming
   FramingMode: 2
-  FramingSize: 0.8
+  FramingSize: 1
   CenterOffset: {x: 0, y: 0}
-  Damping: 2
+  Damping: 1.4
   SizeAdjustment: 2
   LateralAdjustment: 0
   FovRange: {x: 1, y: 100}
@@ -3075,8 +3075,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6167484466743613674}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.08492751, y: 0.17324728, z: -0.014996973, w: 0.9810952}
-  m_LocalPosition: {x: -0.6037217, y: 1.0574828, z: -1.6561254}
+  m_LocalRotation: {x: -0.0069110356, y: 0.9381364, z: -0.018755307, w: -0.34568852}
+  m_LocalPosition: {x: 0.90120184, y: 0.805556, z: 1.0568111}
   m_LocalScale: {x: 0.5555556, y: 0.55555564, z: 0.55555564}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3159,7 +3159,7 @@ MonoBehaviour:
     SplineCurvature: 0.5
   RecenteringTarget: 2
   HorizontalAxis:
-    Value: 20.028746
+    Value: -139.54388
     Center: 0
     Range: {x: -180, y: 180}
     Wrap: 1
@@ -3169,7 +3169,7 @@ MonoBehaviour:
       Time: 2
     Restrictions: 0
   VerticalAxis:
-    Value: -1.4530278
+    Value: -10
     Center: 17.5
     Range: {x: -10, y: 45}
     Wrap: 0
@@ -3519,6 +3519,7 @@ MonoBehaviour:
   playerState: 0
   playerInputReader: {fileID: 3346526419801248037}
   camLock: {fileID: 723914422489816658}
+  animationController: {fileID: 0}
   cameraTransform: {fileID: 1017288822997136610}
   groundCheck: {fileID: 2819344902670104981}
   dodgeForce: 14
@@ -3563,8 +3564,12 @@ MonoBehaviour:
   skillTrigger: 
   currentPotionCount: 0
   maxPotionCount: 0
+  healValue: 0
+  heavyDamage: 0
+  uniqueSkillDamage: 0
   stateCam: {fileID: 4650176941812897797}
   playerHUD: {fileID: 6103312202448696634}
+  skillCooldown: 0
   IsReadySynced:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -3586,7 +3591,6 @@ MonoBehaviour:
   anim: {fileID: 6188842549224692989}
   player: {fileID: 2873737067603535493}
   inputReader: {fileID: 3346526419801248037}
-  isMoving: 0
   potionObject: {fileID: 5276104369471452875}
   emptyPotionObject: {fileID: 510181105399325352, guid: 1343b194a616ab9419b399bc4feff8ae, type: 3}
   throwForce: 7
@@ -3836,6 +3840,14 @@ MonoBehaviour:
       NameHash: 1276664872
       Synchronize: 1
       ParameterType: 9
+    - name: isExhausted
+      NameHash: -2076922056
+      Synchronize: 1
+      ParameterType: 9
+    - name: isAttacking
+      NameHash: 973584577
+      Synchronize: 1
+      ParameterType: 4
   AnimatorParametersExpanded: 0
 --- !u!114 &7412974830409730787
 MonoBehaviour:

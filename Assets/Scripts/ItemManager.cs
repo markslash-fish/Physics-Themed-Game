@@ -19,6 +19,12 @@ public class ItemManager : ScriptableObject
     public int speedBonus;
     public float senseBonus;
 
+    public float cooldownReductionBonus;
+    public int heavyAttackBonus;
+    public int uniqueSkillBonus;
+    public int healingBonus;
+    public int damageReductionBonus;
+    public int extraStaminaBonus;
     
     public enum EquipmentType
     {

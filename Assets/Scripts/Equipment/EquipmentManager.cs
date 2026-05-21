@@ -50,6 +50,7 @@ public class EquipmentManager : NetworkBehaviour
             player.playerBaseMaxHealth += item.healthBonus;
             player.playerBaseSense += item.senseBonus;
             player.skillTrigger = item.animTrigger;
+            player.skillCooldown += item.skillCooldown;
 
         }
 
@@ -62,6 +63,12 @@ public class EquipmentManager : NetworkBehaviour
             player.playerBaseCurrentHealth.Value += item.healthBonus;
             player.playerBaseMaxHealth += item.healthBonus / 2;
             player.playerBaseSense += item.senseBonus / 2;
+            player.healValue += item.healingBonus;
+            player.skillCooldown *= (1 - item.cooldownReductionBonus) ;
+            player.playerBaseDefense += item.damageReductionBonus * 3 / 2;
+            player.playerBaseMaxHealth += item.damageReductionBonus * 9/2;
+            player.heavyDamage /= item.heavyAttackBonus / 3;
+            player.uniqueSkillDamage /= item.uniqueSkillBonus / 3;
         }
      
 

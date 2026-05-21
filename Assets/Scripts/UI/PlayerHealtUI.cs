@@ -13,7 +13,7 @@ public class PlayerHealthUI : MonoBehaviour
     [Header("Stamina UI")]
     public Image staminaImage;
 
-    public float delay = 0.4f;
+    public float delay = 0.8f;
     public float damageSpeed = 2f;
     public float healSpeed = 2f;
 

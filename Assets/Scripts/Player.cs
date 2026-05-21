@@ -19,6 +19,7 @@ public class Player : NetworkBehaviour, IDamageable
     [Header("References")]
     [SerializeField] PlayerInputReader playerInputReader;
     [SerializeField] PlayerCamLockOn camLock;
+    [SerializeField] PlayerAnimationController animationController;
     [SerializeField] Transform cameraTransform;
     [SerializeField] Transform groundCheck;
 
@@ -69,7 +70,7 @@ public class Player : NetworkBehaviour, IDamageable
     [Header("Stats")]
     public NetworkVariable<int> playerBaseCurrentHealth = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     [SerializeField] public int playerBaseMaxHealth;
-    public NetworkVariable<int> playerBaseCurrentStamina = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public NetworkVariable<int> playerBaseCurrentStamina = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     public int playerBaseMaxStamina;
     [SerializeField] public int playerBaseMinAP;
     [SerializeField] public int playerBaseMaxAP;
@@ -80,16 +81,20 @@ public class Player : NetworkBehaviour, IDamageable
     [SerializeField] public string skillTrigger;
     [SerializeField] public int currentPotionCount;
     [SerializeField] public int maxPotionCount;
+    public int healValue;
+    public int heavyDamage;
+    public int uniqueSkillDamage;
     public CinemachineStateDrivenCamera stateCam;
     public GameObject playerHUD;
-
+    public float skillCooldown;
     public NetworkVariable<bool> IsReadySynced = new NetworkVariable<bool>(false,
          NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     public event Action onHurt;
     public event Action onDeath;
+    public event Action onExhaust;
     public Coroutine staminaRegenCoroutine;
-
+    
     public override void OnNetworkSpawn()
     {
         GameManager.Instance.LockCursor();
@@ -124,6 +129,19 @@ public class Player : NetworkBehaviour, IDamageable
                 onHurt?.Invoke();
             }
         };
+        playerBaseCurrentStamina.OnValueChanged += (oldVal, newVal) => {
+            if (newVal < oldVal)
+            {
+                if (playerState == PlayerState.IsExhausted) return;
+                if (newVal <= 0 && playerState == PlayerState.IsBlocking)
+                {
+                    onExhaust?.Invoke();
+                }
+                
+
+            }
+        };
+
         playerBaseMaxHealth = 200;
         playerBaseCurrentHealth.Value = playerBaseMaxHealth;
         playerBaseMaxStamina = 100;
@@ -144,6 +162,8 @@ public class Player : NetworkBehaviour, IDamageable
         playerInputReader.onLightAttackStarted += PlayerLightAttack;
         playerInputReader.onHeavyAttackStarted += PlayerHeavyAttack;
         playerInputReader.onLockOn += PlayerCameraLockOn;
+        playerInputReader.onUniqueSkillStarted += PlayerUniqueSkill;
+
     }
 
     public override void OnNetworkDespawn()
@@ -160,6 +180,7 @@ public class Player : NetworkBehaviour, IDamageable
 
         playerInputReader.onLightAttackStarted -= PlayerLightAttack;
         playerInputReader.onHeavyAttackStarted -= PlayerHeavyAttack;
+        playerInputReader.onUniqueSkillStarted -= PlayerUniqueSkill;
     }
 
     void Start()
@@ -167,6 +188,7 @@ public class Player : NetworkBehaviour, IDamageable
         rb = GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
         playerInputReader = GetComponent<PlayerInputReader>();
+        animationController = GetComponent<PlayerAnimationController>();
     }
 
     void Update()
@@ -202,7 +224,7 @@ public class Player : NetworkBehaviour, IDamageable
             playerInputReader.lAttackAction.Disable();
             playerInputReader.hAttackAction.Disable();
         }
-        else if (playerState == PlayerState.IsAttacking)
+        else if (playerState == PlayerState.IsAttacking || anim.GetCurrentAnimatorStateInfo(4).IsName(skillTrigger))
         {
             playerInputReader.sprintAction.Disable();
             playerInputReader.dodgeAction.Disable();
@@ -267,7 +289,7 @@ public class Player : NetworkBehaviour, IDamageable
             playerInputReader.healAction.Disable();
             playerInputReader.moveAction.Disable();
         }
-        else if (playerState == PlayerState.IsDead || anim.GetCurrentAnimatorStateInfo(1).IsName("Death"))
+        else if (playerState == PlayerState.IsDead)
         {
             playerInputReader.sprintAction.Disable();
             playerInputReader.jumpAction.Disable();
@@ -277,6 +299,7 @@ public class Player : NetworkBehaviour, IDamageable
             playerInputReader.blockAction.Disable();
             playerInputReader.healAction.Disable();
             playerInputReader.moveAction.Disable();
+           
         }
         else if (PauseManager.Instance.isPaused() || GameManager.Instance.isInConfirmation())
         {
@@ -301,7 +324,7 @@ public class Player : NetworkBehaviour, IDamageable
             playerInputReader.moveAction.Enable();
         }
         if (playerState != PlayerState.IsAttacking &&
-          playerState != PlayerState.IsDodging &&
+          playerState != PlayerState.IsDodging && playerState != PlayerState.IsExhausted &&
           playerBaseCurrentStamina.Value < playerBaseMaxStamina)
         {
             if (staminaRegenCoroutine == null)
@@ -323,19 +346,33 @@ public class Player : NetworkBehaviour, IDamageable
     void FixedUpdate()
     {
         if (!IsOwner) return;
-
         if (playerState == PlayerState.IsHurt) return;
-
         if (!canMove && isBusy) return;
 
-
-
-        if (move != Vector3.zero)
+        // Handle character rotation
+        if (camLock != null && camLock.currentEnemy != null)
         {
-            Quaternion rot = Quaternion.LookRotation(move);
-            transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * 10f);
+            // Force the player to INSTANTLY look at the enemy on the Y-axis.
+            // No Slerp lag means Cinemachine doesn't get tricked into shifting frame compositions.
+            Vector3 dirToEnemy = (camLock.currentEnemy.position - transform.position).normalized;
+            dirToEnemy.y = 0;
+
+            if (dirToEnemy != Vector3.zero || playerState != PlayerState.IsDodging)
+            {
+                transform.rotation = Quaternion.LookRotation(dirToEnemy);
+            }
+        }
+        else
+        {
+            // Unlocked: Smoothly rotate into your moving vector direction
+            if (move != Vector3.zero )
+            {
+                Quaternion rot = Quaternion.LookRotation(move);
+                transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.fixedDeltaTime * 10f);
+            }
         }
 
+        // Standard physics translation execution loop
         float currentSpeed = isRunning ? runSpeed : baseWalkSpeed;
 
         if (isGrounded && verticalVelocity < 0)
@@ -343,15 +380,12 @@ public class Player : NetworkBehaviour, IDamageable
             verticalVelocity = -2f;
         }
 
-        verticalVelocity += gravity * Time.deltaTime;
+        verticalVelocity += gravity * Time.fixedDeltaTime;
 
         Vector3 velocity = isBlocking ? move * currentWalkSpeed : move * currentSpeed;
         velocity.y = verticalVelocity;
 
-
-        rb.MovePosition(rb.position + velocity * Time.deltaTime);
-
-
+        rb.MovePosition(rb.position + velocity * Time.fixedDeltaTime);
     }
 
     // ======================
@@ -364,29 +398,35 @@ public class Player : NetworkBehaviour, IDamageable
 
     void CalculateMovement()
     {
-
         float x = movement.x;
         float z = movement.y;
 
-        Vector3 forward = cameraTransform.forward;
-        Vector3 right = cameraTransform.right;
-        if (camLock.currentEnemy != null) // You'll need to expose these variables
+        Vector3 forward;
+        Vector3 right;
+
+        if (camLock != null && camLock.currentEnemy != null)
         {
-            // Direction from player to enemy
+            // 1. Establish the forward line directly from you to the enemy
             forward = (camLock.currentEnemy.position - transform.position).normalized;
-            right = Quaternion.Euler(0, 90, 0) * forward;
+            forward.y = 0; // Lock it flat to the floor
+            forward.Normalize();
+
+            // 2. Derive the right vector cleanly using a cross product or standard 90-degree rotation.
+            // This stops the input matrix from changing based on Cinemachine's framing camera adjustments!
+            right = new Vector3(forward.z, 0f, -forward.x);
         }
         else
         {
+            // Unlocked movement remains purely camera-relative
             forward = cameraTransform.forward;
             right = cameraTransform.right;
+            forward.y = 0;
+            right.y = 0;
+            forward.Normalize();
+            right.Normalize();
         }
-        forward.y = 0;
-        right.y = 0;
 
-        forward.Normalize();
-        right.Normalize();
-
+        // Recombine inputs securely
         move = forward * z + right * x;
     }
 
@@ -461,6 +501,7 @@ public class Player : NetworkBehaviour, IDamageable
     // ======================
     public void PlayerLightAttack()
     {
+        if (!IsOwner) return;
         int staminaConsumption = 8;
 
      
@@ -504,16 +545,69 @@ public class Player : NetworkBehaviour, IDamageable
     // ======================
     public void PlayerHeavyAttack()
     {
-        int baseDamage = UnityEngine.Random.Range(playerBaseMinAP, playerBaseMaxAP);
+        if (!IsOwner) return;
+
         int staminaConsumption = 17;
-        playerDamage = baseDamage * 3;
-        if (isBusy) return;
-        if (playerBaseCurrentStamina.Value < staminaConsumption) return;
-        playerState = PlayerState.IsAttacking;
-        if (comboStep != 0) return;
+
+        // 1. Guard Clause: If busy with another action (like Dodge, Hurt, Heal), block it.
+        // But allow it if we are already in an attacking state (just like light attack handles it).
+        if (isBusy && playerState != PlayerState.IsAttacking) return;
+
+        // 2. Guard Clause: If we are already executing a heavy attack, block duplicate inputs.
         if (isHeavyAttacking) return;
-        playerBaseCurrentStamina.Value -= staminaConsumption;
+
+        // 3. Guard Clause: If mid light-attack combo, don't allow a heavy attack override.
+        if (comboStep != 0) return;
+
+        // 4. Guard Clause: Check stamina assets.
+        if (playerBaseCurrentStamina.Value < staminaConsumption) return;
+
+        // ==========================================
+        // EXECUTE HEAVY ATTACK
+        // ==========================================
+        int baseDamage = UnityEngine.Random.Range(playerBaseMinAP, playerBaseMaxAP);
+        heavyDamage = baseDamage * 3;
+
+        playerState = PlayerState.IsAttacking;
         isHeavyAttacking = true;
+        comboTimer = 0f; // Clear combo tracker time arrays safely
+
+        // Deduct stamina asset over the network wire
+        playerBaseCurrentStamina.Value -= staminaConsumption;
+    }
+    public void PlayerUniqueSkill()
+    {
+        
+        animationController.PlaySkill(skillTrigger);
+        if(skillTrigger == "isSpeedSkill")
+        {
+            if (!IsOwner) return;
+            if (isBusy) return;
+            if (!isGrounded) return;
+            playerState = PlayerState.IsDodging;
+            anim.applyRootMotion = false;
+            isDodging = true;
+            Vector3 dodgeDir = move;
+
+            if (dodgeDir == Vector3.zero)
+            {
+                dodgeDir = transform.forward;
+            }
+
+            rb.AddForce(dodgeDir * dodgeForce, ForceMode.Impulse);
+           
+        }
+        else if(skillTrigger == "isTimeSkill")
+        {
+            playerState = PlayerState.IsHealing;
+           
+        }
+        else if(skillTrigger == "isForceSkill")
+        {
+            playerState = PlayerState.IsAttacking;
+            anim.SetBool("isAttacking", true);
+          
+        }
     }
 
     // ======================
@@ -571,6 +665,7 @@ public class Player : NetworkBehaviour, IDamageable
 
     public void Dodge()
     {
+        if (!IsOwner) return;
         if (isBusy) return;
         int staminaConsumption = 15;
         if (playerBaseCurrentStamina.Value < staminaConsumption) return;
@@ -612,29 +707,41 @@ public class Player : NetworkBehaviour, IDamageable
     {
        
         playerBaseCurrentHealth.Value = 0;
+        playerState = PlayerState.IsDead;
         Cursor.lockState = CursorLockMode.None;
        
     }
     public void TakeDamage(int damage, Vector3 hitDir)
     {
-        if (anim.GetCurrentAnimatorStateInfo(1).IsName("Death") || isDodging) return;
+        if (playerState == PlayerState.IsDead || isDodging || anim.GetCurrentAnimatorStateInfo(1).IsName("HeavyHit")) return;
     
        
         int healthDamage = (damage * damage) / (damage + playerBaseDefense);
         int staminaDamage = (healthDamage * (5/2));
-        float knockbackForce = (damage <20)? 5f: 7f;
+        float knockbackForce = (anim.GetCurrentAnimatorStateInfo(1).IsName("Player_Exhaust"))? 16f: 5.5f;
+        ResetCombo();
         ApplyKnockbackClientRpc(knockbackForce, hitDir);
+
+        if (isHeavyAttacking || playerState == PlayerState.IsAttacking)
+        {
+            isHeavyAttacking = false; // Turn off the flag immediately
+            canMove = true;           // Restore movement authorization tracking
+                                      // Set state to hurt so Update() loop stops locking down raw input maps
+            playerState = PlayerState.IsHurt;
+        }
         if (playerState == PlayerState.IsBlocking && isBlocking)
         {
             playerBaseCurrentHealth.Value -= healthDamage / 5;
             playerBaseCurrentStamina.Value -= staminaDamage;
+            if (playerBaseCurrentStamina.Value <= 0)
+            {
+                onExhaust?.Invoke();
+
+
+                return;
+            }
             return;
 
-        }
-        if(playerState == PlayerState.IsBlocking && isBlocking && playerBaseCurrentStamina.Value <= 0)
-        {
-            playerBaseCurrentStamina.Value = 0;
-            playerState = PlayerState.IsExhausted;
         }
         playerBaseCurrentHealth.Value -= healthDamage;
 
@@ -646,12 +753,7 @@ public class Player : NetworkBehaviour, IDamageable
             PlayerOnDeath();
           
         }
-        else if(playerBaseCurrentStamina.Value <= 0)
-        {
-            playerBaseCurrentStamina.Value = 0;
-            playerState = PlayerState.IsExhausted;
-
-        }
+     
       
        
     }
@@ -692,7 +794,13 @@ public class Player : NetworkBehaviour, IDamageable
     {
         anim.applyRootMotion = true;
         playerState = PlayerState.None;
+        isHeavyAttacking = false;
+        animationController.ResetAttacking();
         Debug.Log("Nonee");
+    }
+    void ResetPlayerStamina()
+    {
+        playerBaseCurrentStamina.Value = playerBaseMaxStamina;
     }
     void DecreasePotionCount()
     {
@@ -700,7 +808,7 @@ public class Player : NetworkBehaviour, IDamageable
     }
     void HealPlayer()
     {
-        int healValue = 45;
+        healValue = 45;
         int damageToHealth = playerBaseMaxHealth - playerBaseCurrentHealth.Value;
         playerBaseCurrentHealth.Value += healValue;
         if(healValue > damageToHealth)
@@ -711,8 +819,9 @@ public class Player : NetworkBehaviour, IDamageable
     }
     void SetPlayerDeath()
     {
-        playerState = PlayerState.IsDead;
+        if (!IsOwner) return;
         GameManager.Instance.NotifyPlayerDeathRpc();
+        GetComponent<NetworkObject>().Despawn();
     }
     [Rpc(SendTo.Server)]
     public void SetReadyRpc()
@@ -755,5 +864,15 @@ void SpawnGhostClientRpc(Vector3 pos, Quaternion rot)
             playerBaseCurrentStamina.Value += 1;
         }
         staminaRegenCoroutine = null;
+    }
+    [ServerRpc]
+    public void RequestDamageWindowServerRpc(float duration)
+    {
+        // The server grabs its own attached components and initiates the timing loop
+        EnemyAttackHitboxScript[] hitboxes = GetComponentsInChildren<EnemyAttackHitboxScript>();
+        foreach (var hitbox in hitboxes)
+        {
+            hitbox.StartDamageWindow(duration);
+        }
     }
 }   
