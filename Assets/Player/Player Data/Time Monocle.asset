@@ -19,9 +19,15 @@ MonoBehaviour:
   animTrigger: isTimeSkill
   skillCooldown: 30
   baseDamage: 0
-  attackBonus: 0
+  attackBonus: 4
   defenseBonus: 0
-  healthBonus: 9
+  healthBonus: 16
   staminaBonus: 0
   speedBonus: 2
   senseBonus: 0.4
+  cooldownReductionBonus: 0
+  heavyAttackBonus: 0
+  uniqueSkillBonus: 0
+  healingBonus: 15
+  damageReductionBonus: 0
+  extraStaminaBonus: 0

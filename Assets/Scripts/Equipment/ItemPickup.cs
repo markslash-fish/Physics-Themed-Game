@@ -1,3 +1,4 @@
+using System;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -7,30 +8,23 @@ public class ItemPickup : NetworkBehaviour
     public GameObject itemVisual;
     public GameObject equipPrompt;
 
-    bool playerNear;
-
+    private bool playerNear;
 
     private void Start()
     {
-        equipPrompt.SetActive(false);
+        if (equipPrompt != null)
+            equipPrompt.SetActive(false);
     }
+
     void Update()
     {
-        if(playerNear)
+        // Only allow the player who is actually near the item to interact
+        if (playerNear)
         {
-            
             if (Input.GetKeyDown(KeyCode.E))
             {
-
-
-
-              
                 RequestEquipServerRPC();
-
-
-               
             }
-           
         }
     }
 
@@ -38,42 +32,73 @@ public class ItemPickup : NetworkBehaviour
     void RequestEquipServerRPC(RpcParams rpcParams = default)
     {
         ulong clientID = rpcParams.Receive.SenderClientId;
-       
 
         if (NetworkManager.Singleton.ConnectedClients.TryGetValue(clientID, out var client))
         {
             var playerObject = client.PlayerObject;
             EquipmentManager manager = playerObject.GetComponent<EquipmentManager>();
-            
 
             if (manager != null)
             {
                 if (manager.primaryAugment != null && manager.secondaryAugment != null) return;
                 int index = manager.allEquipment.IndexOf(item);
 
-                
                 manager.FindItemByIndexRpc(index);
             }
         }
-        equipPrompt.SetActive(false);
-        itemVisual.GetComponent<NetworkObject>().Despawn();
+
+        // Hide prompt globally on the server if it's being despawned
+        HidePromptClientRpc();
+
+        if (itemVisual != null && itemVisual.GetComponent<NetworkObject>().IsSpawned)
+        {
+            itemVisual.GetComponent<NetworkObject>().Despawn();
+        }
+    }
+
+    // ClientRpc ensures that when an item is picked up, any active prompt disappears immediately
+    [ClientRpc]
+    private void HidePromptClientRpc()
+    {
+        if (equipPrompt != null) equipPrompt.SetActive(false);
+        playerNear = false;
         this.enabled = false;
     }
+
     void OnTriggerEnter(Collider other)
     {
         if (itemVisual == null) return;
-        Debug.Log("Something entered trigger");
-        if(other.CompareTag("Player"))
-        Debug.Log("PLAYER DETECTED");
-         playerNear = true;
-        
-        equipPrompt.SetActive(true);
+
+        // 1. Verify if the object that entered the trigger is a Player
+        if (other.CompareTag("Player"))
+        {
+            // 2. Grab the network properties of that specific player character
+            if (other.TryGetComponent<NetworkObject>(out var playerNetObj))
+            {
+                // CRITICAL FIX: Only set the prompt active if THIS specific client owns the character entering the zone
+                if (playerNetObj.IsOwner)
+                {
+                    Debug.Log("LOCAL PLAYER DETECTED - Showing Prompt");
+                    playerNear = true;
+                    if (equipPrompt != null) equipPrompt.SetActive(true);
+                }
+            }
+        }
     }
 
     void OnTriggerExit(Collider other)
     {
-        if(other.CompareTag("Player"))
-            playerNear = false;
-        equipPrompt.SetActive(false);
+        if (other.CompareTag("Player"))
+        {
+            if (other.TryGetComponent<NetworkObject>(out var playerNetObj))
+            {
+                // CRITICAL FIX: Only hide it if the local player is the one walking away
+                if (playerNetObj.IsOwner)
+                {
+                    playerNear = false;
+                    if (equipPrompt != null) equipPrompt.SetActive(false);
+                }
+            }
+        }
     }
 }

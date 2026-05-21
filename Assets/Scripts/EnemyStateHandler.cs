@@ -83,14 +83,7 @@ public class EnemyStateHandler : NetworkBehaviour
         if (enemyState.Value == EnemyState.IsStrafing)
         {
             enemyAI.EnemyStrafing();
-            if (enemyAI.strafeDirection == 1)
-            {
-                animationController.PlayStrafe();
-            }
-            else if(enemyAI.strafeDirection == -1)
-            {
-                animationController.MirrorStrafe();
-            }
+            
            
            
 

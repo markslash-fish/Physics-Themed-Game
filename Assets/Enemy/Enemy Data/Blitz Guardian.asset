@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GuardianDataManager
   poise: 2
   enemyName: Blitz Guardian
-  enemyHealth: 300
+  enemyHealth: 340
   enemyStamina: 158
-  enemyDefense: 35
+  enemyDefense: 40
   enemySpeed: 2.1
-  enemyMinAttackPower: 15
-  enemyMaxAttackPower: 21
+  enemyMinAttackPower: 36
+  enemyMaxAttackPower: 40
   enemyID: 22601
-  enemyKey: guardian-broken
+  enemyKey: guardian-blitz

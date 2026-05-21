@@ -26,27 +26,33 @@ public class EnemyAnimationController : NetworkBehaviour
         {
             animator.ResetControllerState();
         }
-            MirrorStrafe();
-        
-        
-       
+
+        if (stateHandler.CurrentState == EnemyStateHandler.EnemyState.IsStrafing)
+        {
+            PlayStrafe();
+        }
+
+
+
     }
     public void PlayStrafe()
     {
-       bool isStrafing = stateHandler.enemyState.Value == EnemyStateHandler.EnemyState.IsStrafing;
-        animator.SetBool("isStrafing", isStrafing);
+      if (enemyAI.strafeDirection == 1)
+        {
+            animator.SetInteger("isStrafing", 0);
+        }
+      else if (enemyAI.strafeDirection == -1)
+        {
+            animator.SetInteger("isStrafing", 1);
+        }
+
     }
     public void PlayIdle()
     {
        bool isIdle = stateHandler.enemyState.Value == EnemyStateHandler.EnemyState.Idle;
         animator.SetBool("isIdle", isIdle);
     }
-    public void MirrorStrafe()
-    {
-      bool  isStrafingRight = enemyAI.strafeDirection == -1;
-        animator.SetBool("isStrafingRight", isStrafingRight);
-     
-    }
+ 
     public void PlayExhaust()
     {
     animator.SetBool("isExhausted", true);     

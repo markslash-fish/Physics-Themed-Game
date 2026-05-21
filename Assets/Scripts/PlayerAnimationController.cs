@@ -29,6 +29,7 @@ public class PlayerAnimationController : NetworkBehaviour
         inputReader.onHeal += PlayHeal;
         player.onHurt += PlayHit;
         player.onDeath += PlayDeath;
+        player.onExhaust += PlayExhaust;
     }
     public override void OnNetworkDespawn()
     {
@@ -43,6 +44,7 @@ public class PlayerAnimationController : NetworkBehaviour
         inputReader.onHeal -= PlayHeal;
         player.onHurt -= PlayHit;
         player.onDeath -= PlayDeath;
+        player.onExhaust -= PlayExhaust;
     }
     private void Awake()
     {
@@ -57,10 +59,13 @@ public class PlayerAnimationController : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        
+        if(anim.GetCurrentAnimatorStateInfo(1).IsName("Player_Exhaust"))
+        {
+            player.playerState = Player.PlayerState.IsExhausted;
+        }
+      
 
 
-   
         PlayMove();
     }
     void PlayMove()
@@ -135,6 +140,7 @@ public class PlayerAnimationController : NetworkBehaviour
                 player.canCombo = false;
                 anim.SetInteger("LightAttack", 3);
             }
+            anim.SetBool("isAttacking", true);
         }
       
     }
@@ -143,6 +149,7 @@ public class PlayerAnimationController : NetworkBehaviour
         if (player.playerState == Player.PlayerState.IsAttacking)
         {
             if (player.comboStep != 0) return;
+            anim.SetBool("isAttacking", true);
             anim.SetTrigger("HeavyAttack");
         }
        
@@ -156,18 +163,33 @@ public class PlayerAnimationController : NetworkBehaviour
         }
        
     }
-    void PlayHit()
+    public void PlaySkill(string animTrigger)
     {
-        if (player.isBlocking && player.playerState == Player.PlayerState.IsBlocking) return;
-
-         player.playerState = Player.PlayerState.IsHurt;
-         anim.ResetControllerState();
-         anim.SetTrigger("Hit");
+        anim.SetTrigger(animTrigger);
     }
-    void PlayExhaust()
+   public void PlayHit()
     {
-        player.playerState = Player.PlayerState.IsExhausted;
-        anim.ResetControllerState();
+        player.playerState = Player.PlayerState.IsHurt;
+        if (player.isBlocking && player.playerState == Player.PlayerState.IsBlocking) return;
+        if (player.playerState == Player.PlayerState.IsDodging) return;
+
+        anim.ResetTrigger("HeavyAttack");
+        anim.ResetTrigger("jumpTrigger");
+        anim.ResetTrigger("Heal");
+        anim.ResetTrigger("Dodge");
+        anim.SetInteger("LightAttack", 0);
+        anim.SetBool("isAttacking", false);
+        if (anim.GetCurrentAnimatorStateInfo(1).IsName("Player_Exhaust"))
+        {
+            anim.ResetTrigger("HeavyHit");
+            anim.SetTrigger("HeavyHit");
+            return;
+        }
+        anim.ResetTrigger("Hit");
+        anim.SetTrigger("Hit");
+    }
+    public void PlayExhaust()
+    {
         anim.SetTrigger("isExhausted");
     }
     void PlaySprint(bool sprinting)
@@ -175,20 +197,21 @@ public class PlayerAnimationController : NetworkBehaviour
      
 
         
-            anim.SetFloat("isSprinting", 1.2f);
+      anim.SetFloat("isSprinting", 1.2f);
         
     }
     void EndSprint(bool sprinting)
     {
    
         
-            anim.SetFloat("isSprinting", 0.8f);
+      anim.SetFloat("isSprinting", 0.8f);
         
     }
     void PlayDeath()
     {
         anim.SetTrigger("isDead");
     }
+  
        
     IEnumerator ShowPotionDelay()
     {
@@ -215,5 +238,8 @@ public class PlayerAnimationController : NetworkBehaviour
         yield return new WaitForSeconds(12f);
         bottle.SetActive(false);
     }
-    
+  public void ResetAttacking()
+    {
+        anim.SetBool("isAttacking", false);
+    }
 }

@@ -19,9 +19,15 @@ MonoBehaviour:
   animTrigger: isSpeedSkill
   skillCooldown: 7
   baseDamage: 25
-  attackBonus: 3
-  defenseBonus: 0
+  attackBonus: 6
+  defenseBonus: 3
   healthBonus: 9
   staminaBonus: 0
   speedBonus: 4
   senseBonus: 0.2
+  cooldownReductionBonus: 0.25
+  heavyAttackBonus: 0
+  uniqueSkillBonus: 0
+  healingBonus: 0
+  damageReductionBonus: 0
+  extraStaminaBonus: 0
