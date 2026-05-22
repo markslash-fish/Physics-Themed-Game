@@ -32,9 +32,9 @@ public class Player : NetworkBehaviour, IDamageable
 
     [Header("Movement")]
     [SerializeField] private float jumpHeight;
-    [SerializeField] private float baseWalkSpeed;
-    [SerializeField] private float currentWalkSpeed;
-    [SerializeField] private float runSpeed;
+    [SerializeField] public float baseWalkSpeed;
+    [SerializeField] public float currentWalkSpeed;
+    [SerializeField] public float runSpeed;
     [SerializeField] float gravity = -20f;
     float verticalVelocity;
 
@@ -568,7 +568,7 @@ public class Player : NetworkBehaviour, IDamageable
         // EXECUTE HEAVY ATTACK
         // ==========================================
         int baseDamage = UnityEngine.Random.Range(playerBaseMinAP, playerBaseMaxAP);
-        heavyDamage = baseDamage * 3;
+        heavyDamage = baseDamage * 2;
         playerDamage = heavyDamage;
         playerState = PlayerState.IsAttacking;
         isHeavyAttacking = true;
@@ -581,8 +581,9 @@ public class Player : NetworkBehaviour, IDamageable
     {
         if (skillInCooldown) return;
         animationController.PlaySkill(skillTrigger);
+        playerDamage = uniqueSkillDamage;
         StartCoroutine(StartSkillCooldown());
-        playerDamage = (UnityEngine.Random.Range(playerBaseMinAP, playerBaseMaxAP) + uniqueSkillDamage);
+       
         if(skillTrigger == "isSpeedSkill")
         {
             if (!IsOwner) return;
@@ -606,7 +607,7 @@ public class Player : NetworkBehaviour, IDamageable
             playerState = PlayerState.IsHealing;
            
         }
-        else if(skillTrigger == "isForceSkill")
+        else if(skillTrigger == "isForceSkill" || skillTrigger == "isMassSkill")
         {
             playerState = PlayerState.IsAttacking;
             anim.SetBool("isAttacking", true);
@@ -814,7 +815,7 @@ public class Player : NetworkBehaviour, IDamageable
     }
     void HealPlayer()
     {
-        healValue *= 2;
+        healValue *= 1;
         int damageToHealth = playerBaseMaxHealth - playerBaseCurrentHealth.Value;
         playerBaseCurrentHealth.Value += healValue;
         if(healValue > damageToHealth)

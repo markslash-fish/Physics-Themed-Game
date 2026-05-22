@@ -16,7 +16,7 @@ public class ItemManager : ScriptableObject
     public int defenseBonus;
     public int healthBonus;
     public int staminaBonus;
-    public int speedBonus;
+    public float speedBonus;
     public float senseBonus;
 
     public float cooldownReductionBonus;

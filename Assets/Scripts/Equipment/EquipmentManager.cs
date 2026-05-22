@@ -48,10 +48,12 @@ public class EquipmentManager : NetworkBehaviour
             player.playerBaseDefense += item.defenseBonus;
             player.playerBaseCurrentHealth.Value += item.healthBonus;
             player.playerBaseMaxHealth += item.healthBonus;
+            player.baseWalkSpeed += item.speedBonus;
+            player.runSpeed += item.speedBonus;
             player.playerBaseSense += item.senseBonus;
             player.skillTrigger = item.animTrigger;
             player.skillCooldown += item.skillCooldown;
-
+            player.uniqueSkillDamage += item.baseDamage;
         }
 
        else  if (secondaryAugment == null)
@@ -62,12 +64,14 @@ public class EquipmentManager : NetworkBehaviour
             player.playerBaseDefense += item.defenseBonus / 2;
             player.playerBaseCurrentHealth.Value += item.healthBonus;
             player.playerBaseMaxHealth += item.healthBonus / 2;
+            player.baseWalkSpeed += item.speedBonus /2;
+            player.runSpeed += item.speedBonus /2;
             player.playerBaseSense += item.senseBonus / 2;
             player.healValue += item.healingBonus;
             player.skillCooldown *= (1 - item.cooldownReductionBonus) ;
-            player.playerBaseDefense += item.damageReductionBonus * 3 / 2;
-            player.playerBaseMaxHealth += item.damageReductionBonus * 9/2;
-            player.heavyDamage /= item.heavyAttackBonus / 3;
+            player.playerBaseDefense += Mathf.RoundToInt(item.damageReductionBonus * (3f / 2f));
+            player.playerBaseMaxHealth += Mathf.RoundToInt(item.damageReductionBonus * (9f/2f));
+            player.heavyDamage /= Mathf.RoundToInt(item.damageReductionBonus / 3f);
             player.uniqueSkillDamage /= item.uniqueSkillBonus / 3;
         }
      
