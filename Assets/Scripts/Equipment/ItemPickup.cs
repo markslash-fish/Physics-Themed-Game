@@ -7,6 +7,7 @@ public class ItemPickup : NetworkBehaviour
     public ItemManager item;
     public GameObject itemVisual;
     public GameObject equipPrompt;
+    PlayerSoundFX sfx;
 
     private bool playerNear;
 
@@ -24,6 +25,7 @@ public class ItemPickup : NetworkBehaviour
             if (Input.GetKeyDown(KeyCode.E))
             {
                 RequestEquipServerRPC();
+                sfx.ItemPickUpSFX();
             }
         }
     }
@@ -81,6 +83,7 @@ public class ItemPickup : NetworkBehaviour
                     Debug.Log("LOCAL PLAYER DETECTED - Showing Prompt");
                     playerNear = true;
                     if (equipPrompt != null) equipPrompt.SetActive(true);
+                     sfx = other.GetComponent<PlayerSoundFX>();
                 }
             }
         }
