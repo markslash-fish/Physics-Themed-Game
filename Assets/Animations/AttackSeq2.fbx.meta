@@ -113,11 +113,25 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
+      - time: 0.79279274
+        functionName: NoTargetSFX
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       - time: 0.8344124
         functionName: TriggerLeftHandDamage
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0.3
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.87696135
+        functionName: DisableLeftTrail
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
         intParameter: 0
         messageOptions: 0
       - time: 0.90676033
@@ -129,20 +143,6 @@ ModelImporter:
         messageOptions: 0
       - time: 0.96646345
         functionName: EnableMove
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.79279274
-        functionName: NoTargetSFX
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.9315068
-        functionName: ResetTrails
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0

@@ -60358,11 +60358,25 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_Events:
   - time: 0.16666667
+    functionName: TrailOff
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 0.16666667
     functionName: SetTracking
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 1
+    messageOptions: 0
+  - time: 0.25
+    functionName: TrailOn
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
     messageOptions: 0
   - time: 0.625
     functionName: SetTracking
@@ -60378,11 +60392,32 @@ AnimationClip:
     floatParameter: 0.4
     intParameter: 0
     messageOptions: 0
+  - time: 0.7083333
+    functionName: BRAttackSFX
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 2.125
+    functionName: BLAttackSFX
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
   - time: 2.1666667
     functionName: TriggerRightHandDamage
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0.3
+    intParameter: 0
+    messageOptions: 0
+  - time: 3.125
+    functionName: TrailOff
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 3.25

@@ -17,6 +17,9 @@ public class PlayerSoundFX : NetworkBehaviour
     public AudioClip noTargetAttackSFX;
     public AudioClip noSoundHeavySFX;
 
+    public AudioClip chargeSkillGSFX;
+    public AudioClip impactSkillGSFX;
+
     [Header("Movement")]
     public AudioClip jumpSFX;
     public AudioClip landingSFX;
@@ -25,6 +28,8 @@ public class PlayerSoundFX : NetworkBehaviour
     [Header("Heal")]
     public AudioClip drinkSFX;
     public AudioClip popSFX;
+
+    public AudioClip itemPickupSFX;
 
     // =========================
     // GENERIC PLAY
@@ -305,6 +310,70 @@ public class PlayerSoundFX : NetworkBehaviour
         if (!IsOwner) return;
 
         popPotionServerRpc();
+    }
+    // =========================
+    // GuantSkill
+    // =========================
+
+    [ServerRpc]
+    void chargeSkillGServerRpc()
+    {
+        chargeSkillGClientRpc();
+    }
+
+    [ClientRpc]
+    void chargeSkillGClientRpc()
+    {
+        PlayClip(chargeSkillGSFX);
+    }
+
+    public void GuantChargeSFX()
+    {
+        if (!IsOwner) return;
+
+        chargeSkillGServerRpc();
+    }
+        //impacct skil guant
+        [ServerRpc]
+    void impactSkillGServerRpc()
+    {
+        impactSkillGClientRpc();
+    }
+
+    [ClientRpc]
+    void impactSkillGClientRpc()
+    {
+        PlayClip(impactSkillGSFX);
+    }
+
+    public void GuantImpactSFX()
+    {
+        if (!IsOwner) return;
+
+        impactSkillGServerRpc();
+    }
+
+     // =========================
+    // Item Pickup SFX
+    // =========================
+
+    [ServerRpc]
+    void itemPickupServerRpc()
+    {
+        itemPickupClientRpc();
+    }
+
+    [ClientRpc]
+    void itemPickupClientRpc()
+    {
+        PlayClip(itemPickupSFX);
+    }
+
+    public void ItemPickUpSFX()
+    {
+        if (!IsOwner) return;
+
+        itemPickupServerRpc();
     }
     
 

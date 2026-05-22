@@ -3075,8 +3075,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6167484466743613674}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.017003126, y: 0.52560645, z: -0.010507967, w: 0.850493}
-  m_LocalPosition: {x: -1.2422316, y: 0.805556, z: -0.62118745}
+  m_LocalRotation: {x: 0.048438977, y: -0.18666577, z: 0.009215282, w: 0.9811853}
+  m_LocalPosition: {x: 0.5694424, y: 0.9034904, z: -1.4424345}
   m_LocalScale: {x: 0.5555556, y: 0.55555564, z: 0.55555564}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3159,7 +3159,7 @@ MonoBehaviour:
     SplineCurvature: 0.5
   RecenteringTarget: 2
   HorizontalAxis:
-    Value: 63.432323
+    Value: -21.543047
     Center: 0
     Range: {x: -180, y: 180}
     Wrap: 1
@@ -3169,7 +3169,7 @@ MonoBehaviour:
       Time: 2
     Restrictions: 0
   VerticalAxis:
-    Value: -10
+    Value: -6.2637424
     Center: 17.5
     Range: {x: -10, y: 45}
     Wrap: 0
@@ -3453,7 +3453,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1764149282
+  GlobalObjectIdHash: 1738339513
   InScenePlacedSourceGlobalObjectIdHash: 3174027574
   DeferredDespawnTick: 0
   Ownership: 1
@@ -3479,7 +3479,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
   ShowTopMostFoldoutHeaderGroup: 1
-  ghostPrefab: {fileID: 8490371952613030879, guid: 1bddfe653a3ab9d42a39afbe2fbec349, type: 3}
+  ghostPrefab: {fileID: 0}
   ghostSpawnDelay: 0.1
   playerState: 0
   playerInputReader: {fileID: 3346526419801248037}
@@ -3986,7 +3986,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 0.472
+  m_Volume: 0.226
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -4086,8 +4086,10 @@ MonoBehaviour:
   chargeVFX: {fileID: 8011998094573082391, guid: 6dda45fbc7f7e9e43b34acbb493133e9, type: 3}
   heavyBurstVFX: {fileID: 7932645971135791481, guid: 5bd9989ac09c9c44db7b1c809ed3be81, type: 3}
   impactVFX: {fileID: 2196197084933303326, guid: 8ff6649ae286c0040af812e58c8604ed, type: 3}
+  skillGVFX: {fileID: 7932645971135791481, guid: 7a2d0669da1c01a4992b086c29a07da8, type: 3}
   handPoint: {fileID: 723728517810505955}
   rightHandPoint: {fileID: 723728517810505955}
+  skillGPoint: {fileID: 6775958783474122388}
   leftTrail: {fileID: 9215612684284571420}
   rightTrail: {fileID: 3464931634088783938}
   leftPoint: {fileID: 5690876048433150161}
@@ -4128,14 +4130,17 @@ MonoBehaviour:
   LattackSFX: {fileID: 8300000, guid: 0ca45b4e9762da04e9df975902d6c4fa, type: 3}
   RattackSFX: {fileID: 8300000, guid: b446f649094e7f34bb01fe57cc247f12, type: 3}
   heavyAttackSFX: {fileID: 8300000, guid: b43a1187f2d3ebd4eb3710ba66596913, type: 3}
-  chargeAttackSFX: {fileID: 8300000, guid: 96070b5f271018a4a80b47522e285fbf, type: 3}
+  chargeAttackSFX: {fileID: 8300000, guid: 2ea93cb31431744438234f842d35ce0c, type: 3}
   noTargetAttackSFX: {fileID: 8300000, guid: 4eec304d9de4b374197a0d501289a2f4, type: 3}
   noSoundHeavySFX: {fileID: 8300000, guid: 26b7115d3be08e04e83a5bf5383759b8, type: 3}
+  chargeSkillGSFX: {fileID: 8300000, guid: 2ea93cb31431744438234f842d35ce0c, type: 3}
+  impactSkillGSFX: {fileID: 8300000, guid: bf4b5098c4dce1547a057ffbe57268b7, type: 3}
   jumpSFX: {fileID: 8300000, guid: bdf522fe742b4a749b008bae9cc670b1, type: 3}
   landingSFX: {fileID: 8300000, guid: d630b719c95233e4699139899141110f, type: 3}
   dashSFX: {fileID: 8300000, guid: 98f4639e2d6d4194c8dd91ff68bbd3e8, type: 3}
   drinkSFX: {fileID: 8300000, guid: 0288941bbf476d7429046c649b4231bd, type: 3}
   popSFX: {fileID: 8300000, guid: 5b2f6bb3b54c9ba4b80b6ea7a8b8e20d, type: 3}
+  itemPickupSFX: {fileID: 8300000, guid: b82c08236cdb34d49b73a6f970af81ba, type: 3}
 --- !u!1 &6610172632585228828
 GameObject:
   m_ObjectHideFlags: 0

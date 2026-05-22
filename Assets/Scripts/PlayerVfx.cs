@@ -9,8 +9,11 @@
         public GameObject chargeVFX;
         public GameObject heavyBurstVFX;
         public GameObject impactVFX;
+        public GameObject skillGVFX;
+
         public Transform handPoint;
         public Transform rightHandPoint;
+        public Transform skillGPoint;
 
         public GameObject leftTrail;
         public GameObject rightTrail;
@@ -372,17 +375,17 @@
                 Destroy(vfx, 1f);
             }
 
-            public void PlayJumpVFX()
-        {
-            if (!IsOwner) return;
-            PlayJumpServerRpc();
-        }
+                public void PlayJumpVFX()
+            {
+                if (!IsOwner) return;
+                PlayJumpServerRpc();
+            }
 
-        public void PlayLandVFX()
-        {
-            if (!IsOwner) return;
-            PlayLandServerRpc();
-        }
+            public void PlayLandVFX()
+            {
+                if (!IsOwner) return;
+                PlayLandServerRpc();
+            }
 
             // =========================
             // JUMP TRAIL
@@ -399,15 +402,42 @@
             {
                 jumpTrail.SetActive(state);
             }
-            public void EJumpTrail()
-        {
-            if (!IsOwner) return;
-            SetJumpTrailServerRpc(true);
-        }
+                public void EJumpTrail()
+            {
+                if (!IsOwner) return;
+                SetJumpTrailServerRpc(true);
+            }
 
-        public void DisJumpTrail()
-        {
-            if (!IsOwner) return;
-            SetJumpTrailServerRpc(false);
-        }
+            public void DisJumpTrail()
+            {
+                if (!IsOwner) return;
+                SetJumpTrailServerRpc(false);
+            }
+
+            // =========================
+            // Skill Guantlet
+            // =========================
+
+            [ServerRpc]
+            public void skillGServerRpc(Vector3 pos, Vector3 forward)
+            {
+                skillGClientRpc(pos, forward);
+            }
+
+            [ClientRpc]
+            void skillGClientRpc(Vector3 pos, Vector3 forward)
+            {
+                GameObject vfx = Instantiate(skillGVFX, pos, Quaternion.LookRotation(forward));
+                Destroy(vfx, 1f);
+            }
+
+            public void GSkillVFX()
+            {
+                if (!IsOwner) return;
+
+                Vector3 pos = skillGPoint.position;
+
+                skillGServerRpc(pos, skillGPoint.forward);
+            }
+            
     }
