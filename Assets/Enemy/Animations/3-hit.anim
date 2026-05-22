@@ -60936,6 +60936,20 @@ AnimationClip:
     floatParameter: 0.3
     intParameter: 0
     messageOptions: 0
+  - time: 0.73333335
+    functionName: PlaySlashR
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 0.73333335
+    functionName: BRAttackSFX
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
   - time: 1
     functionName: SetTracking
     data: 
@@ -60945,6 +60959,20 @@ AnimationClip:
     messageOptions: 0
   - time: 1.4333333
     functionName: SetTracking
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 1.4666667
+    functionName: BLAttackSFX
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 1.4666667
+    functionName: PlaySlashL
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0

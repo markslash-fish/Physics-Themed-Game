@@ -85,11 +85,11 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.8903332
-        functionName: ReleaseHeavy
+      - time: 0.3753754
+        functionName: ChargeAttackSFX
         data: 
         objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
+        floatParameter: 0.3
         intParameter: 0
         messageOptions: 0
       - time: 0.67037034
@@ -99,18 +99,39 @@ ModelImporter:
         floatParameter: 0.3
         intParameter: 0
         messageOptions: 0
-      - time: 0.9099099
-        functionName: HeavyAttackSFX
+      - time: 0.84930384
+        functionName: NoSoundHeavySFX
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0.3
         intParameter: 0
         messageOptions: 0
-      - time: 0.98994976
-        functionName: ResetState
+      - time: 0.9483323
+        functionName: EndHeavyAttack
         data: 
         objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0.3
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.99050635
+        functionName: EnableMove
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.9041096
+        functionName: StopCharge
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.77168953
+        functionName: ResetTrails
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
         intParameter: 0
         messageOptions: 0
       transformMask: []

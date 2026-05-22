@@ -156,6 +156,27 @@
 
             ReleaseHeavyServerRpc(pos, transform.forward);
         }
+         [ServerRpc]
+        public void StopChargeServerRpc()
+        {
+            StopChargeClientRpc();
+        }
+
+        [ClientRpc]
+        void StopChargeClientRpc()
+        {
+            if (currentCharge != null)
+            {
+                Destroy(currentCharge);
+                currentCharge = null;
+            }
+        }
+        public void StopCharge()
+        {
+            if (!IsOwner) return;
+
+            StopChargeServerRpc();
+        }
 
             // =========================
             // TRAILS
@@ -196,6 +217,36 @@
             if (!IsOwner) return;
             SetTrailServerRpc(false, false);
         }
+        // =========================
+        // RESET TRAILS
+        // =========================
+
+        [ServerRpc]
+        public void ResetTrailsServerRpc()
+        {
+            ResetTrailsClientRpc();
+        }
+
+        [ClientRpc]
+        void ResetTrailsClientRpc()
+        {
+            leftTrail.SetActive(false);
+            rightTrail.SetActive(false);
+
+            // optional para clear agad yung lumang trail
+            if (leftTrail.TryGetComponent(out TrailRenderer lt))
+                lt.Clear();
+
+            if (rightTrail.TryGetComponent(out TrailRenderer rt))
+                rt.Clear();
+        }
+
+        public void ResetTrails()
+        {
+            if (!IsOwner) return;
+
+            ResetTrailsServerRpc();
+        }       
 
             // =========================
             // SWING

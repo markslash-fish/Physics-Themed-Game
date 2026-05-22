@@ -120,13 +120,6 @@ ModelImporter:
         floatParameter: 0.3
         intParameter: 0
         messageOptions: 0
-      - time: 0.88940096
-        functionName: PlayImpactRight
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
       - time: 0.90676033
         functionName: ResetState
         data: 
@@ -142,7 +135,14 @@ ModelImporter:
         intParameter: 0
         messageOptions: 0
       - time: 0.79279274
-        functionName: LAttackSFX
+        functionName: NoTargetSFX
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.9315068
+        functionName: ResetTrails
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
