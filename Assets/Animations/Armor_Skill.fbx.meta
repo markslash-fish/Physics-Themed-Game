@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 60fe419eccbea9b4c9d72cedff6885f7
+guid: 185bfa324e2a85e428a9d7851479a3a1
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -19,21 +19,13 @@ ModelImporter:
     animationImportErrors: 
     animationImportWarnings: "\nClip 'Scene' has import animation warnings that might
       lower retargeting quality:\nNote: Activate translation DOF on avatar to improve
-      retargeting quality.\n\t'DEF-upper_arm.L' has scale animation that will be
-      discarded.\n\t'DEF-upper_arm.L.001' is inbetween humanoid transforms and has
-      rotation animation that will be discarded.\n\t'DEF-forearm.L' has scale animation
-      that will be discarded.\n\t'DEF-forearm.L.001' is inbetween humanoid transforms
-      and has rotation animation that will be discarded.\n\t'DEF-hand.L' has scale
-      animation that will be discarded.\n\t'DEF-upper_arm.R' has scale animation
-      that will be discarded.\n\t'DEF-upper_arm.R.001' is inbetween humanoid transforms
-      and has rotation animation that will be discarded.\n\t'DEF-forearm.R' has scale
-      animation that will be discarded.\n\t'DEF-forearm.R.001' is inbetween humanoid
-      transforms and has rotation animation that will be discarded.\n\t'DEF-hand.R'
-      has scale animation that will be discarded.\n\t'DEF-thigh.L' has scale animation
-      that will be discarded.\n\t'DEF-thigh.L.001' is inbetween humanoid transforms
-      and has rotation animation that will be discarded.\n\t'DEF-shin.L' has scale
-      animation that will be discarded.\n\t'DEF-shin.L.001' is inbetween humanoid
-      transforms and has rotation animation that will be discarded.\n\t'DEF-foot.L'
+      retargeting quality.\n\t'DEF-upper_arm.L.001' is inbetween humanoid transforms
+      and has rotation animation that will be discarded.\n\t'DEF-upper_arm.R.001'
+      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'DEF-thigh.L'
+      has scale animation that will be discarded.\n\t'DEF-thigh.L.001' is inbetween
+      humanoid transforms and has rotation animation that will be discarded.\n\t'DEF-shin.L'
+      has scale animation that will be discarded.\n\t'DEF-shin.L.001' is inbetween
+      humanoid transforms and has rotation animation that will be discarded.\n\t'DEF-foot.L'
       has scale animation that will be discarded.\n\t'DEF-toe.L' has scale animation
       that will be discarded.\n\t'DEF-thigh.R' has scale animation that will be discarded.\n\t'DEF-thigh.R.001'
       is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'DEF-shin.R'
@@ -54,11 +46,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: HeavyAttk
+      name: Scene
       takeName: Scene
       internalID: -623603649343465320
       firstFrame: 1
-      lastFrame: 48
+      lastFrame: 45
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -67,80 +59,17 @@ ModelImporter:
       hasAdditiveReferencePose: 0
       loopTime: 0
       loopBlend: 0
-      loopBlendOrientation: 1
+      loopBlendOrientation: 0
       loopBlendPositionY: 1
       loopBlendPositionXZ: 0
       keepOriginalOrientation: 0
       keepOriginalPositionY: 1
-      keepOriginalPositionXZ: 1
+      keepOriginalPositionXZ: 0
       heightFromFeet: 0
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
-      events:
-      - time: 0.29032257
-        functionName: StartChargeClientRpc
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.3753754
-        functionName: ChargeAttackSFX
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0.3
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.67037034
-        functionName: TriggerRightHandDamage
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0.3
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.84930384
-        functionName: NoSoundHeavySFX
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0.3
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.9483323
-        functionName: EndHeavyAttack
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.99050635
-        functionName: EnableMove
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.9041096
-        functionName: StopCharge
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.77168953
-        functionName: ResetTrails
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.98994976
-        functionName: ResetState
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
+      events: []
       transformMask: []
       maskType: 3
       maskSource: {instanceID: 0}

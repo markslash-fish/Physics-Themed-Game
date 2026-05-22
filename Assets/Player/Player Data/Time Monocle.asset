@@ -22,7 +22,7 @@ MonoBehaviour:
   attackBonus: 4
   defenseBonus: 0
   healthBonus: 16
-  staminaBonus: 0
+  staminaBonus: 2
   speedBonus: 2
   senseBonus: 0.4
   cooldownReductionBonus: 0

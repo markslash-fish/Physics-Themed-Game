@@ -331,7 +331,7 @@ void ShowHPBar()
     {
         enemyCurrentStamina.Value = enemyMaxStamina;
         animationController.RecoverExhaust();
-        stateHandler.CurrentState = EnemyStateHandler.EnemyState.IsStrafing;
+      
         
     }
   
