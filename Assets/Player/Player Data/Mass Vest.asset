@@ -18,7 +18,7 @@ MonoBehaviour:
   equipmentType: 1
   animTrigger: isMassSkill
   skillCooldown: 10
-  baseDamage: 25
+  baseDamage: 12
   attackBonus: 6
   defenseBonus: 36
   healthBonus: 30

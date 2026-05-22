@@ -5358,6 +5358,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+--- !u!114 &5896761423301507408 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5588712859600902827, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+  m_PrefabInstance: {fileID: 2043114679537476603}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!114 &6035712910883991434 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5735810283084778609, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
@@ -5386,6 +5397,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24982f39c056c9a4bb93cc8e474cf2c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealthUI
+  player: {fileID: 2873737067603535493}
   healthImage: {fileID: 6035712910883991434}
   damageImage: {fileID: 4157861522041233720}
   healImage: {fileID: 8055045120692229376}
@@ -5393,6 +5405,7 @@ MonoBehaviour:
   delay: 0.4
   damageSpeed: 2
   healSpeed: 2
+  potionCounter: {fileID: 5896761423301507408}
 --- !u!224 &6778172974258392318 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4776755224543276805, guid: 832b3a54a0c6957408e19860449d945e, type: 3}

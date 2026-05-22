@@ -18,7 +18,7 @@ MonoBehaviour:
   equipmentType: 2
   animTrigger: isForceSkill
   skillCooldown: 10
-  baseDamage: 25
+  baseDamage: 20
   attackBonus: 12
   defenseBonus: 8
   healthBonus: 22

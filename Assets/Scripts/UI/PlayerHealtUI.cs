@@ -2,14 +2,16 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using Unity.Netcode;
+using TMPro;
 
 public class PlayerHealthUI : MonoBehaviour
 {
+    [Header("Reference")]
+    [SerializeField] private Player player;
     [Header("Health UI")]
     public Image healthImage;
     public Image damageImage;
     public Image healImage;
-
     [Header("Stamina UI")]
     public Image staminaImage;
 
@@ -17,10 +19,17 @@ public class PlayerHealthUI : MonoBehaviour
     public float damageSpeed = 2f;
     public float healSpeed = 2f;
 
+    [Header("Potion Count")]
+    public TMP_Text potionCounter;
+
+
     Coroutine damageRoutine;
     Coroutine healRoutine;
 
-    // HEALTH SYSTEM
+    private void Update()
+    {
+        potionCounter.SetText(player.currentPotionCount.ToString());
+    }
     public void SetHealth(float current, float max)
     {
         float target = current / max;

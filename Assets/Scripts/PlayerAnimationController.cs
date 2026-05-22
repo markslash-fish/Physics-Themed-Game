@@ -173,12 +173,7 @@ public class PlayerAnimationController : NetworkBehaviour
         if (player.isBlocking && player.playerState == Player.PlayerState.IsBlocking) return;
         if (player.playerState == Player.PlayerState.IsDodging) return;
 
-        anim.ResetTrigger("HeavyAttack");
-        anim.ResetTrigger("jumpTrigger");
-        anim.ResetTrigger("Heal");
-        anim.ResetTrigger("Dodge");
-        anim.SetInteger("LightAttack", 0);
-        anim.SetBool("isAttacking", false);
+        anim.ResetControllerState();
         if (anim.GetCurrentAnimatorStateInfo(1).IsName("Player_Exhaust"))
         {
             anim.ResetTrigger("HeavyHit");
