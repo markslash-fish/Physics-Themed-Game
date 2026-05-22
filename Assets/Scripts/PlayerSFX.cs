@@ -14,11 +14,17 @@ public class PlayerSoundFX : NetworkBehaviour
     public AudioClip RattackSFX;
     public AudioClip heavyAttackSFX;
     public AudioClip chargeAttackSFX;
+    public AudioClip noTargetAttackSFX;
+    public AudioClip noSoundHeavySFX;
 
     [Header("Movement")]
     public AudioClip jumpSFX;
     public AudioClip landingSFX;
     public AudioClip dashSFX;
+
+    [Header("Heal")]
+    public AudioClip drinkSFX;
+    public AudioClip popSFX;
 
     // =========================
     // GENERIC PLAY
@@ -211,4 +217,95 @@ public class PlayerSoundFX : NetworkBehaviour
 
         LandServerRpc();
     }
+        // =========================
+    // No Target
+    // =========================
+
+    [ServerRpc]
+    void NoTargetServerRpc()
+    {
+        NoTargetClientRpc();
+    }
+
+    [ClientRpc]
+    void NoTargetClientRpc()
+    {
+        PlayClip(noTargetAttackSFX);
+    }
+
+    public void NoTargetSFX()
+    {
+        if (!IsOwner) return;
+
+        NoTargetServerRpc();
+    }
+    
+    // =========================
+    // No Sound Heavy Attack
+    // =========================
+
+    [ServerRpc]
+    void noSoundHeavyServerRpc()
+    {
+        noSoundHeavyClientRpc();
+    }
+
+    [ClientRpc]
+    void noSoundHeavyClientRpc()
+    {
+        PlayClip(noSoundHeavySFX);
+    }
+
+    public void NoSoundHeavySFX()
+    {
+        if (!IsOwner) return;
+
+        noSoundHeavyServerRpc();
+    }
+    // =========================
+    // Drink Potion
+    // =========================
+
+    [ServerRpc]
+    void drinkPotionServerRpc()
+    {
+        drinkPotionClientRpc();
+    }
+
+    [ClientRpc]
+    void drinkPotionClientRpc()
+    {
+        PlayClip(drinkSFX);
+    }
+
+    public void drinkPotionSFX()
+    {
+        if (!IsOwner) return;
+
+        drinkPotionServerRpc();
+    }
+    // =========================
+    // Pop Potion
+    // =========================
+
+    [ServerRpc]
+    void popPotionServerRpc()
+    {
+        popPotionClientRpc();
+    }
+
+    [ClientRpc]
+    void popPotionClientRpc()
+    {
+        PlayClip(popSFX);
+    }
+
+    public void popPotionSFX()
+    {
+        if (!IsOwner) return;
+
+        popPotionServerRpc();
+    }
+    
+
 }

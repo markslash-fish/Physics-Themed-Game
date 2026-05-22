@@ -1520,7 +1520,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 3363441167
+  GlobalObjectIdHash: 3558390827
   InScenePlacedSourceGlobalObjectIdHash: 568711568
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1780,8 +1780,10 @@ MonoBehaviour:
   playerBaseSense: 0
   playerDamage: 0
   skillTrigger: 
-  potionCount: 0
+  currentPotionCount: 0
+  maxPotionCount: 0
   stateCam: {fileID: 0}
+  playerHUD: {fileID: 0}
   IsReadySynced:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -1943,6 +1945,10 @@ MonoBehaviour:
       NameHash: 1125312739
       Synchronize: 1
       ParameterType: 1
+    - name: isDead
+      NameHash: 1276664872
+      Synchronize: 1
+      ParameterType: 9
   AnimatorParametersExpanded: 0
 --- !u!114 &8276390161162897293
 MonoBehaviour:

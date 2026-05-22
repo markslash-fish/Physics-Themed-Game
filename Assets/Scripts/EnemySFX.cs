@@ -13,6 +13,9 @@ public class EnemySFX : NetworkBehaviour
     public AudioClip BLattackSFX;
     public AudioClip BRattackSFX;
 
+        [Header("Dash")]
+    public AudioClip dashSFX;
+
 
     public AudioClip crossAttackSFX;
     public AudioClip trustAttackSFX;
@@ -105,6 +108,24 @@ public class EnemySFX : NetworkBehaviour
     {
         if(!IsOwner) return;
         TrustAttackServerRpc();
+    }
+
+            //Dash
+    [ServerRpc]
+    void DashServerRpc()
+    {
+        DashClientRpc();
+    }
+    [ClientRpc]
+    void DashClientRpc()
+    {
+        PlayClip(dashSFX);
+    }
+    
+    public void DashSFX()
+    {
+        if(!IsOwner) return;
+        DashServerRpc();
     }
 
 

@@ -4,7 +4,9 @@ using Unity.Netcode;
 using UnityEngine;
 
 public class EnemyAttackHitboxScript : NetworkBehaviour
-{
+{      
+    PlayerVfx vfx;
+    PlayerSoundFX sfx;
     public List<Collider> ignoredColliders = new List<Collider>();
     [SerializeField] EnemyAI enemyAI = null;
     [SerializeField] Player player = null;
@@ -19,7 +21,9 @@ public class EnemyAttackHitboxScript : NetworkBehaviour
     {
         // Using components in parent, but safely checking them later depending on hitBoxType
         enemyAI = GetComponentInParent<EnemyAI>();
+
         player = GetComponentInParent<Player>();
+        vfx = GetComponentInParent<PlayerVfx>();
     }
 
     void Start()
@@ -34,6 +38,7 @@ public class EnemyAttackHitboxScript : NetworkBehaviour
             targetTag = "Player";
             targetMask = playerMask;
         }
+        sfx = GetComponentInParent<PlayerSoundFX>();
     }
 
     // FIX 1: Allow the Owner (Player 2 client, or Host enemy) to start the coroutine locally
@@ -69,7 +74,7 @@ public class EnemyAttackHitboxScript : NetworkBehaviour
         foreach (Collider entity in hitEntities)
         {
             // We verify the object is part of the Netcode network simulation
-            if (entity.TryGetComponent(out NetworkObject netObj))
+            if (entity.TryGetComponent(out IDamageable damageable))
             {
                 if (!ignoredColliders.Contains(entity))
                 {
@@ -77,44 +82,39 @@ public class EnemyAttackHitboxScript : NetworkBehaviour
                     Vector3 hitDir = (entity.transform.position - transform.parent.position).normalized;
                     hitDir.y = 0.15f;
 
-                    // FIX 3: Route the data to the server instead of executing locally on Player 2's machine
-                    RequestDamageServerRpc(netObj.NetworkObjectId, damage, hitDir);
 
-                    ignoredColliders.Add(entity);
-                    Debug.Log($"Hit registered locally by owner! Target NetID: {netObj.NetworkObjectId}");
+                       damageable.TakeDamage(damage, hitDir);
+
+                        ///SOUND Effect////
+                        if(hitBoxType == "Player")
+                        {
+                            sfx.LAttackSFX();
+                            vfx.PlayImpactLeft();
+                        }
+                        else
+                        {
+                            sfx.RAttackSFX();
+                            vfx.PlayImpactRight();
+                            
+                        }
+                        sfx.HeavyAttackSFX();
+                        vfx.ReleaseHeavy();
+
+                        ////VFX /////
+                        
+                        ignoredColliders.Add(entity);
+
+                    Debug.Log("AAAAAAAAAAAAA");
+                   }
+               
+                
                 }
             }
-        }
-    }
 
-    // FIX 4: Server RPC executes the actual damage logic globally across the server state
-    [ServerRpc]
-    private void RequestDamageServerRpc(ulong targetNetworkObjectId, int damage, Vector3 hitDir)
-    {
-        // Find the matching spawned object securely on the server context
-        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetNetworkObjectId, out NetworkObject targetNetObj))
-        {
-            if (targetNetObj.TryGetComponent(out IDamageable damageable))
-            {
-                // Apply health/shield logic on the server state
-                damageable.TakeDamage(damage, hitDir);
 
-                if (targetNetObj.CompareTag("Player"))
-                {
-                    Vector3 lookDir = -hitDir;
-                    lookDir.y = 0f;
-
-                    if (lookDir != Vector3.zero)
-                    {
-                        // Note: If you use ClientNetworkTransform on your player, 
-                        // you will want to handle this rotation inside a ClientRpc instead!
-                        targetNetObj.transform.rotation = Quaternion.LookRotation(lookDir);
-                    }
-                }
-            }
-        }
-    }
-
+        
+     }
+ 
     public void ResetIgnoredList()
     {
         ignoredColliders.Clear();

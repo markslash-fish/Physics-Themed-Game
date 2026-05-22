@@ -579,7 +579,7 @@ MonoBehaviour:
   enemyAI: {fileID: 0}
   player: {fileID: 2873737067603535493}
   attackPointOffset: {x: 0, y: 0, z: 0}
-  attackRange: 2.1
+  attackRange: 2
   targetTag: 
   hitBoxType: Player
   targetMask:
@@ -2280,7 +2280,7 @@ MonoBehaviour:
   enemyAI: {fileID: 0}
   player: {fileID: 2873737067603535493}
   attackPointOffset: {x: 0, y: 0, z: 0}
-  attackRange: 2.1
+  attackRange: 2
   targetTag: 
   hitBoxType: Player
   targetMask:
@@ -3075,8 +3075,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6167484466743613674}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.0069110356, y: 0.9381364, z: -0.018755307, w: -0.34568852}
-  m_LocalPosition: {x: 0.90120184, y: 0.805556, z: 1.0568111}
+  m_LocalRotation: {x: 0.085783646, y: -0.37661314, z: 0.035050903, w: 0.921724}
+  m_LocalPosition: {x: 1.2595935, y: 1.0877308, z: -1.2840335}
   m_LocalScale: {x: 0.5555556, y: 0.55555564, z: 0.55555564}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3159,7 +3159,7 @@ MonoBehaviour:
     SplineCurvature: 0.5
   RecenteringTarget: 2
   HorizontalAxis:
-    Value: -139.54388
+    Value: -44.449493
     Center: 0
     Range: {x: -180, y: 180}
     Wrap: 1
@@ -3169,7 +3169,7 @@ MonoBehaviour:
       Time: 2
     Restrictions: 0
   VerticalAxis:
-    Value: -10
+    Value: -0.6122006
     Center: 17.5
     Range: {x: -10, y: 45}
     Wrap: 0
@@ -3368,7 +3368,6 @@ GameObject:
   - component: {fileID: 7283492180231401998}
   - component: {fileID: 6188842549224692989}
   - component: {fileID: 9214761043581794811}
-  - component: {fileID: 3156551160829568723}
   - component: {fileID: 2873737067603535493}
   - component: {fileID: 5780384627574921872}
   - component: {fileID: 3346526419801248037}
@@ -3382,6 +3381,7 @@ GameObject:
   - component: {fileID: 8196634419083182311}
   - component: {fileID: 6620910185433933449}
   - component: {fileID: 2060449404602136921}
+  - component: {fileID: 3156551160829568723}
   - component: {fileID: 7385745744713372365}
   m_Layer: 7
   m_Name: PlayerBaseFixed
@@ -3453,7 +3453,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1764149282
+  GlobalObjectIdHash: 1738339513
   InScenePlacedSourceGlobalObjectIdHash: 3174027574
   DeferredDespawnTick: 0
   Ownership: 1
@@ -3466,41 +3466,6 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!114 &3156551160829568723
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6352987617116327525}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 672847772a1938e4e8f6960dcb93fe59, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerVfx
-  ShowTopMostFoldoutHeaderGroup: 1
-  chargeVFX: {fileID: 8011998094573082391, guid: 6dda45fbc7f7e9e43b34acbb493133e9, type: 3}
-  heavyBurstVFX: {fileID: 7932645971135791481, guid: 5bd9989ac09c9c44db7b1c809ed3be81, type: 3}
-  impactVFX: {fileID: 2196197084933303326, guid: 8ff6649ae286c0040af812e58c8604ed, type: 3}
-  handPoint: {fileID: 723728517810505955}
-  rightHandPoint: {fileID: 723728517810505955}
-  leftTrail: {fileID: 9215612684284571420}
-  rightTrail: {fileID: 3464931634088783938}
-  leftPoint: {fileID: 5690876048433150161}
-  rightPoint: {fileID: 723728517810505955}
-  leftSwingVFX: {fileID: 4027079200475401466, guid: 2b149bce795244949828f3a86efe554d, type: 3}
-  rightSwingVFX: {fileID: 4023490492631638675, guid: 97d01797e8e2bdd47b66753a4439d800, type: 3}
-  jumpVFX: {fileID: 6764984069707642957, guid: 4f335530c56311644b07005554270f7d, type: 3}
-  jumpLandVFX: {fileID: 6764984069707642957, guid: 528e7174b6745eb4489eab644d120a9d, type: 3}
-  jumpPoint: {fileID: 2433977268925119198}
-  jumpTrail: {fileID: 7174379236638843650, guid: de048f9fd40faf749b336fe67864aea2, type: 3}
-  walkVFX: {fileID: 6764984069707642957, guid: c5cbbf6e65389b546b97073cb996e344, type: 3}
-  leftFootPoint: {fileID: 8682492837454213008}
-  rightFootPoint: {fileID: 5916745693152536854}
-  healGlowVFX: {fileID: 700847064048384398, guid: 9214528e8c847804e81b6c01019d115d, type: 3}
-  healVFX: {fileID: 440489671753973126, guid: 7f4d3c83d9ff823479c503fbd3140651, type: 3}
-  healVfxPoint: {fileID: 1014752396212338250}
-  animator: {fileID: 4986775403615611231, guid: 474c954e2f5291747940fc67aef7bfbe, type: 3}
 --- !u!114 &2873737067603535493
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3522,7 +3487,7 @@ MonoBehaviour:
   animationController: {fileID: 0}
   cameraTransform: {fileID: 1017288822997136610}
   groundCheck: {fileID: 2819344902670104981}
-  dodgeForce: 14
+  dodgeForce: 16
   isBlocking: 0
   isDodging: 0
   jumpHeight: 2
@@ -3593,7 +3558,7 @@ MonoBehaviour:
   inputReader: {fileID: 3346526419801248037}
   potionObject: {fileID: 5276104369471452875}
   emptyPotionObject: {fileID: 510181105399325352, guid: 1343b194a616ab9419b399bc4feff8ae, type: 3}
-  throwForce: 7
+  throwForce: 20
 --- !u!114 &3346526419801248037
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3776,6 +3741,13 @@ MonoBehaviour:
     TriggerNameHash: -2141573296
     TransitionIndex: 0
   - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: 1353639306
+    DestinationState: 1748754976
+    TransitionDuration: 0.25
+    TriggerNameHash: -329449596
+    TransitionIndex: 0
+  - IsCrossFadeExit: 0
     Layer: 3
     OriginatingState: -499022955
     DestinationState: 152752528
@@ -3848,6 +3820,22 @@ MonoBehaviour:
       NameHash: 973584577
       Synchronize: 1
       ParameterType: 4
+    - name: isForceSkill
+      NameHash: -329449596
+      Synchronize: 1
+      ParameterType: 9
+    - name: isTimeSkill
+      NameHash: 1459356546
+      Synchronize: 1
+      ParameterType: 9
+    - name: isSpeedSkill
+      NameHash: -2142181851
+      Synchronize: 1
+      ParameterType: 9
+    - name: isMassSkill
+      NameHash: 1729423880
+      Synchronize: 1
+      ParameterType: 9
   AnimatorParametersExpanded: 0
 --- !u!114 &7412974830409730787
 MonoBehaviour:
@@ -4004,7 +3992,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.472
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -4088,6 +4076,41 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &3156551160829568723
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6352987617116327525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 672847772a1938e4e8f6960dcb93fe59, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerVfx
+  ShowTopMostFoldoutHeaderGroup: 1
+  chargeVFX: {fileID: 8011998094573082391, guid: 6dda45fbc7f7e9e43b34acbb493133e9, type: 3}
+  heavyBurstVFX: {fileID: 7932645971135791481, guid: 5bd9989ac09c9c44db7b1c809ed3be81, type: 3}
+  impactVFX: {fileID: 2196197084933303326, guid: 8ff6649ae286c0040af812e58c8604ed, type: 3}
+  handPoint: {fileID: 723728517810505955}
+  rightHandPoint: {fileID: 723728517810505955}
+  leftTrail: {fileID: 9215612684284571420}
+  rightTrail: {fileID: 3464931634088783938}
+  leftPoint: {fileID: 5690876048433150161}
+  rightPoint: {fileID: 723728517810505955}
+  leftSwingVFX: {fileID: 4027079200475401466, guid: 2b149bce795244949828f3a86efe554d, type: 3}
+  rightSwingVFX: {fileID: 4023490492631638675, guid: 97d01797e8e2bdd47b66753a4439d800, type: 3}
+  jumpVFX: {fileID: 6764984069707642957, guid: 4f335530c56311644b07005554270f7d, type: 3}
+  jumpLandVFX: {fileID: 6764984069707642957, guid: 528e7174b6745eb4489eab644d120a9d, type: 3}
+  jumpPoint: {fileID: 2433977268925119198}
+  jumpTrail: {fileID: 7174379236638843650, guid: de048f9fd40faf749b336fe67864aea2, type: 3}
+  walkVFX: {fileID: 6764984069707642957, guid: c5cbbf6e65389b546b97073cb996e344, type: 3}
+  leftFootPoint: {fileID: 8682492837454213008}
+  rightFootPoint: {fileID: 5916745693152536854}
+  healGlowVFX: {fileID: 700847064048384398, guid: 9214528e8c847804e81b6c01019d115d, type: 3}
+  healVFX: {fileID: 440489671753973126, guid: 7f4d3c83d9ff823479c503fbd3140651, type: 3}
+  healVfxPoint: {fileID: 1014752396212338250}
+  animator: {fileID: 4986775403615611231, guid: 474c954e2f5291747940fc67aef7bfbe, type: 3}
 --- !u!114 &7385745744713372365
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4112,9 +4135,13 @@ MonoBehaviour:
   RattackSFX: {fileID: 8300000, guid: b446f649094e7f34bb01fe57cc247f12, type: 3}
   heavyAttackSFX: {fileID: 8300000, guid: b43a1187f2d3ebd4eb3710ba66596913, type: 3}
   chargeAttackSFX: {fileID: 8300000, guid: 96070b5f271018a4a80b47522e285fbf, type: 3}
+  noTargetAttackSFX: {fileID: 8300000, guid: 4eec304d9de4b374197a0d501289a2f4, type: 3}
+  noSoundHeavySFX: {fileID: 8300000, guid: 26b7115d3be08e04e83a5bf5383759b8, type: 3}
   jumpSFX: {fileID: 8300000, guid: bdf522fe742b4a749b008bae9cc670b1, type: 3}
   landingSFX: {fileID: 8300000, guid: d630b719c95233e4699139899141110f, type: 3}
   dashSFX: {fileID: 8300000, guid: 98f4639e2d6d4194c8dd91ff68bbd3e8, type: 3}
+  drinkSFX: {fileID: 8300000, guid: 0288941bbf476d7429046c649b4231bd, type: 3}
+  popSFX: {fileID: 8300000, guid: 5b2f6bb3b54c9ba4b80b6ea7a8b8e20d, type: 3}
 --- !u!1 &6610172632585228828
 GameObject:
   m_ObjectHideFlags: 0
