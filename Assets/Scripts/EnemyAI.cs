@@ -139,6 +139,7 @@ public class EnemyAI : NetworkBehaviour, IDamageable
         if (!IsServer) return;
         if (newState == EnemyStateHandler.EnemyState.OnDeath)
         {
+            animationController.PlayDead();
             StartCoroutine(PlayDeath());
             navMeshAgent.isStopped = true;
             navMeshAgent.updatePosition = false;
@@ -212,6 +213,7 @@ public class EnemyAI : NetworkBehaviour, IDamageable
         ShowHPBar();
         foreach (Collider  player in playersHit)
         {
+          
             Vector3 directionToPlayer = (player.transform.position - transform.position);
             var deadPlayer = player.GetComponent<Player>();
             if (deadPlayer.playerState == Player.PlayerState.IsDead) return;
@@ -243,7 +245,7 @@ public class EnemyAI : NetworkBehaviour, IDamageable
 
         int healthDamage = (damage * damage) / (damage + enemyDefense);
         enemyCurrentHealth.Value -= healthDamage;
-
+        if (stateHandler.CurrentState == EnemyStateHandler.EnemyState.OnDeath) return;
         if (enemyCurrentHealth.Value <= 0)
         {
             stateHandler.CurrentState = EnemyStateHandler.EnemyState.OnDeath;
@@ -360,7 +362,7 @@ void ShowHPBar()
     }
     private IEnumerator PlayDeath()
     {
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(5.5f);
         GetComponent<NetworkObject>().Despawn();
     }
 

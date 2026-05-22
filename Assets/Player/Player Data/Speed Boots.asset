@@ -18,7 +18,7 @@ MonoBehaviour:
   equipmentType: 3
   animTrigger: isSpeedSkill
   skillCooldown: 7
-  baseDamage: 25
+  baseDamage: 0
   attackBonus: 6
   defenseBonus: 3
   healthBonus: 9

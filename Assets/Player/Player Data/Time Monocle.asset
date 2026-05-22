@@ -17,7 +17,7 @@ MonoBehaviour:
   itemPrefab2: {fileID: 0}
   equipmentType: 0
   animTrigger: isTimeSkill
-  skillCooldown: 30
+  skillCooldown: 180
   baseDamage: 0
   attackBonus: 4
   defenseBonus: 0

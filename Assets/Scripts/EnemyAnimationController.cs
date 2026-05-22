@@ -57,6 +57,10 @@ public class EnemyAnimationController : NetworkBehaviour
     {
     animator.SetBool("isExhausted", true);     
     }
+    public void PlayDead()
+    {
+        animator.SetTrigger("isDead");
+    }
     public void RecoverExhaust()
     {
         animator.SetBool("isExhausted", false);

@@ -11,7 +11,7 @@ public class Player : NetworkBehaviour, IDamageable
     public float ghostSpawnDelay = 0.05f;
     float ghostTimer = 0f;
 
-    public enum PlayerState { None, IsJumping, IsDodging, IsAttacking, IsBlocking, IsHealing, IsHurt, IsExhausted, IsDead }
+    public enum PlayerState { None, IsJumping, IsDodging, IsAttacking, IsBlocking, IsHealing, IsHurt, IsExhausted, IsDead, }
     public PlayerState playerState;
 
     public bool isBusy => playerState != PlayerState.None;
@@ -87,6 +87,7 @@ public class Player : NetworkBehaviour, IDamageable
     public CinemachineStateDrivenCamera stateCam;
     public GameObject playerHUD;
     public float skillCooldown;
+    public bool skillInCooldown;
     public NetworkVariable<bool> IsReadySynced = new NetworkVariable<bool>(false,
          NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
@@ -97,6 +98,7 @@ public class Player : NetworkBehaviour, IDamageable
     
     public override void OnNetworkSpawn()
     {
+        healValue = 45;
         GameManager.Instance.LockCursor();
         jumpHeight = 2.2f;
         baseWalkSpeed = 4f;
@@ -567,7 +569,7 @@ public class Player : NetworkBehaviour, IDamageable
         // ==========================================
         int baseDamage = UnityEngine.Random.Range(playerBaseMinAP, playerBaseMaxAP);
         heavyDamage = baseDamage * 3;
-
+        playerDamage = heavyDamage;
         playerState = PlayerState.IsAttacking;
         isHeavyAttacking = true;
         comboTimer = 0f; // Clear combo tracker time arrays safely
@@ -577,8 +579,10 @@ public class Player : NetworkBehaviour, IDamageable
     }
     public void PlayerUniqueSkill()
     {
-        
+        if (skillInCooldown) return;
         animationController.PlaySkill(skillTrigger);
+        StartCoroutine(StartSkillCooldown());
+        playerDamage = (UnityEngine.Random.Range(playerBaseMinAP, playerBaseMaxAP) + uniqueSkillDamage);
         if(skillTrigger == "isSpeedSkill")
         {
             if (!IsOwner) return;
@@ -717,7 +721,7 @@ public class Player : NetworkBehaviour, IDamageable
     
        
         int healthDamage = (damage * damage) / (damage + playerBaseDefense);
-        int staminaDamage = (healthDamage * (5/2));
+        int staminaDamage = Mathf.RoundToInt(healthDamage * (5f / 2f));
         float knockbackForce = (anim.GetCurrentAnimatorStateInfo(1).IsName("Player_Exhaust"))? 16f: 5.5f;
         ResetCombo();
         ApplyKnockbackClientRpc(knockbackForce, hitDir);
@@ -727,7 +731,7 @@ public class Player : NetworkBehaviour, IDamageable
             isHeavyAttacking = false; // Turn off the flag immediately
             canMove = true;           // Restore movement authorization tracking
                                       // Set state to hurt so Update() loop stops locking down raw input maps
-            playerState = PlayerState.IsHurt;
+            
         }
         if (playerState == PlayerState.IsBlocking && isBlocking)
         {
@@ -743,6 +747,8 @@ public class Player : NetworkBehaviour, IDamageable
             return;
 
         }
+        playerState = PlayerState.IsHurt;
+
         playerBaseCurrentHealth.Value -= healthDamage;
 
     
@@ -808,7 +814,7 @@ public class Player : NetworkBehaviour, IDamageable
     }
     void HealPlayer()
     {
-        healValue = 45;
+        healValue *= 2;
         int damageToHealth = playerBaseMaxHealth - playerBaseCurrentHealth.Value;
         playerBaseCurrentHealth.Value += healValue;
         if(healValue > damageToHealth)
@@ -816,6 +822,21 @@ public class Player : NetworkBehaviour, IDamageable
             playerBaseCurrentHealth.Value = playerBaseMaxHealth;
         }
 
+    }
+    void TriggerTimeSkillEffects()
+    {
+        healValue *= 2;
+        int damageToHealth = playerBaseMaxHealth - playerBaseCurrentHealth.Value;
+        playerBaseCurrentHealth.Value += healValue;
+        if (healValue > damageToHealth)
+        {
+            playerBaseCurrentHealth.Value = playerBaseMaxHealth;
+        }
+        if(currentPotionCount <= maxPotionCount)
+        {
+            currentPotionCount += 1;
+        }
+        
     }
     void SetPlayerDeath()
     {
@@ -874,5 +895,18 @@ void SpawnGhostClientRpc(Vector3 pos, Quaternion rot)
         {
             hitbox.StartDamageWindow(duration);
         }
+    }
+    private IEnumerator StartSkillCooldown()
+    {
+       
+        
+            skillInCooldown = true;
+
+            yield return new WaitForSeconds(skillCooldown);
+
+            skillInCooldown = false;
+
+            Debug.Log("Skill ready!");
+        
     }
 }   

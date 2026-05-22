@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using Unity.AppUI.UI;
 using Unity.Netcode;
@@ -11,6 +12,7 @@ public class NetworkUIManager : MonoBehaviour
     [SerializeField] private UnityEngine.UI.Button hostButton;
     [SerializeField] private UnityEngine.UI.Button startButton;
     [SerializeField] private UnityEngine.UI.Button joinButton;
+    [SerializeField] private GameObject blackScreen;
     [SerializeField] private TMP_InputField portInputField;
     [SerializeField] private TMP_Text portText;
 
@@ -19,7 +21,7 @@ public class NetworkUIManager : MonoBehaviour
     {
         hostButton.onClick.AddListener(HostButtonOnClick);
 
-        startButton.onClick.AddListener(StartGame);
+        startButton.onClick.AddListener(StartFadeIn);
         joinButton.onClick.AddListener(JoinGame);
     }
 
@@ -49,8 +51,15 @@ public class NetworkUIManager : MonoBehaviour
     }
   
     
+    public void StartFadeIn()
+    {
+        StartCoroutine(StartDelay());
+        blackScreen.GetComponent<Animator>().SetBool("isFade", false);
+
+    }
     public void StartGame()
     {
+      
         NetworkManager.Singleton.SceneManager.LoadScene("Main Game", UnityEngine.SceneManagement.LoadSceneMode.Single);
     }
     public void JoinGame()
@@ -85,5 +94,10 @@ public class NetworkUIManager : MonoBehaviour
             // 3. Optional: Clear local references if needed
             Debug.Log("Network Shutdown successful.");
         }
+    }
+    private IEnumerator StartDelay()
+    {
+        yield return new WaitForSeconds(6f);
+        StartGame();
     }
 }
