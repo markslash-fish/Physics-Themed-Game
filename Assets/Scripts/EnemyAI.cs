@@ -116,7 +116,6 @@ public class EnemyAI : NetworkBehaviour, IDamageable
     {
         if (!IsServer) return;
 
-     
         if (targetPlayer == null) return;
 
         CalculateDistancefromPlayer();
@@ -127,11 +126,7 @@ public class EnemyAI : NetworkBehaviour, IDamageable
             ResetEnemyRotation();
         }
         var playerDead = targetPlayer.gameObject.GetComponent<Player>();
-        if (playerDead.playerState == Player.PlayerState.IsDead)
-        {
-            targetPlayer = null;
-            return;
-        }
+        
 
     }
     private void OnStateChanged(EnemyStateHandler.EnemyState oldState, EnemyStateHandler.EnemyState newState)
@@ -216,7 +211,6 @@ public class EnemyAI : NetworkBehaviour, IDamageable
           
             Vector3 directionToPlayer = (player.transform.position - transform.position);
             var deadPlayer = player.GetComponent<Player>();
-            if (deadPlayer.playerState == Player.PlayerState.IsDead) return;
             float distance = directionToPlayer.sqrMagnitude;
             if (distance < closestPlayer)
             {

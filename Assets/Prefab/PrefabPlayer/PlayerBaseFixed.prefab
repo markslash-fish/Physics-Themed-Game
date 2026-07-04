@@ -579,7 +579,7 @@ MonoBehaviour:
   enemyAI: {fileID: 0}
   player: {fileID: 2873737067603535493}
   attackPointOffset: {x: 0, y: 0, z: 0}
-  attackRange: 2
+  attackRange: 2.2
   targetTag: 
   hitBoxType: Player
   targetMask:
@@ -714,6 +714,7 @@ GameObject:
   - component: {fileID: 8099749426557078541}
   - component: {fileID: 2998417388948116023}
   - component: {fileID: 2319752275024751955}
+  - component: {fileID: 1291206793204350596}
   m_Layer: 7
   m_Name: Lock-On Camera
   m_TagString: Untagged
@@ -855,6 +856,36 @@ MonoBehaviour:
   FovRange: {x: 1, y: 100}
   DollyRange: {x: -180, y: 180}
   OrthoSizeRange: {x: 1, y: 1000}
+--- !u!114 &1291206793204350596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2002699538466746812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca7de3aefa901374ba29464584a3109a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineDecollider
+  CameraRadius: 0.4
+  Decollision:
+    Enabled: 0
+    ObstacleLayers:
+      serializedVersion: 2
+      m_Bits: 1
+    UseFollowTarget:
+      Enabled: 0
+      YOffset: 0
+    Damping: 0.5
+    SmoothingTime: 0
+  TerrainResolution:
+    Enabled: 1
+    TerrainLayers:
+      serializedVersion: 2
+      m_Bits: 1
+    MaximumRaycast: 10
+    Damping: 0.5
 --- !u!1 &2028228223976744879
 GameObject:
   m_ObjectHideFlags: 0
@@ -2280,7 +2311,7 @@ MonoBehaviour:
   enemyAI: {fileID: 0}
   player: {fileID: 2873737067603535493}
   attackPointOffset: {x: 0, y: 0, z: 0}
-  attackRange: 2
+  attackRange: 2.2
   targetTag: 
   hitBoxType: Player
   targetMask:
@@ -3060,6 +3091,7 @@ GameObject:
   - component: {fileID: 4289760637920620772}
   - component: {fileID: 5417362707246247487}
   - component: {fileID: 9213458688395396791}
+  - component: {fileID: 4955238117263413336}
   m_Layer: 0
   m_Name: Third Person Camera
   m_TagString: Untagged
@@ -3075,8 +3107,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6167484466743613674}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.048438977, y: -0.18666577, z: 0.009215282, w: 0.9811853}
-  m_LocalPosition: {x: 0.5694424, y: 0.9034904, z: -1.4424345}
+  m_LocalRotation: {x: 0.0979806, y: 0.8272711, z: -0.53177905, w: 0.15242518}
+  m_LocalPosition: {x: -0.44270518, y: 3.471462, z: 1.1605835}
   m_LocalScale: {x: 0.5555556, y: 0.55555564, z: 0.55555564}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3159,7 +3191,7 @@ MonoBehaviour:
     SplineCurvature: 0.5
   RecenteringTarget: 2
   HorizontalAxis:
-    Value: -21.543047
+    Value: 159.04643
     Center: 0
     Range: {x: -180, y: 180}
     Wrap: 1
@@ -3169,7 +3201,7 @@ MonoBehaviour:
       Time: 2
     Restrictions: 0
   VerticalAxis:
-    Value: -6.2637424
+    Value: 42.2285
     Center: 17.5
     Range: {x: -10, y: 45}
     Wrap: 0
@@ -3260,7 +3292,7 @@ MonoBehaviour:
         LegacyInput: 
         LegacyGain: 1
         CancelDeltaTime: 0
-      InputValue: 0
+      InputValue: -14.506423
       Driver:
         AccelTime: 0.2
         DecelTime: 0.2
@@ -3273,7 +3305,7 @@ MonoBehaviour:
         LegacyInput: 
         LegacyGain: 1
         CancelDeltaTime: 0
-      InputValue: -0
+      InputValue: -7.2532115
       Driver:
         AccelTime: 0.2
         DecelTime: 0.2
@@ -3292,6 +3324,36 @@ MonoBehaviour:
         DecelTime: 0
   PlayerIndex: -1
   AutoEnableInputs: 1
+--- !u!114 &4955238117263413336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6167484466743613674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca7de3aefa901374ba29464584a3109a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineDecollider
+  CameraRadius: 0.4
+  Decollision:
+    Enabled: 0
+    ObstacleLayers:
+      serializedVersion: 2
+      m_Bits: 1
+    UseFollowTarget:
+      Enabled: 0
+      YOffset: 0
+    Damping: 0.5
+    SmoothingTime: 0
+  TerrainResolution:
+    Enabled: 1
+    TerrainLayers:
+      serializedVersion: 2
+      m_Bits: 4294967295
+    MaximumRaycast: 10
+    Damping: 0.5
 --- !u!1 &6176815359530291697
 GameObject:
   m_ObjectHideFlags: 0
@@ -3536,6 +3598,7 @@ MonoBehaviour:
   playerHUD: {fileID: 6103312202448696634}
   skillCooldown: 0
   skillInCooldown: 0
+  cooldownTimer: 0
   IsReadySynced:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
@@ -3828,6 +3891,10 @@ MonoBehaviour:
       ParameterType: 9
     - name: isMassSkill
       NameHash: 1729423880
+      Synchronize: 1
+      ParameterType: 9
+    - name: Kneel
+      NameHash: 543860015
       Synchronize: 1
       ParameterType: 9
   AnimatorParametersExpanded: 0
@@ -5254,6 +5321,94 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7283492180231401998}
     m_Modifications:
+    - target: {fileID: 2578618961128850157, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 663
+      objectReference: {fileID: 0}
+    - target: {fileID: 2578618961128850157, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 630
+      objectReference: {fileID: 0}
+    - target: {fileID: 2578618961128850157, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.14380571
+      objectReference: {fileID: 0}
+    - target: {fileID: 2578618961128850157, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.15818627
+      objectReference: {fileID: 0}
+    - target: {fileID: 2578618961128850157, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.14380571
+      objectReference: {fileID: 0}
+    - target: {fileID: 2578618961128850157, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -503
+      objectReference: {fileID: 0}
+    - target: {fileID: 2578618961128850157, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -398
+      objectReference: {fileID: 0}
+    - target: {fileID: 3895777384684829096, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+      propertyPath: m_Type
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3895777384684829096, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+    - target: {fileID: 3895777384684829096, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+      propertyPath: m_Color.b
+      value: 0.23584908
+      objectReference: {fileID: 0}
+    - target: {fileID: 3895777384684829096, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+      propertyPath: m_Color.g
+      value: 0.23584908
+      objectReference: {fileID: 0}
+    - target: {fileID: 3895777384684829096, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+      propertyPath: m_Color.r
+      value: 0.23584908
+      objectReference: {fileID: 0}
+    - target: {fileID: 4351911733139989799, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+      propertyPath: m_text
+      value: skill ready
+      objectReference: {fileID: 0}
+    - target: {fileID: 4351911733139989799, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+      propertyPath: m_fontSize
+      value: 120
+      objectReference: {fileID: 0}
+    - target: {fileID: 4351911733139989799, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+      propertyPath: m_fontStyle
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4351911733139989799, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+      propertyPath: m_fontColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4351911733139989799, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+      propertyPath: m_fontColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4351911733139989799, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+      propertyPath: m_fontColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4351911733139989799, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 120
+      objectReference: {fileID: 0}
+    - target: {fileID: 4351911733139989799, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 4569691434504036276, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 600
+      objectReference: {fileID: 0}
+    - target: {fileID: 4569691434504036276, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 200
+      objectReference: {fileID: 0}
     - target: {fileID: 4776755224543276805, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -5346,6 +5501,17 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 3421542946798785364}
   m_SourcePrefab: {fileID: 100100000, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+--- !u!114 &2323718113723303644 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4351911733139989799, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
+  m_PrefabInstance: {fileID: 2043114679537476603}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!114 &4157861522041233720 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2731759726869070531, guid: 832b3a54a0c6957408e19860449d945e, type: 3}
@@ -5404,6 +5570,7 @@ MonoBehaviour:
   delay: 0.4
   damageSpeed: 2
   healSpeed: 2
+  cooldownText: {fileID: 2323718113723303644}
   potionCounter: {fileID: 5896761423301507408}
 --- !u!224 &6778172974258392318 stripped
 RectTransform:

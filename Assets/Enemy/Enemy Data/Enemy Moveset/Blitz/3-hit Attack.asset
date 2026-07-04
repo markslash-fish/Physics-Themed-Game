@@ -17,4 +17,4 @@ MonoBehaviour:
   maxRange: 5
   baseWeight: 45
   animTrigger: is3hit
-  cooldown: 2.7
+  cooldown: 5

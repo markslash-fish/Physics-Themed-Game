@@ -17,4 +17,4 @@ MonoBehaviour:
   maxRange: 6
   baseWeight: 45
   animTrigger: isLeapAttack
-  cooldown: 12
+  cooldown: 10

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CombatMove
   moveName: Long Crossed Slash
   minRange: 6
-  maxRange: 8.7
+  maxRange: 8
   baseWeight: 70
   animTrigger: isLongCrossSlash
-  cooldown: 6
+  cooldown: 12

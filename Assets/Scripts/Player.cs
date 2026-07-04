@@ -29,7 +29,6 @@ public class Player : NetworkBehaviour, IDamageable
     public bool isBlocking = false;
     public bool isDodging = false;
 
-
     [Header("Movement")]
     [SerializeField] private float jumpHeight;
     [SerializeField] public float baseWalkSpeed;
@@ -38,14 +37,12 @@ public class Player : NetworkBehaviour, IDamageable
     [SerializeField] float gravity = -20f;
     float verticalVelocity;
 
-
     [Header("Ground Check")]
     public LayerMask groundMask;
     private float groundDistance = 0.3f;
 
     public Vector2 movement;
     public Vector3 move;
-
 
     public bool isGrounded;
     public bool isRunning;
@@ -70,7 +67,7 @@ public class Player : NetworkBehaviour, IDamageable
     [Header("Stats")]
     public NetworkVariable<int> playerBaseCurrentHealth = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     [SerializeField] public int playerBaseMaxHealth;
-    public NetworkVariable<int> playerBaseCurrentStamina = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public NetworkVariable<int> playerBaseCurrentStamina = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     public int playerBaseMaxStamina;
     [SerializeField] public int playerBaseMinAP;
     [SerializeField] public int playerBaseMaxAP;
@@ -88,6 +85,7 @@ public class Player : NetworkBehaviour, IDamageable
     public GameObject playerHUD;
     public float skillCooldown;
     public bool skillInCooldown;
+    public float cooldownTimer;
     public NetworkVariable<bool> IsReadySynced = new NetworkVariable<bool>(false,
          NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
@@ -95,7 +93,7 @@ public class Player : NetworkBehaviour, IDamageable
     public event Action onDeath;
     public event Action onExhaust;
     public Coroutine staminaRegenCoroutine;
-    
+
     public override void OnNetworkSpawn()
     {
         healValue = 45;
@@ -117,20 +115,17 @@ public class Player : NetworkBehaviour, IDamageable
         {
             stateCam.Priority = 0;
             playerHUD.SetActive(false);
-
-
         }
+
         playerBaseCurrentHealth.OnValueChanged += (oldVal, newVal) => {
             if (newVal < oldVal)
             {
-                if(newVal <= 0)
-                {
-                    onDeath?.Invoke();
-                }
+                if (newVal <= 0) onDeath?.Invoke();
                 if (playerState == PlayerState.IsHealing) return;
                 onHurt?.Invoke();
             }
         };
+
         playerBaseCurrentStamina.OnValueChanged += (oldVal, newVal) => {
             if (newVal < oldVal)
             {
@@ -139,15 +134,23 @@ public class Player : NetworkBehaviour, IDamageable
                 {
                     onExhaust?.Invoke();
                 }
-                
-
             }
         };
 
-        playerBaseMaxHealth = 200;
-        playerBaseCurrentHealth.Value = playerBaseMaxHealth;
-        playerBaseMaxStamina = 100;
-        playerBaseCurrentStamina.Value = playerBaseMaxStamina;
+        // FIX: Only server writes NetworkVariables
+        if (IsServer)
+        {
+            playerBaseMaxHealth = 200;
+            playerBaseCurrentHealth.Value = playerBaseMaxHealth;
+            playerBaseMaxStamina = 100;
+            playerBaseCurrentStamina.Value = playerBaseMaxStamina;
+        }
+        else
+        {
+            playerBaseMaxHealth = 200;
+            playerBaseMaxStamina = 100;
+        }
+
         playerBaseMinAP = 11;
         playerBaseMaxAP = 13;
         playerBaseDefense = 13;
@@ -165,7 +168,6 @@ public class Player : NetworkBehaviour, IDamageable
         playerInputReader.onHeavyAttackStarted += PlayerHeavyAttack;
         playerInputReader.onLockOn += PlayerCameraLockOn;
         playerInputReader.onUniqueSkillStarted += PlayerUniqueSkill;
-
     }
 
     public override void OnNetworkDespawn()
@@ -179,7 +181,6 @@ public class Player : NetworkBehaviour, IDamageable
         playerInputReader.onMove -= PlayerMove;
         playerInputReader.jumpStarted -= PlayerJump;
         playerInputReader.onHeal -= PlayerHeal;
-
         playerInputReader.onLightAttackStarted -= PlayerLightAttack;
         playerInputReader.onHeavyAttackStarted -= PlayerHeavyAttack;
         playerInputReader.onUniqueSkillStarted -= PlayerUniqueSkill;
@@ -195,25 +196,21 @@ public class Player : NetworkBehaviour, IDamageable
 
     void Update()
     {
-
-        if (IsOwner) {
+        if (IsOwner)
+        {
             CheckGround();
             CalculateMovement();
             HandleComboReset();
 
-            if (!IsOwner) return;
-
             if (isDodging)
             {
                 ghostTimer += Time.deltaTime;
-
                 if (ghostTimer >= ghostSpawnDelay)
                 {
                     SpawnGhostServerRpc(transform.position, transform.rotation);
                     ghostTimer = 0f;
                 }
             }
-
         }
 
         if (playerState == PlayerState.IsJumping)
@@ -266,7 +263,6 @@ public class Player : NetworkBehaviour, IDamageable
             playerInputReader.hAttackAction.Disable();
             playerInputReader.dodgeAction.Disable();
             playerInputReader.blockAction.Disable();
-
         }
         else if (playerState == PlayerState.IsHurt)
         {
@@ -278,9 +274,8 @@ public class Player : NetworkBehaviour, IDamageable
             playerInputReader.hAttackAction.Disable();
             playerInputReader.dodgeAction.Disable();
             playerInputReader.blockAction.Disable();
-
         }
-        else if(playerState == PlayerState.IsExhausted)
+        else if (playerState == PlayerState.IsExhausted)
         {
             playerInputReader.sprintAction.Disable();
             playerInputReader.jumpAction.Disable();
@@ -301,9 +296,8 @@ public class Player : NetworkBehaviour, IDamageable
             playerInputReader.blockAction.Disable();
             playerInputReader.healAction.Disable();
             playerInputReader.moveAction.Disable();
-           
         }
-        else if (PauseManager.Instance.isPaused() || GameManager.Instance.isInConfirmation())
+        else if (PauseManager.Instance.isPaused() || GameManager.Instance.isInConfirmation() || anim.GetCurrentAnimatorStateInfo(0).IsName("Player_Kneel"))
         {
             playerInputReader.sprintAction.Disable();
             playerInputReader.jumpAction.Disable();
@@ -325,25 +319,24 @@ public class Player : NetworkBehaviour, IDamageable
             playerInputReader.healAction.Enable();
             playerInputReader.moveAction.Enable();
         }
+
         if (playerState != PlayerState.IsAttacking &&
-          playerState != PlayerState.IsDodging && playerState != PlayerState.IsExhausted &&
-          playerBaseCurrentStamina.Value < playerBaseMaxStamina)
+            playerState != PlayerState.IsDodging &&
+            playerState != PlayerState.IsExhausted &&
+            playerBaseCurrentStamina.Value < playerBaseMaxStamina)
         {
             if (staminaRegenCoroutine == null)
-            {
                 staminaRegenCoroutine = StartCoroutine(StaminaRegen());
-            }
         }
         else
         {
-            // Stop regenerating if they attack, dodge, or hit max stamina
             if (staminaRegenCoroutine != null)
             {
                 StopCoroutine(staminaRegenCoroutine);
-                staminaRegenCoroutine = null; // Reset the reference safely
+                staminaRegenCoroutine = null;
             }
         }
-}
+    }
 
     void FixedUpdate()
     {
@@ -351,42 +344,29 @@ public class Player : NetworkBehaviour, IDamageable
         if (playerState == PlayerState.IsHurt) return;
         if (!canMove && isBusy) return;
 
-        // Handle character rotation
         if (camLock != null && camLock.currentEnemy != null)
         {
-            // Force the player to INSTANTLY look at the enemy on the Y-axis.
-            // No Slerp lag means Cinemachine doesn't get tricked into shifting frame compositions.
             Vector3 dirToEnemy = (camLock.currentEnemy.position - transform.position).normalized;
             dirToEnemy.y = 0;
-
             if (dirToEnemy != Vector3.zero || playerState != PlayerState.IsDodging)
-            {
                 transform.rotation = Quaternion.LookRotation(dirToEnemy);
-            }
         }
         else
         {
-            // Unlocked: Smoothly rotate into your moving vector direction
-            if (move != Vector3.zero )
+            if (move != Vector3.zero)
             {
                 Quaternion rot = Quaternion.LookRotation(move);
                 transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.fixedDeltaTime * 10f);
             }
         }
 
-        // Standard physics translation execution loop
         float currentSpeed = isRunning ? runSpeed : baseWalkSpeed;
 
-        if (isGrounded && verticalVelocity < 0)
-        {
-            verticalVelocity = -2f;
-        }
-
+        if (isGrounded && verticalVelocity < 0) verticalVelocity = -2f;
         verticalVelocity += gravity * Time.fixedDeltaTime;
 
         Vector3 velocity = isBlocking ? move * currentWalkSpeed : move * currentSpeed;
         velocity.y = verticalVelocity;
-
         rb.MovePosition(rb.position + velocity * Time.fixedDeltaTime);
     }
 
@@ -408,18 +388,13 @@ public class Player : NetworkBehaviour, IDamageable
 
         if (camLock != null && camLock.currentEnemy != null)
         {
-            // 1. Establish the forward line directly from you to the enemy
             forward = (camLock.currentEnemy.position - transform.position).normalized;
-            forward.y = 0; // Lock it flat to the floor
+            forward.y = 0;
             forward.Normalize();
-
-            // 2. Derive the right vector cleanly using a cross product or standard 90-degree rotation.
-            // This stops the input matrix from changing based on Cinemachine's framing camera adjustments!
             right = new Vector3(forward.z, 0f, -forward.x);
         }
         else
         {
-            // Unlocked movement remains purely camera-relative
             forward = cameraTransform.forward;
             right = cameraTransform.right;
             forward.y = 0;
@@ -428,7 +403,6 @@ public class Player : NetworkBehaviour, IDamageable
             right.Normalize();
         }
 
-        // Recombine inputs securely
         move = forward * z + right * x;
     }
 
@@ -441,62 +415,34 @@ public class Player : NetworkBehaviour, IDamageable
         }
 
         float currentSpeed = isRunning ? runSpeed : baseWalkSpeed;
-
-
-        if (isGrounded && verticalVelocity < 0)
-        {
-            verticalVelocity = -2f;
-        }
-
+        if (isGrounded && verticalVelocity < 0) verticalVelocity = -2f;
         verticalVelocity += gravity * Time.deltaTime;
 
         Vector3 velocity = isBlocking ? move * currentSpeed : move * currentWalkSpeed;
         velocity.y = verticalVelocity;
-
-
     }
 
-    void PlayerMove(Vector2 input)
-    {
-        movement = input;
-    }
+    void PlayerMove(Vector2 input) { movement = input; }
 
     void PlayerJump()
     {
         if (isBusy) return;
-
-
         if (isGrounded)
         {
             playerState = PlayerState.IsJumping;
             verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
-
         }
-
-
     }
 
-    void SetSprint(bool value)
-    {
-        value = true;
-        isRunning = value;
+    void SetSprint(bool value) { value = true; isRunning = value; }
+    void EndSprint(bool value) { value = false; isRunning = value; }
+    public void PlayerInteract() { }
 
-    }
-    void EndSprint(bool value)
-    {
-        value = false;
-        isRunning = value;
-    }
-    public void PlayerInteract()
-    {
-
-    }
     public void PlayerHeal()
     {
         if (isBusy && playerBaseCurrentHealth.Value == playerBaseMaxHealth || currentPotionCount == 0) return;
         playerState = PlayerState.IsHealing;
     }
-
 
     // ======================
     // LIGHT ATTACK COMBO
@@ -504,42 +450,23 @@ public class Player : NetworkBehaviour, IDamageable
     public void PlayerLightAttack()
     {
         if (!IsOwner) return;
-        int staminaConsumption = 8;
+        int staminaConsumption = 12;
 
-     
         if (isBusy && playerState != PlayerState.IsAttacking) return;
-
-      
         if (playerState == PlayerState.IsAttacking && !canCombo) return;
-
-      
         if (isHeavyAttacking) return;
         if (playerBaseCurrentStamina.Value < staminaConsumption) return;
 
-       
         playerDamage = UnityEngine.Random.Range(playerBaseMinAP, playerBaseMaxAP);
         playerState = PlayerState.IsAttacking;
         comboTimer = 0f;
 
-      
-        if (comboStep == 0)
-        {
-            comboStep = 1;
-            canCombo = false;
-        }
-        else if (comboStep == 1 && canCombo)
-        {
-            comboStep = 2;
-            canCombo = false;
-        }
-        else if (comboStep == 2 && canCombo)
-        {
-            comboStep = 3;
-            canCombo = false;
-        }
+        if (comboStep == 0) { comboStep = 1; canCombo = false; }
+        else if (comboStep == 1 && canCombo) { comboStep = 2; canCombo = false; }
+        else if (comboStep == 2 && canCombo) { comboStep = 3; canCombo = false; }
 
-      
-        playerBaseCurrentStamina.Value -= staminaConsumption;
+        // FIX: Hindi na direkta ang write — ServerRpc na para gumana sa Player 2
+        DeductStaminaServerRpc(staminaConsumption);
     }
 
     // ======================
@@ -548,70 +475,49 @@ public class Player : NetworkBehaviour, IDamageable
     public void PlayerHeavyAttack()
     {
         if (!IsOwner) return;
+        int staminaConsumption = 23;
 
-        int staminaConsumption = 17;
-
-        // 1. Guard Clause: If busy with another action (like Dodge, Hurt, Heal), block it.
-        // But allow it if we are already in an attacking state (just like light attack handles it).
         if (isBusy && playerState != PlayerState.IsAttacking) return;
-
-        // 2. Guard Clause: If we are already executing a heavy attack, block duplicate inputs.
         if (isHeavyAttacking) return;
-
-        // 3. Guard Clause: If mid light-attack combo, don't allow a heavy attack override.
         if (comboStep != 0) return;
-
-        // 4. Guard Clause: Check stamina assets.
         if (playerBaseCurrentStamina.Value < staminaConsumption) return;
 
-        // ==========================================
-        // EXECUTE HEAVY ATTACK
-        // ==========================================
         int baseDamage = UnityEngine.Random.Range(playerBaseMinAP, playerBaseMaxAP);
         heavyDamage = baseDamage * 2;
         playerDamage = heavyDamage;
         playerState = PlayerState.IsAttacking;
         isHeavyAttacking = true;
-        comboTimer = 0f; // Clear combo tracker time arrays safely
+        comboTimer = 0f;
 
-        // Deduct stamina asset over the network wire
-        playerBaseCurrentStamina.Value -= staminaConsumption;
+        // FIX: Hindi na direkta ang write — ServerRpc na para gumana sa Player 2
+        DeductStaminaServerRpc(staminaConsumption);
     }
+
     public void PlayerUniqueSkill()
     {
-        if (skillInCooldown) return;
+        playerDamage = UnityEngine.Random.Range(playerBaseMinAP, playerBaseMaxAP) + uniqueSkillDamage;
+        if (skillInCooldown || isBusy) return;
+        if (!isGrounded) return;
         animationController.PlaySkill(skillTrigger);
-        playerDamage = uniqueSkillDamage;
         StartCoroutine(StartSkillCooldown());
-       
-        if(skillTrigger == "isSpeedSkill")
+        cooldownTimer = skillCooldown;
+
+        if (skillTrigger == "isSpeedSkill")
         {
-            if (!IsOwner) return;
-            if (isBusy) return;
-            if (!isGrounded) return;
             playerState = PlayerState.IsDodging;
             anim.applyRootMotion = false;
             isDodging = true;
-            Vector3 dodgeDir = move;
-
-            if (dodgeDir == Vector3.zero)
-            {
-                dodgeDir = transform.forward;
-            }
-
+            Vector3 dodgeDir = move == Vector3.zero ? transform.forward : move;
             rb.AddForce(dodgeDir * dodgeForce, ForceMode.Impulse);
-           
         }
-        else if(skillTrigger == "isTimeSkill")
+        else if (skillTrigger == "isTimeSkill")
         {
             playerState = PlayerState.IsHealing;
-           
         }
-        else if(skillTrigger == "isForceSkill" || skillTrigger == "isMassSkill")
+        else if (skillTrigger == "isForceSkill" || skillTrigger == "isMassSkill")
         {
             playerState = PlayerState.IsAttacking;
             anim.SetBool("isAttacking", true);
-          
         }
     }
 
@@ -620,30 +526,20 @@ public class Player : NetworkBehaviour, IDamageable
     // ======================
     void HandleComboReset()
     {
-
         if (comboStep > 0)
         {
             comboTimer += Time.deltaTime;
-
-            if (comboTimer >= comboResetTime)
-            {
-                ResetCombo();
-
-            }
+            if (comboTimer >= comboResetTime) ResetCombo();
         }
     }
 
-    public void EnableNextCombo()
-    {
-        canCombo = true;
-    }
+    public void EnableNextCombo() { canCombo = true; }
 
     public void ResetCombo()
     {
         comboStep = 0;
         canCombo = false;
         comboTimer = 0f;
-
         anim.SetInteger("LightAttack", 0);
     }
 
@@ -651,46 +547,27 @@ public class Player : NetworkBehaviour, IDamageable
     {
         playerState = PlayerState.None;
         isHeavyAttacking = false;
-
-
     }
 
-    public void DisableMove()
-    {
-        canMove = false;
-    }
-
-    public void EnableMove()
-    {
-        canMove = true;
-    }
-
-
-
+    public void DisableMove() { canMove = false; }
+    public void EnableMove() { canMove = true; }
 
     public void Dodge()
     {
         if (!IsOwner) return;
         if (isBusy) return;
-        int staminaConsumption = 15;
+        int staminaConsumption = 19;
         if (playerBaseCurrentStamina.Value < staminaConsumption) return;
         playerState = PlayerState.IsDodging;
         if (!isGrounded) return;
 
         anim.applyRootMotion = false;
         isDodging = true;
-        Vector3 dodgeDir = move;
-
-        if (dodgeDir == Vector3.zero)
-        {
-            dodgeDir = transform.forward;
-        }
-
+        Vector3 dodgeDir = move == Vector3.zero ? transform.forward : move;
         rb.AddForce(dodgeDir * dodgeForce, ForceMode.Impulse);
-        playerBaseCurrentStamina.Value -= staminaConsumption;
 
-
-
+        // FIX: Hindi na direkta ang write — ServerRpc na para gumana sa Player 2
+        DeductStaminaServerRpc(staminaConsumption);
     }
 
     void StartBlock()
@@ -699,7 +576,6 @@ public class Player : NetworkBehaviour, IDamageable
         if (isBlocking) return;
         playerState = PlayerState.IsBlocking;
         isBlocking = true;
-
     }
 
     void StopBlock()
@@ -708,95 +584,102 @@ public class Player : NetworkBehaviour, IDamageable
         playerState = PlayerState.None;
         isBlocking = false;
     }
+
     void PlayerOnDeath()
     {
-       
         playerBaseCurrentHealth.Value = 0;
         playerState = PlayerState.IsDead;
         Cursor.lockState = CursorLockMode.None;
-       
     }
+
+    // ======================
+    // TAKE DAMAGE
+    // ======================
     public void TakeDamage(int damage, Vector3 hitDir)
     {
+        // FIX: Server lang ang mag-process ng damage — para consistent sa Player 1 at Player 2
+        if (!IsServer) return;
+
         if (playerState == PlayerState.IsDead || isDodging || anim.GetCurrentAnimatorStateInfo(1).IsName("HeavyHit")) return;
-    
-       
+
         int healthDamage = (damage * damage) / (damage + playerBaseDefense);
         int staminaDamage = Mathf.RoundToInt(healthDamage * (5f / 2f));
-        float knockbackForce = (anim.GetCurrentAnimatorStateInfo(1).IsName("Player_Exhaust"))? 16f: 5.5f;
+        float knockbackForce = anim.GetCurrentAnimatorStateInfo(1).IsName("Player_Exhaust") ? 16f : 5f;
+
         ResetCombo();
-        ApplyKnockbackClientRpc(knockbackForce, hitDir);
 
         if (isHeavyAttacking || playerState == PlayerState.IsAttacking)
         {
-            isHeavyAttacking = false; // Turn off the flag immediately
-            canMove = true;           // Restore movement authorization tracking
-                                      // Set state to hurt so Update() loop stops locking down raw input maps
-            
+            isHeavyAttacking = false;
+            canMove = true;
         }
+
+        // BLOCKING: bawasan stamina, maliit na health damage
         if (playerState == PlayerState.IsBlocking && isBlocking)
         {
-            playerBaseCurrentHealth.Value -= healthDamage / 5;
+            healthDamage = 8;
+            knockbackForce = 6f;
+
+            // FIX: Stamina reduction habang nagbo-block — dati gumagana na ito pero kailangan ng IsServer check
             playerBaseCurrentStamina.Value -= staminaDamage;
+            if (playerBaseCurrentStamina.Value < 0) playerBaseCurrentStamina.Value = 0;
+
+            ApplyKnockbackClientRpc(knockbackForce, hitDir);
+            playerBaseCurrentHealth.Value -= healthDamage;
+            if (playerBaseCurrentHealth.Value < 0) playerBaseCurrentHealth.Value = 0;
+
             if (playerBaseCurrentStamina.Value <= 0)
             {
                 onExhaust?.Invoke();
-
-
-                return;
+                StartCoroutine(Flinch());
             }
             return;
-
         }
-        playerState = PlayerState.IsHurt;
+
+        ApplyKnockbackClientRpc(knockbackForce, hitDir);
 
         playerBaseCurrentHealth.Value -= healthDamage;
-
-    
+        if (playerBaseCurrentHealth.Value < 0) playerBaseCurrentHealth.Value = 0;
 
        
-        if (playerBaseCurrentHealth.Value <= 0)
-        {
-            PlayerOnDeath();
-          
-        }
      
-      
-       
+        if (playerBaseCurrentStamina.Value < 0) playerBaseCurrentStamina.Value = 0;
+
+        playerState = PlayerState.IsHurt;
+
+        if (playerBaseCurrentHealth.Value <= 0) PlayerOnDeath();
+    }
+
+    // FIX: Bagong ServerRpc para sa stamina deduction ng player actions
+    // Kailangan ito kasi Server write permission na ang stamina, hindi na Owner
+    [ServerRpc(RequireOwnership = false)]
+    private void DeductStaminaServerRpc(int amount)
+    {
+        playerBaseCurrentStamina.Value -= amount;
+        if (playerBaseCurrentStamina.Value < 0) playerBaseCurrentStamina.Value = 0;
     }
 
     [Rpc(SendTo.Everyone, InvokePermission = RpcInvokePermission.Everyone)]
     private void ApplyKnockbackClientRpc(float force, Vector3 dir)
     {
-       
         ApplyPlayerKnockback(force, dir);
     }
 
-
     public void ApplyPlayerKnockback(float knockbackForce, Vector3 hitDir)
     {
-      
         anim.applyRootMotion = false;
-
-       
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
-
-     
         rb.AddForce(hitDir * knockbackForce, ForceMode.Impulse);
-
         Debug.Log("Knockback Applied");
     }
+
     public void PlayerCameraLockOn()
     {
         if (!IsOwner) return;
-
-     
-        if (camLock != null)
-        {
-            camLock.ToggleLockOn();
-        }
+        if (camLock != null) camLock.ToggleLockOn();
     }
+
     void ResetState()
     {
         anim.applyRootMotion = true;
@@ -805,46 +688,43 @@ public class Player : NetworkBehaviour, IDamageable
         animationController.ResetAttacking();
         Debug.Log("Nonee");
     }
+
     void ResetPlayerStamina()
     {
+        // FIX: Server lang ang makakawrite
+        if (!IsServer) return;
         playerBaseCurrentStamina.Value = playerBaseMaxStamina;
     }
-    void DecreasePotionCount()
-    {
-        currentPotionCount--;
-    }
+
+    void DecreasePotionCount() { currentPotionCount--; }
+
     void HealPlayer()
     {
-        healValue *= 1;
+        // FIX: Server lang ang makakawrite ng health
+        if (!IsServer) return;
         int damageToHealth = playerBaseMaxHealth - playerBaseCurrentHealth.Value;
         playerBaseCurrentHealth.Value += healValue;
-        if(healValue > damageToHealth)
-        {
-            playerBaseCurrentHealth.Value = playerBaseMaxHealth;
-        }
-
+        if (healValue > damageToHealth) playerBaseCurrentHealth.Value = playerBaseMaxHealth;
     }
+
     void TriggerTimeSkillEffects()
     {
+        // FIX: Server lang ang makakawrite ng health
+        if (!IsServer) return;
         healValue *= 2;
         int damageToHealth = playerBaseMaxHealth - playerBaseCurrentHealth.Value;
         playerBaseCurrentHealth.Value += healValue;
-        if (healValue > damageToHealth)
-        {
-            playerBaseCurrentHealth.Value = playerBaseMaxHealth;
-        }
-        if(currentPotionCount <= maxPotionCount)
-        {
-            currentPotionCount += 1;
-        }
-        
+        if (healValue > damageToHealth) playerBaseCurrentHealth.Value = playerBaseMaxHealth;
+        if (currentPotionCount != maxPotionCount) currentPotionCount += 1;
     }
+
     void SetPlayerDeath()
     {
         if (!IsOwner) return;
         GameManager.Instance.NotifyPlayerDeathRpc();
-        GetComponent<NetworkObject>().Despawn();
+        StartCoroutine(DespawnDelay());
     }
+
     [Rpc(SendTo.Server)]
     public void SetReadyRpc()
     {
@@ -853,32 +733,34 @@ public class Player : NetworkBehaviour, IDamageable
     }
 
     [ServerRpc]
-void SpawnGhostServerRpc(Vector3 pos, Quaternion rot)
-{
-    SpawnGhostClientRpc(pos, rot);
-}
-
-[ClientRpc]
-void SpawnGhostClientRpc(Vector3 pos, Quaternion rot)
-{
-    GameObject ghost = Instantiate(ghostPrefab, pos, rot);
-
-    Animator ghostAnim = ghost.GetComponent<Animator>();
-    Animator myAnim = GetComponent<Animator>();
-
-    if (ghostAnim != null && myAnim != null)
+    void SpawnGhostServerRpc(Vector3 pos, Quaternion rot)
     {
-        ghostAnim.Play(myAnim.GetCurrentAnimatorStateInfo(0).fullPathHash, 0, 0f);
-        ghostAnim.speed = 0f;
+        SpawnGhostClientRpc(pos, rot);
     }
-}
- public void EndDodge()
- {
-    isDodging = false;
-    ghostTimer = 0f;
- }
+
+    [ClientRpc]
+    void SpawnGhostClientRpc(Vector3 pos, Quaternion rot)
+    {
+        GameObject ghost = Instantiate(ghostPrefab, pos, rot);
+        Animator ghostAnim = ghost.GetComponent<Animator>();
+        Animator myAnim = GetComponent<Animator>();
+        if (ghostAnim != null && myAnim != null)
+        {
+            ghostAnim.Play(myAnim.GetCurrentAnimatorStateInfo(0).fullPathHash, 0, 0f);
+            ghostAnim.speed = 0f;
+        }
+    }
+
+    public void EndDodge()
+    {
+        isDodging = false;
+        ghostTimer = 0f;
+    }
+
     private IEnumerator StaminaRegen()
     {
+        // FIX: Server lang ang mag-regen ng stamina dahil Server write permission na
+        if (!IsServer) yield break;
 
         while (playerBaseCurrentStamina.Value < playerBaseMaxStamina)
         {
@@ -887,27 +769,32 @@ void SpawnGhostClientRpc(Vector3 pos, Quaternion rot)
         }
         staminaRegenCoroutine = null;
     }
+
     [ServerRpc]
     public void RequestDamageWindowServerRpc(float duration)
     {
-        // The server grabs its own attached components and initiates the timing loop
         EnemyAttackHitboxScript[] hitboxes = GetComponentsInChildren<EnemyAttackHitboxScript>();
         foreach (var hitbox in hitboxes)
-        {
             hitbox.StartDamageWindow(duration);
-        }
     }
+
     private IEnumerator StartSkillCooldown()
     {
-       
-        
-            skillInCooldown = true;
-
-            yield return new WaitForSeconds(skillCooldown);
-
-            skillInCooldown = false;
-
-            Debug.Log("Skill ready!");
-        
+        skillInCooldown = true;
+        yield return new WaitForSeconds(skillCooldown);
+        skillInCooldown = false;
+        Debug.Log("Skill ready!");
     }
-}   
+
+    private IEnumerator Flinch()
+    {
+        playerInputReader.moveAction.Disable();
+        yield return new WaitForSeconds(0.8f);
+        playerInputReader.moveAction.Enable();
+    }
+    private IEnumerator DespawnDelay()
+    {
+        yield return new WaitForSeconds(3f);
+        GetComponent<NetworkObject>().Despawn();
+    }
+}

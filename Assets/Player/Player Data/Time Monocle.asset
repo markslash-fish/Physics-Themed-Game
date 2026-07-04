@@ -23,7 +23,7 @@ MonoBehaviour:
   defenseBonus: 0
   healthBonus: 16
   staminaBonus: 2
-  speedBonus: 2
+  speedBonus: 0.5
   senseBonus: 0.4
   cooldownReductionBonus: 0
   heavyAttackBonus: 0

@@ -142,6 +142,13 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
+      - time: 0.8914874
+        functionName: ResetCombo
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       - time: 0.9107612
         functionName: ResetState
         data: 
@@ -149,8 +156,8 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.93328804
-        functionName: ResetCombo
+      - time: 0.96803653
+        functionName: ResetTrails
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
@@ -158,13 +165,6 @@ ModelImporter:
         messageOptions: 0
       - time: 0.9895013
         functionName: EnableMove
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.96803653
-        functionName: ResetTrails
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0

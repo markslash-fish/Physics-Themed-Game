@@ -17,4 +17,4 @@ MonoBehaviour:
   maxRange: 7
   baseWeight: 55
   animTrigger: isFrontDash
-  cooldown: 3.5
+  cooldown: 5
