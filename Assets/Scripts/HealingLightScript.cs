@@ -2,20 +2,27 @@ using UnityEngine;
 
 public class HealingLightScript : MonoBehaviour
 {
-    public void OnTriggerStay(Collider other)
+    public bool isInTrigger;
+    public GameObject buttonVisual = null;
+    public void OnTriggerEnter(Collider other)
     {
         if(other.gameObject.CompareTag("Player"))
         {
-           var player = other.GetComponent<Player>();
-            if(player.currentPotionCount != player.maxPotionCount)
+            var player = other.GetComponent<Player>();
+            
+
+            if (player != null && player.IsLocalPlayer)
             {
-                player.currentPotionCount = player.maxPotionCount;
+                isInTrigger = true;
+                buttonVisual.SetActive(true);
+
             }
-           if(player.playerBaseCurrentHealth.Value != player.playerBaseMaxHealth)
-            {
-                player.playerBaseCurrentHealth.Value = player.playerBaseMaxHealth;
-            }
-           
+
         }
+    }
+    public void OnTriggerExit(Collider other)
+    {
+        isInTrigger = false;
+        buttonVisual.SetActive(false);
     }
 }

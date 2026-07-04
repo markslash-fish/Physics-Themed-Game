@@ -4,7 +4,7 @@ using Unity.Netcode;
 using UnityEngine;
 
 public class EnemyAttackHitboxScript : NetworkBehaviour
-{      
+{
     PlayerVfx vfx;
     PlayerSoundFX sfx;
     public List<Collider> ignoredColliders = new List<Collider>();
@@ -19,9 +19,7 @@ public class EnemyAttackHitboxScript : NetworkBehaviour
 
     private void Awake()
     {
-        // Using components in parent, but safely checking them later depending on hitBoxType
         enemyAI = GetComponentInParent<EnemyAI>();
-
         player = GetComponentInParent<Player>();
         vfx = GetComponentInParent<PlayerVfx>();
     }
@@ -41,9 +39,9 @@ public class EnemyAttackHitboxScript : NetworkBehaviour
         sfx = GetComponentInParent<PlayerSoundFX>();
     }
 
-    // FIX 1: Allow the Owner (Player 2 client, or Host enemy) to start the coroutine locally
     public void StartDamageWindow(float duration)
     {
+        // FIX: IsOwner check is correct — only the owner starts the coroutine
         if (!IsOwner) return;
 
         if (attackRoutine != null) StopCoroutine(attackRoutine);
@@ -63,9 +61,9 @@ public class EnemyAttackHitboxScript : NetworkBehaviour
         }
     }
 
-    // FIX 2: Let the Owner perform the Physics query for instant responsiveness 
     public void DealDamage()
     {
+        // FIX: IsOwner check is correct — only the owner does the physics query
         if (!IsOwner) return;
 
         Vector3 spherePos = transform.TransformPoint(attackPointOffset);
@@ -73,49 +71,78 @@ public class EnemyAttackHitboxScript : NetworkBehaviour
 
         foreach (Collider entity in hitEntities)
         {
-            // We verify the object is part of the Netcode network simulation
-            if (entity.TryGetComponent(out IDamageable damageable))
+            if (ignoredColliders.Contains(entity)) continue;
+
+            // FIX: Get the NetworkObject to send its ID to the server
+            if (entity.TryGetComponent(out NetworkObject targetNetObj))
             {
-                if (!ignoredColliders.Contains(entity))
-                {
-                    int damage = (hitBoxType == "Player") ? player.playerDamage : enemyAI.enemyDamage;
-                    Vector3 hitDir = (entity.transform.position - transform.parent.position).normalized;
-                    hitDir.y = 0.15f;
+                int damage = (hitBoxType == "Player") ? player.playerDamage : enemyAI.enemyDamage;
+                Vector3 hitDir = (entity.transform.position - transform.parent.position).normalized;
+                hitDir.y = 0.15f;
 
+                // FIX: Send damage request to server so it works for ALL clients including Player 2
+                RequestDamageServerRpc(targetNetObj.NetworkObjectId, damage, hitDir);
 
-                       damageable.TakeDamage(damage, hitDir);
+                // Play SFX and VFX locally on the owner (feels responsive)
+                PlayHitEffects();
 
-                        ///SOUND Effect////
-                        if(hitBoxType == "Player")
-                        {
-                            sfx.LAttackSFX();
-                            vfx.PlayImpactLeft();
-                        }
-                        else
-                        {
-                            sfx.RAttackSFX();
-                            vfx.PlayImpactRight();
-                            
-                        }
-                        sfx.HeavyAttackSFX();
-                        vfx.ReleaseHeavy();
+                ignoredColliders.Add(entity);
 
-                        ////VFX /////
-                        
-                        ignoredColliders.Add(entity);
-
-                    Debug.Log("AAAAAAAAAAAAA");
-                   }
-               
-                
-                }
+                Debug.Log("Hit registered, sending to server!");
             }
+            // Fallback: if no NetworkObject but has IDamageable (local-only objects)
+            else if (entity.TryGetComponent(out IDamageable localDamageable))
+            {
+                int damage = (hitBoxType == "Player") ? player.playerDamage : enemyAI.enemyDamage;
+                Vector3 hitDir = (entity.transform.position - transform.parent.position).normalized;
+                hitDir.y = 0.15f;
 
+                localDamageable.TakeDamage(damage, hitDir);
+                PlayHitEffects();
+                ignoredColliders.Add(entity);
+            }
+        }
+    }
 
-        
-     }
- 
+    // FIX: ServerRpc — this runs on the HOST/SERVER, so damage is always applied correctly
+    // RequireOwnership = true means only the owner of this object can call this (default, safe)
+    [ServerRpc]
+    private void RequestDamageServerRpc(ulong targetNetworkObjectId, int damage, Vector3 hitDir)
+    {
+        // Find the target NetworkObject on the server
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(targetNetworkObjectId, out NetworkObject targetNetObj))
+        {
+            // Apply damage via IDamageable — this runs on the server so it syncs to all clients
+            if (targetNetObj.TryGetComponent(out IDamageable damageable))
+            {
+                damageable.TakeDamage(damage, hitDir);
+                Debug.Log($"Server applied {damage} damage to {targetNetObj.name}");
+            }
+        }
+    }
+
+    private void PlayHitEffects()
+    {
+        if (hitBoxType == "Player")
+        {
+            sfx.LAttackSFX();
+            vfx.PlayImpactLeft();
+        }
+        else
+        {
+            sfx.RAttackSFX();
+            vfx.PlayImpactRight();
+        }
+        sfx.HeavyAttackSFX();
+        vfx.ReleaseHeavy();
+    }
+
     public void ResetIgnoredList()
+    {
+        ignoredColliders.Clear();
+    }
+
+    public void ResetHitbox()
     {
         ignoredColliders.Clear();
     }
@@ -125,10 +152,5 @@ public class EnemyAttackHitboxScript : NetworkBehaviour
         Gizmos.color = Color.green;
         Vector3 spherePos = transform.TransformPoint(attackPointOffset);
         Gizmos.DrawWireSphere(spherePos, attackRange);
-    }
-
-    public void ResetHitbox()
-    {
-        ignoredColliders.Clear();
     }
 }

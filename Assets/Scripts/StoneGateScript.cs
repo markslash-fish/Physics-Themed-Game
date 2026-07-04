@@ -4,7 +4,7 @@ using UnityEngine;
 public class StoneGateScript : MonoBehaviour
 {
     [SerializeField] Animator animator;
-    public GameObject floatingButtonUI = null;
+    public GameObject buttonVisual = null;
 
 
     [Header("Audio Settings")]
@@ -36,13 +36,14 @@ public class StoneGateScript : MonoBehaviour
             if (player != null && player.IsLocalPlayer && !player.IsReadySynced.Value)
             {
                 isInTrigger = true;
-                floatingButtonUI.SetActive(true);
+                buttonVisual.SetActive(true);
             }
         }
     }
     private void OnTriggerExit(Collider other)
     {
         isInTrigger = false;
+        buttonVisual.SetActive(false);
     }
     public void OpenGate()
     {
@@ -70,7 +71,7 @@ public class StoneGateScript : MonoBehaviour
 
 
         GameManager.Instance.confirmationWindow.SetActive(false);
-        floatingButtonUI.SetActive(false);
+        buttonVisual.SetActive(false);
 
         
         isInTrigger = false;

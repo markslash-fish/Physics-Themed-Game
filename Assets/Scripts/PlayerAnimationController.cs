@@ -64,8 +64,7 @@ public class PlayerAnimationController : NetworkBehaviour
             player.playerState = Player.PlayerState.IsExhausted;
         }
       
-
-
+      
         PlayMove();
     }
     void PlayMove()
@@ -169,10 +168,12 @@ public class PlayerAnimationController : NetworkBehaviour
     }
    public void PlayHit()
     {
-        player.playerState = Player.PlayerState.IsHurt;
+       
         if (player.isBlocking && player.playerState == Player.PlayerState.IsBlocking) return;
         if (player.playerState == Player.PlayerState.IsDodging) return;
 
+
+        player.playerState = Player.PlayerState.IsHurt;
         anim.ResetControllerState();
         if (anim.GetCurrentAnimatorStateInfo(1).IsName("Player_Exhaust"))
         {
@@ -205,6 +206,10 @@ public class PlayerAnimationController : NetworkBehaviour
     void PlayDeath()
     {
         anim.SetTrigger("isDead");
+    }
+   public void PlayKneel()
+    {
+        anim.SetTrigger("Kneel");
     }
   
        

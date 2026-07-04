@@ -18,6 +18,9 @@ public class PlayerHealthUI : MonoBehaviour
     public float delay = 0.8f;
     public float damageSpeed = 2f;
     public float healSpeed = 2f;
+    [Header("Skill Cooldown UI")]
+    public TMP_Text cooldownText;
+   
 
     [Header("Potion Count")]
     public TMP_Text potionCounter;
@@ -29,6 +32,25 @@ public class PlayerHealthUI : MonoBehaviour
     private void Update()
     {
         potionCounter.SetText(player.currentPotionCount.ToString());
+
+        // 1. Check the actual running timer directly instead of comparing them
+        if (player.cooldownTimer > 0f)
+        {
+            player.cooldownTimer -= Time.deltaTime;
+
+            if (player.cooldownTimer < 0f)
+            {
+                player.cooldownTimer = 0f;
+            }
+
+            // Show the actual numbers ticking down
+            cooldownText.SetText(player.cooldownTimer.ToString("0.0"));
+        }
+        // 2. If the timer is 0, it's ready!
+        else
+        {
+            cooldownText.SetText("Skill Ready");
+        }
     }
     public void SetHealth(float current, float max)
     {

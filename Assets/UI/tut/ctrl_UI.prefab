@@ -1799,6 +1799,7 @@ GameObject:
   - component: {fileID: 3219869565971341701}
   - component: {fileID: 8285458630523194057}
   - component: {fileID: 4561078284436633325}
+  - component: {fileID: 7412499828129460974}
   m_Layer: 5
   m_Name: ctrl_UI
   m_TagString: Untagged
@@ -1889,3 +1890,15 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &7412499828129460974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9216109796869732328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2368530c0fbe11b46b508c9793b4e2c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ControlUIScript
